@@ -1,0 +1,1850 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Questões | ULYSSES</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+
+    <style>
+
+        :root {
+            --bg-body: #f8fafc;
+            --surface: #ffffff;
+
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
+
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+
+            --border: #e2e8f0;
+
+            --success: #16a34a;
+            --success-light: #f0fdf4;
+
+            --danger: #dc2626;
+            --danger-light: #fef2f2;
+
+            --warning: #d97706;
+            --warning-light: #fffbeb;
+
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+
+            --shadow-sm:
+                0 1px 3px rgba(0,0,0,.05);
+
+            --shadow-md:
+                0 10px 25px -5px rgba(0,0,0,.05),
+                0 8px 10px -6px rgba(0,0,0,.03);
+        }
+
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        body {
+            font-family:
+                'Inter',
+                system-ui,
+                -apple-system,
+                sans-serif;
+
+            background: var(--bg-body);
+
+            background-image:
+                radial-gradient(
+                    #e2e8f0 1px,
+                    transparent 1px
+                );
+
+            background-size: 24px 24px;
+
+            color: var(--text-main);
+
+            min-height: 100vh;
+
+            display: flex;
+            flex-direction: column;
+
+            -webkit-font-smoothing: antialiased;
+        }
+
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        .header {
+            height: 68px;
+
+            background:
+                rgba(255,255,255,.85);
+
+            backdrop-filter: blur(8px);
+
+            border-bottom:
+                1px solid var(--border);
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 0 32px;
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 10;
+        }
+
+
+        .logo {
+            font-size: 19px;
+
+            font-weight: 800;
+
+            color: var(--primary);
+
+            letter-spacing: .5px;
+
+            text-decoration: none;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+        }
+
+
+        .aluno {
+            font-size: 13px;
+
+            color: var(--text-muted);
+
+            font-weight: 500;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            background: var(--surface);
+
+            padding: 6px 14px;
+
+            border-radius: 20px;
+
+            border: 1px solid var(--border);
+
+            box-shadow: var(--shadow-sm);
+        }
+
+
+        .aluno strong {
+            color: var(--text-main);
+
+            font-weight: 700;
+        }
+
+
+        /* =========================
+           CONTAINER
+        ========================= */
+
+        .container {
+            width: 100%;
+
+            max-width: 760px;
+
+            margin: 40px auto;
+
+            padding: 0 24px;
+
+            flex-grow: 1;
+        }
+
+
+        .topo {
+            margin-bottom: 24px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 20px;
+        }
+
+
+        .topo h1 {
+            font-size: 24px;
+
+            font-weight: 800;
+
+            margin-bottom: 4px;
+        }
+
+
+        .topo p {
+            color: var(--text-muted);
+
+            font-size: 14px;
+        }
+
+
+        /* =========================
+           CRONÔMETRO
+        ========================= */
+
+        .cronometro {
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            background: var(--surface);
+
+            border: 1px solid var(--border);
+
+            border-radius: 12px;
+
+            padding: 10px 16px;
+
+            box-shadow: var(--shadow-sm);
+
+            color: var(--primary);
+
+            font-weight: 800;
+
+            font-size: 16px;
+
+            min-width: 115px;
+
+            justify-content: center;
+        }
+
+
+        .cronometro i {
+            width: 18px;
+            height: 18px;
+        }
+
+
+        .cronometro-tempo {
+            font-variant-numeric: tabular-nums;
+
+            letter-spacing: 1px;
+        }
+
+
+        /* =========================
+           CARD
+        ========================= */
+
+        .questao-card {
+            background: var(--surface);
+
+            border: 1px solid var(--border);
+
+            border-radius: var(--radius-lg);
+
+            padding: 32px;
+
+            box-shadow: var(--shadow-md);
+
+            position: relative;
+
+            overflow: hidden;
+        }
+
+
+        /* =========================
+           PROGRESSO
+        ========================= */
+
+        .progress-bar-container {
+            position: absolute;
+
+            top: 0;
+
+            left: 0;
+
+            right: 0;
+
+            height: 4px;
+
+            background: #f1f5f9;
+        }
+
+
+        .progress-bar-fill {
+            height: 100%;
+
+            background: var(--primary);
+
+            transition: width .3s ease;
+        }
+
+
+        /* =========================
+           CABEÇALHO DA QUESTÃO
+        ========================= */
+
+        .questao-topo {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            margin-bottom: 24px;
+
+            padding-bottom: 16px;
+
+            border-bottom: 1px solid var(--border);
+        }
+
+
+        .numero {
+            font-size: 15px;
+
+            font-weight: 700;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 6px;
+        }
+
+
+        .numero span {
+            color: var(--primary);
+        }
+
+
+        /* =========================
+           TAGS
+        ========================= */
+
+        .informacoes {
+            display: flex;
+
+            gap: 8px;
+
+            align-items: center;
+        }
+
+
+        .tag {
+            padding: 4px 10px;
+
+            border-radius: 6px;
+
+            font-size: 12px;
+
+            font-weight: 600;
+        }
+
+
+        .tag-serie {
+            background: var(--primary-light);
+
+            color: var(--primary);
+
+            border: 1px solid #bfdbfe;
+        }
+
+
+        .tag-facil {
+            background: #f0fdf4;
+
+            color: #16a34a;
+
+            border: 1px solid #bbf7d0;
+        }
+
+
+        .tag-medio {
+            background: #fffbeb;
+
+            color: #d97706;
+
+            border: 1px solid #fef3c7;
+        }
+
+
+        .tag-dificil {
+            background: #fef2f2;
+
+            color: #dc2626;
+
+            border: 1px solid #fecaca;
+        }
+
+
+        /* =========================
+           ENUNCIADO
+        ========================= */
+
+        .enunciado-label {
+            font-size: 11px;
+
+            text-transform: uppercase;
+
+            font-weight: 700;
+
+            color: var(--text-muted);
+
+            letter-spacing: .05em;
+
+            margin-bottom: 10px;
+        }
+
+
+        .enunciado {
+            font-size: 16px;
+
+            line-height: 1.6;
+
+            font-weight: 500;
+
+            margin-bottom: 28px;
+
+            white-space: pre-line;
+        }
+
+
+        /* =========================
+           ALTERNATIVAS
+        ========================= */
+
+        .alternativas {
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 12px;
+        }
+
+
+        .alternativa {
+            display: flex;
+
+            align-items: flex-start;
+
+            gap: 14px;
+
+            padding: 16px;
+
+            border: 1px solid var(--border);
+
+            border-radius: var(--radius-md);
+
+            cursor: pointer;
+
+            transition: all .2s ease;
+
+            background: var(--surface);
+        }
+
+
+        .alternativa:hover {
+            border-color: #93c5fd;
+
+            background: var(--primary-light);
+        }
+
+
+        .alternativa input {
+            appearance: none;
+
+            width: 18px;
+
+            height: 18px;
+
+            border: 2px solid #cbd5e1;
+
+            border-radius: 50%;
+
+            margin-top: 2px;
+
+            flex-shrink: 0;
+
+            position: relative;
+        }
+
+
+        .alternativa input:checked {
+            border-color: var(--primary);
+
+            background: var(--primary);
+        }
+
+
+        .alternativa input:checked::after {
+            content: '';
+
+            position: absolute;
+
+            top: 4px;
+
+            left: 4px;
+
+            width: 6px;
+
+            height: 6px;
+
+            background: white;
+
+            border-radius: 50%;
+        }
+
+
+        .letra {
+            font-weight: 700;
+
+            color: var(--primary);
+
+            font-size: 15px;
+        }
+
+
+        .texto-alternativa {
+            font-size: 15px;
+
+            line-height: 1.5;
+
+            flex-grow: 1;
+        }
+
+
+        /* =========================
+           RESPOSTA CORRETA
+        ========================= */
+
+        .alternativa-correta {
+            background: var(--success-light) !important;
+
+            border-color: #86efac !important;
+
+            box-shadow:
+                0 0 0 1px var(--success);
+        }
+
+
+        .alternativa-correta .letra {
+            color: var(--success);
+        }
+
+
+        /* =========================
+           RESPOSTA ERRADA
+        ========================= */
+
+        .alternativa-errada {
+            background: var(--danger-light) !important;
+
+            border-color: #fca5a5 !important;
+
+            box-shadow:
+                0 0 0 1px var(--danger);
+        }
+
+
+        .alternativa-errada .letra {
+            color: var(--danger);
+        }
+
+
+        /* =========================
+           FEEDBACK
+        ========================= */
+
+        .feedback {
+            margin-top: 20px;
+
+            padding: 16px;
+
+            border-radius: var(--radius-md);
+
+            display: flex;
+
+            gap: 12px;
+        }
+
+
+        .feedback-correto {
+            background: var(--success-light);
+
+            border: 1px solid #bbf7d0;
+
+            color: var(--success);
+        }
+
+
+        .feedback-incorreto {
+            background: var(--danger-light);
+
+            border: 1px solid #fecaca;
+
+            color: var(--danger);
+        }
+
+
+        .feedback-conteudo {
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 5px;
+        }
+
+
+        .feedback-titulo {
+            font-size: 15px;
+
+            font-weight: 800;
+        }
+
+
+        .feedback-texto {
+            font-size: 14px;
+
+            color: var(--text-main);
+        }
+
+
+        /* =========================
+           BOTÕES
+        ========================= */
+
+        .botoes-navegacao {
+            display: flex;
+
+            gap: 12px;
+
+            margin-top: 32px;
+
+            padding-top: 20px;
+
+            border-top: 1px solid var(--border);
+        }
+
+
+        .btn-responder {
+            width: 100%;
+
+            height: 48px;
+
+            border: none;
+
+            border-radius: var(--radius-sm);
+
+            background: var(--primary);
+
+            color: white;
+
+            font-size: 14px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 8px;
+
+            font-family: inherit;
+
+            text-decoration: none;
+        }
+
+
+        .btn-responder:hover {
+            background: var(--primary-hover);
+        }
+
+
+        /* =========================
+           RESULTADO FINAL
+        ========================= */
+
+        .resultado-final {
+            text-align: center;
+
+            padding: 40px 32px;
+        }
+
+
+        .resultado-topo h2 {
+            font-size: 26px;
+
+            margin-bottom: 8px;
+        }
+
+
+        .resultado-topo p {
+            color: var(--text-muted);
+
+            font-size: 14px;
+        }
+
+
+        .resultado-nota {
+            margin: 25px 0;
+        }
+
+
+        .nota-label {
+            display: block;
+
+            font-size: 13px;
+
+            color: var(--text-muted);
+        }
+
+
+        .resultado-nota strong {
+            font-size: 52px;
+
+            color: var(--primary);
+
+            font-weight: 800;
+        }
+
+
+        .nota-total {
+            font-size: 20px;
+
+            color: var(--text-muted);
+        }
+
+
+        .resultado-estatisticas {
+            display: flex;
+
+            gap: 12px;
+
+            margin-bottom: 25px;
+        }
+
+
+        .resultado-item {
+            flex: 1;
+
+            padding: 18px;
+
+            border-radius: 10px;
+
+            background: #f8fafc;
+
+            border: 1px solid var(--border);
+        }
+
+
+        .resultado-item strong {
+            display: block;
+
+            font-size: 24px;
+
+            margin-bottom: 5px;
+        }
+
+
+        .resultado-item span {
+            font-size: 13px;
+
+            color: var(--text-muted);
+        }
+
+
+        .acertos strong {
+            color: var(--success);
+        }
+
+
+        .erros strong {
+            color: var(--danger);
+        }
+
+
+        .total strong {
+            color: var(--primary);
+        }
+
+
+        /* =========================
+           TEMPO FINAL
+        ========================= */
+
+        .resultado-tempo {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 8px;
+
+            margin-bottom: 25px;
+
+            padding: 14px;
+
+            background: var(--primary-light);
+
+            border: 1px solid #bfdbfe;
+
+            border-radius: 10px;
+
+            color: var(--primary);
+
+            font-weight: 700;
+
+            font-size: 15px;
+        }
+
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        .footer {
+            text-align: center;
+
+            padding: 24px;
+
+            color: var(--text-muted);
+
+            font-size: 13px;
+        }
+
+
+        /* =========================
+           RESPONSIVO
+        ========================= */
+
+        @media(max-width:600px) {
+
+            .header {
+                padding: 0 16px;
+            }
+
+
+            .container {
+                margin: 20px auto;
+
+                padding: 0 16px;
+            }
+
+
+            .questao-card {
+                padding: 20px;
+            }
+
+
+            .topo {
+                flex-direction: column;
+
+                align-items: flex-start;
+            }
+
+
+            .cronometro {
+                width: 100%;
+            }
+
+
+            .questao-topo {
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                gap: 12px;
+            }
+
+
+            .informacoes {
+                flex-wrap: wrap;
+            }
+
+
+            .resultado-estatisticas {
+                gap: 8px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<header class="header">
+
+    <a href="{% url 'home' %}" class="logo">
+
+        <i data-lucide="graduation-cap"></i>
+
+        ULYSSES
+
+    </a>
+
+
+    {% if aluno %}
+
+        <div class="aluno">
+
+            <i data-lucide="user"></i>
+
+            <span>
+
+                Aluno:
+
+                <strong>
+
+                    {{ aluno.nome }}
+
+                </strong>
+
+            </span>
+
+        </div>
+
+    {% endif %}
+
+</header>
+
+
+
+<main class="container">
+
+
+    <!-- =========================
+         TOPO
+    ========================= -->
+
+    <div class="topo">
+
+        <div>
+
+            <h1>
+                Caderno de Questões
+            </h1>
+
+            <p>
+                Responda às questões com atenção.
+            </p>
+
+        </div>
+
+
+        {% if questao_atual and not questionario_finalizado %}
+
+            <!-- CRONÔMETRO -->
+
+            <div class="cronometro">
+
+                <i data-lucide="timer"></i>
+
+                <span
+                    id="cronometro"
+                    class="cronometro-tempo"
+                >
+                    00:00
+                </span>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+
+    {% if questionario_finalizado %}
+
+
+        <!-- =========================
+             RESULTADO FINAL
+        ========================= -->
+
+        <div class="questao-card resultado-final">
+
+
+            <div class="resultado-topo">
+
+                <h2>
+                    Questionário finalizado!
+                </h2>
+
+                <p>
+                    Confira seu resultado abaixo.
+                </p>
+
+            </div>
+
+
+
+            <div class="resultado-nota">
+
+                <span class="nota-label">
+                    Sua nota
+                </span>
+
+                <strong>
+                    {{ nota|floatformat:2 }}
+                </strong>
+
+                <span class="nota-total">
+                    / 10
+                </span>
+
+            </div>
+
+
+
+            <div class="resultado-estatisticas">
+
+
+                <div class="resultado-item acertos">
+
+                    <strong>
+                        {{ acertos }}
+                    </strong>
+
+                    <span>
+                        Acertos
+                    </span>
+
+                </div>
+
+
+                <div class="resultado-item erros">
+
+                    <strong>
+                        {{ erros }}
+                    </strong>
+
+                    <span>
+                        Erros
+                    </span>
+
+                </div>
+
+
+                <div class="resultado-item total">
+
+                    <strong>
+                        {{ total_resultado }}
+                    </strong>
+
+                    <span>
+                        Questões
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- TEMPO TOTAL -->
+
+            <div class="resultado-tempo">
+
+                <i data-lucide="timer"></i>
+
+                <span>
+                    Tempo total:
+                </span>
+
+                <strong id="tempo-final">
+                    {{ tempo_segundos|default:0 }}
+                </strong>
+
+            </div>
+
+
+
+            <div class="botoes-navegacao">
+
+                <a
+                    href="{% url 'home' %}"
+                    class="btn-responder"
+                >
+
+                    <i data-lucide="home"></i>
+
+                    Voltar ao Início
+
+                </a>
+
+            </div>
+
+
+        </div>
+
+
+
+    {% elif questao_atual %}
+
+
+        <!-- =========================
+             QUESTÃO
+        ========================= -->
+
+        <div class="questao-card">
+
+
+            <!-- PROGRESSO -->
+
+            <div class="progress-bar-container">
+
+                <div
+                    class="progress-bar-fill"
+                    style="
+                        width:
+                        {% widthratio numero_questao total_questoes 100 %}%;
+                    "
+                ></div>
+
+            </div>
+
+
+
+            <!-- CABEÇALHO -->
+
+            <div class="questao-topo">
+
+
+                <div class="numero">
+
+                    <i data-lucide="help-circle"></i>
+
+                    <span>
+                        Questão {{ numero_questao }}
+                    </span>
+
+                    de {{ total_questoes }}
+
+                </div>
+
+
+
+                <div class="informacoes">
+
+
+                    <span class="tag tag-serie">
+
+                        {{ questao_atual.get_serie_display }}
+
+                    </span>
+
+
+                    {% if questao_atual.dificuldade == 'facil' %}
+
+                        <span class="tag tag-facil">
+                            Fácil
+                        </span>
+
+                    {% elif questao_atual.dificuldade == 'medio' %}
+
+                        <span class="tag tag-medio">
+                            Médio
+                        </span>
+
+                    {% elif questao_atual.dificuldade == 'dificil' %}
+
+                        <span class="tag tag-dificil">
+                            Difícil
+                        </span>
+
+                    {% endif %}
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- ENUNCIADO -->
+
+            <div class="enunciado-label">
+                Enunciado
+            </div>
+
+
+            <div class="enunciado">
+
+                {{ questao_atual.enunciado }}
+
+            </div>
+
+
+
+            <!-- =========================
+                 ALTERNATIVAS
+            ========================= -->
+
+            <form
+                method="post"
+                id="form-questao"
+            >
+
+                {% csrf_token %}
+
+
+                <!-- CAMPO DO TEMPO -->
+
+                <input
+                    type="hidden"
+                    name="tempo_segundos"
+                    id="tempo_segundos"
+                    value="0"
+                >
+
+
+
+                <div class="alternativas">
+
+
+                    <!-- A -->
+
+                    <label
+                        class="
+                            alternativa
+
+                            {% if resposta_mostrada %}
+
+                                {% if questao_atual.resposta_correta == 'A' %}
+
+                                    alternativa-correta
+
+                                {% elif resposta_escolhida == 'A' %}
+
+                                    alternativa-errada
+
+                                {% endif %}
+
+                            {% endif %}
+                        "
+                    >
+
+                        <input
+                            type="radio"
+                            name="resposta"
+                            value="A"
+
+                            {% if resposta_atual == 'A' %}
+                                checked
+                            {% endif %}
+
+                            {% if resposta_mostrada %}
+                                disabled
+                            {% endif %}
+                        >
+
+                        <span class="letra">
+                            A)
+                        </span>
+
+                        <span class="texto-alternativa">
+
+                            {{ questao_atual.alternativa_a }}
+
+                        </span>
+
+                    </label>
+
+
+
+                    <!-- B -->
+
+                    <label
+                        class="
+                            alternativa
+
+                            {% if resposta_mostrada %}
+
+                                {% if questao_atual.resposta_correta == 'B' %}
+
+                                    alternativa-correta
+
+                                {% elif resposta_escolhida == 'B' %}
+
+                                    alternativa-errada
+
+                                {% endif %}
+
+                            {% endif %}
+                        "
+                    >
+
+                        <input
+                            type="radio"
+                            name="resposta"
+                            value="B"
+
+                            {% if resposta_atual == 'B' %}
+                                checked
+                            {% endif %}
+
+                            {% if resposta_mostrada %}
+                                disabled
+                            {% endif %}
+                        >
+
+                        <span class="letra">
+                            B)
+                        </span>
+
+                        <span class="texto-alternativa">
+
+                            {{ questao_atual.alternativa_b }}
+
+                        </span>
+
+                    </label>
+
+
+
+                    <!-- C -->
+
+                    <label
+                        class="
+                            alternativa
+
+                            {% if resposta_mostrada %}
+
+                                {% if questao_atual.resposta_correta == 'C' %}
+
+                                    alternativa-correta
+
+                                {% elif resposta_escolhida == 'C' %}
+
+                                    alternativa-errada
+
+                                {% endif %}
+
+                            {% endif %}
+                        "
+                    >
+
+                        <input
+                            type="radio"
+                            name="resposta"
+                            value="C"
+
+                            {% if resposta_atual == 'C' %}
+                                checked
+                            {% endif %}
+
+                            {% if resposta_mostrada %}
+                                disabled
+                            {% endif %}
+                        >
+
+                        <span class="letra">
+                            C)
+                        </span>
+
+                        <span class="texto-alternativa">
+
+                            {{ questao_atual.alternativa_c }}
+
+                        </span>
+
+                    </label>
+
+
+
+                    <!-- D -->
+
+                    <label
+                        class="
+                            alternativa
+
+                            {% if resposta_mostrada %}
+
+                                {% if questao_atual.resposta_correta == 'D' %}
+
+                                    alternativa-correta
+
+                                {% elif resposta_escolhida == 'D' %}
+
+                                    alternativa-errada
+
+                                {% endif %}
+
+                            {% endif %}
+                        "
+                    >
+
+                        <input
+                            type="radio"
+                            name="resposta"
+                            value="D"
+
+                            {% if resposta_atual == 'D' %}
+                                checked
+                            {% endif %}
+
+                            {% if resposta_mostrada %}
+                                disabled
+                            {% endif %}
+                        >
+
+                        <span class="letra">
+                            D)
+                        </span>
+
+                        <span class="texto-alternativa">
+
+                            {{ questao_atual.alternativa_d }}
+
+                        </span>
+
+                    </label>
+
+
+                </div>
+
+
+
+                <!-- =========================
+                     RESPONDER
+                ========================= -->
+
+                {% if not resposta_mostrada %}
+
+                    <div class="botoes-navegacao">
+
+                        <button
+                            type="submit"
+                            name="acao"
+                            value="responder"
+                            class="btn-responder"
+                        >
+
+                            RESPONDER
+
+                            <i data-lucide="check"></i>
+
+                        </button>
+
+                    </div>
+
+                {% endif %}
+
+
+            </form>
+
+
+
+            <!-- =========================
+                 FEEDBACK
+            ========================= -->
+
+            {% if resposta_mostrada %}
+
+
+                {% if acertou %}
+
+                    <div class="feedback feedback-correto">
+
+                        <i data-lucide="circle-check"></i>
+
+                        <div class="feedback-conteudo">
+
+                            <div class="feedback-titulo">
+
+                                Resposta correta!
+
+                            </div>
+
+                            <div class="feedback-texto">
+
+                                Muito bem! Você acertou esta questão.
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                {% else %}
+
+                    <div class="feedback feedback-incorreto">
+
+                        <i data-lucide="circle-x"></i>
+
+                        <div class="feedback-conteudo">
+
+                            <div class="feedback-titulo">
+
+                                Você errou esta questão.
+
+                            </div>
+
+                            <div class="feedback-texto">
+
+                                A resposta correta está destacada em verde.
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+
+
+                <!-- =========================
+                     PRÓXIMA QUESTÃO
+                ========================= -->
+
+                <div class="botoes-navegacao">
+
+                    <form
+                        method="post"
+                        style="width:100%;"
+                    >
+
+                        {% csrf_token %}
+
+
+                        <!-- Envia também o tempo -->
+
+                        <input
+                            type="hidden"
+                            name="tempo_segundos"
+                            id="tempo_segundos_proxima"
+                            value="0"
+                        >
+
+
+                        <button
+                            type="submit"
+                            name="acao"
+                            value="{% if ultima_questao %}finalizar{% else %}avancar{% endif %}"
+                            class="btn-responder"
+                        >
+
+                            {% if ultima_questao %}
+
+                                Finalizar questionário
+
+                                <i data-lucide="check"></i>
+
+                            {% else %}
+
+                                Próxima questão
+
+                                <i data-lucide="arrow-right"></i>
+
+                            {% endif %}
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+
+            {% endif %}
+
+
+        </div>
+
+
+    {% else %}
+
+
+        <!-- =========================
+             SEM QUESTÕES
+        ========================= -->
+
+        <div class="questao-card resultado-final">
+
+            <h2>
+                Nenhuma questão disponível
+            </h2>
+
+            <p>
+                Ainda não existem questões cadastradas para esta série.
+            </p>
+
+        </div>
+
+
+    {% endif %}
+
+
+</main>
+
+
+
+<footer class="footer">
+
+    ULYSSES • Sistema Educacional
+
+</footer>
+
+
+
+<script>
+
+    lucide.createIcons();
+
+
+    /* =========================================
+       CRONÔMETRO
+    ========================================= */
+
+    {% if questao_atual and not questionario_finalizado %}
+
+        let tempoInicial = localStorage.getItem(
+            "ulysses_tempo_inicio"
+        );
+
+
+        /*
+         * Se ainda não existe um horário de início,
+         * cria agora.
+         */
+
+        if (!tempoInicial) {
+
+            tempoInicial = Date.now();
+
+            localStorage.setItem(
+                "ulysses_tempo_inicio",
+                tempoInicial
+            );
+
+        }
+
+
+        function atualizarCronometro() {
+
+            const agora = Date.now();
+
+
+            /*
+             * Calcula quantos segundos já passaram.
+             */
+
+            const segundos =
+                Math.floor(
+                    (agora - Number(tempoInicial)) / 1000
+                );
+
+
+            const minutos =
+                Math.floor(segundos / 60);
+
+
+            const segundosRestantes =
+                segundos % 60;
+
+
+            const minutosFormatados =
+                String(minutos).padStart(2, "0");
+
+
+            const segundosFormatados =
+                String(segundosRestantes).padStart(2, "0");
+
+
+            const cronometro =
+                document.getElementById("cronometro");
+
+
+            if (cronometro) {
+
+                cronometro.textContent =
+                    `${minutosFormatados}:${segundosFormatados}`;
+
+            }
+
+
+            /*
+             * Guarda o tempo no campo hidden
+             * do formulário.
+             */
+
+            const campoTempo =
+                document.getElementById("tempo_segundos");
+
+
+            if (campoTempo) {
+
+                campoTempo.value = segundos;
+
+            }
+
+
+            /*
+             * Campo utilizado pelo botão
+             * Próxima questão / Finalizar.
+             */
+
+            const campoProxima =
+                document.getElementById(
+                    "tempo_segundos_proxima"
+                );
+
+
+            if (campoProxima) {
+
+                campoProxima.value = segundos;
+
+            }
+
+        }
+
+
+        /*
+         * Atualiza imediatamente.
+         */
+
+        atualizarCronometro();
+
+
+        /*
+         * Atualiza a cada segundo.
+         */
+
+        setInterval(
+            atualizarCronometro,
+            1000
+        );
+
+
+    {% endif %}
+
+
+
+    /* =========================================
+       FINALIZAÇÃO DO QUESTIONÁRIO
+    ========================================= */
+
+    {% if questionario_finalizado %}
+
+        /*
+         * Quando o questionário termina,
+         * não precisamos mais continuar contando.
+         */
+
+        localStorage.removeItem(
+            "ulysses_tempo_inicio"
+        );
+
+    {% endif %}
+
+
+
+    /* =========================================
+       ANTES DE RESPONDER
+    ========================================= */
+
+    const formulario =
+        document.getElementById("form-questao");
+
+
+    if (formulario) {
+
+        formulario.addEventListener(
+            "submit",
+            function () {
+
+                const campoTempo =
+                    document.getElementById(
+                        "tempo_segundos"
+                    );
+
+
+                if (campoTempo) {
+
+                    const inicio =
+                        localStorage.getItem(
+                            "ulysses_tempo_inicio"
+                        );
+
+
+                    if (inicio) {
+
+                        const agora =
+                            Date.now();
+
+
+                        const segundos =
+                            Math.floor(
+                                (
+                                    agora -
+                                    Number(inicio)
+                                ) / 1000
+                            );
+
+
+                        campoTempo.value =
+                            segundos;
+
+                    }
+
+                }
+
+            }
+        );
+
+    }
+
+</script>
+
+
+</body>
+
+</html>

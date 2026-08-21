@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alunos por RA | ULYSSES</title>
+    
+    <!-- Tipografia Plus Jakarta Sans e Ícones Lucide -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            /* Paleta de Cores (Light Mode - Padrão) */
+            --bg-body: #f8fafc;
+            --surface: #ffffff;
+            --surface-hover: #f1f5f9;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            
+            /* Utilitários */
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-pill: 9999px;
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Paleta de Cores (Dark Mode Automático) */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0f172a; /* Slate 900 */
+                --surface: #1e293b; /* Slate 800 */
+                --surface-hover: #334155; /* Slate 700 */
+                --primary: #3b82f6; /* Blue 500 */
+                --primary-hover: #60a5fa; /* Blue 400 */
+                --primary-light: rgba(59, 130, 246, 0.1);
+                --text-main: #f1f5f9; /* Slate 100 */
+                --text-muted: #94a3b8; /* Slate 400 */
+                --border: #334155; /* Slate 700 */
+                --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+                --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            transition: background-color var(--transition), color var(--transition);
+        }
+
+        /* HEADER */
+        .header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            height: 64px;
+            display: flex;
+            align-items: center;
+            padding: 0 32px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .logo {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* MAIN CONTAINER */
+        .container {
+            width: 100%;
+            max-width: 1040px;
+            margin: 32px auto 64px;
+            padding: 0 24px;
+        }
+
+        /* BREADCRUMB */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            font-weight: 500;
+        }
+
+        .breadcrumb a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color var(--transition);
+        }
+
+        .breadcrumb a:hover {
+            color: var(--primary);
+        }
+
+        /* TITULO SEÇÃO */
+        .header-section {
+            margin-bottom: 32px;
+        }
+
+        .title h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.03em;
+            margin-bottom: 6px;
+        }
+
+        .title p {
+            color: var(--text-muted);
+            font-size: 15px;
+            font-weight: 400;
+        }
+
+        /* TOOLBAR (Pesquisa e Contador) */
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            background: var(--surface);
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .search-box input {
+            width: 100%;
+            height: 42px;
+            padding: 0 12px 0 40px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-family: inherit;
+            font-weight: 500;
+            color: var(--text-main);
+            outline: none;
+            transition: var(--transition);
+            background: var(--bg-body);
+        }
+
+        .search-box input:focus {
+            background: var(--surface);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            width: 18px;
+            height: 18px;
+            pointer-events: none;
+        }
+
+        .counter {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .counter span {
+            color: var(--text-main);
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        /* CARD TABELA */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            min-width: 600px; /* Garante que não quebre em telas muito pequenas */
+        }
+
+        th {
+            background: var(--bg-body);
+            padding: 16px 24px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+            letter-spacing: 0.05em;
+        }
+
+        td {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            font-size: 15px;
+            color: var(--text-main);
+            vertical-align: middle;
+            transition: background-color 0.1s ease;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Efeito Hover na Linha */
+        tbody tr:hover td {
+            background: var(--primary-light);
+        }
+
+        /* Info do Aluno (Avatar + Nome) */
+        .student-info {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: var(--radius-pill);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border: 1px solid var(--border);
+        }
+        
+        .avatar i {
+            width: 18px;
+            height: 18px;
+            stroke-width: 2.5;
+        }
+
+        .student-name {
+            font-weight: 600;
+            color: var(--text-main);
+            letter-spacing: -0.01em;
+        }
+
+        /* Badges */
+        .badge-ra {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--bg-body);
+            color: var(--text-main);
+            padding: 6px 12px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 600;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .badge-ra:hover {
+            background: var(--surface-hover);
+            border-color: var(--text-muted);
+            transform: translateY(-1px);
+        }
+
+        .badge-ra:active {
+            transform: translateY(0px);
+        }
+
+        .badge-ra i {
+            width: 14px;
+            height: 14px;
+            color: var(--primary);
+        }
+
+        .badge-serie {
+            display: inline-flex;
+            align-items: center;
+            background: var(--surface-hover);
+            color: var(--text-main);
+            padding: 4px 10px;
+            border-radius: var(--radius-pill);
+            font-size: 12px;
+            font-weight: 700;
+            border: 1px solid var(--border);
+        }
+        
+        /* Ajuste badge serie no dark mode */
+        @media (prefers-color-scheme: dark) {
+            .badge-serie {
+                background: rgba(241, 245, 249, 0.1); /* Sutil destaque */
+            }
+        }
+
+        /* ESTADO VAZIO */
+        .empty-state {
+            text-align: center;
+            padding: 64px 24px;
+            background: var(--surface);
+        }
+
+        .empty-state-icon {
+            width: 64px;
+            height: 64px;
+            color: var(--primary);
+            margin: 0 auto 20px;
+            opacity: 0.8;
+            background: var(--primary-light);
+            padding: 16px;
+            border-radius: var(--radius-pill);
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
+            font-size: 15px;
+            margin-bottom: 24px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn-add {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            height: 42px;
+            padding: 0 20px;
+            background: var(--primary);
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 600;
+            transition: var(--transition);
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-add:hover {
+            background: var(--primary-hover);
+            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* FOOTER */
+        .footer {
+            text-align: center;
+            margin-top: 48px;
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        /* NOTIFICAÇÃO TOAST */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #0f172a; /* Sempre escuro para contraste */
+            color: #ffffff;
+            padding: 12px 20px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            z-index: 100;
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            .toast {
+                background: #f1f5f9; /* Inverte no dark mode */
+                color: #0f172a;
+            }
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        /* RESPONSIVIDADE */
+        @media (max-width: 768px) {
+            .header { padding: 0 20px; }
+            .container { padding: 0 16px; margin-top: 24px; }
+            .title h1 { font-size: 24px; }
+            .toolbar { flex-direction: column; align-items: stretch; padding: 12px; gap: 12px; }
+            .search-box { max-width: 100%; }
+            .counter { text-align: center; border-top: 1px solid var(--border); padding-top: 8px;}
+            th, td { padding: 12px 16px; font-size: 14px; }
+            .avatar { width: 32px; height: 32px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo">
+            <i data-lucide="graduation-cap"></i>
+            ULYSSES
+        </div>
+    </header>
+
+    <main class="container">
+
+        <div class="breadcrumb">
+            <a href="{% url 'home' %}" target="_self">Início</a>
+            <i data-lucide="chevron-right" style="width: 14px; height: 14px; stroke-width: 3;"></i>
+            <span>Registro de Alunos</span>
+        </div>
+
+        <div class="header-section">
+            <div class="title">
+                <h1>Alunos por RA</h1>
+                <p>Consulte e localize os registros acadêmicos dos alunos cadastrados.</p>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <div class="search-box">
+                <i data-lucide="search" class="search-icon"></i>
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="Buscar por nome, RA ou série..." 
+                    onkeyup="filterStudents()"
+                >
+            </div>
+
+            <div class="counter">
+                Total de alunos encontrados: <span id="studentCount">{{ alunos|length }}</span>
+            </div>
+        </div>
+
+        <div class="card">
+            {% if alunos %}
+                <div class="table-container">
+                    <table id="studentsTable">
+                        <thead>
+                            <tr>
+                                <th>Aluno</th>
+                                <th>Série / Ano</th>
+                                <th>Registro Acadêmico (RA)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for aluno in alunos %}
+                                <tr class="student-row">
+                                    <td>
+                                        <div class="student-info">
+                                            <div class="avatar">
+                                                <!-- Ícone genérico modernizado -->
+                                                <i data-lucide="user"></i>
+                                            </div>
+                                            <span class="student-name">{{ aluno.nome }}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge-serie">
+                                            {% if aluno.get_serie_display %}
+                                                {{ aluno.get_serie_display }}
+                                            {% else %}
+                                                {{ aluno.serie|default:"Não informada" }}
+                                            {% endif %}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge-ra" title="Clique para copiar RA" onclick="copyRA('{{ aluno.ra }}')">
+                                            <i data-lucide="copy"></i>
+                                            {{ aluno.ra }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Estado de busca sem resultados -->
+                <div id="noResults" class="empty-state" style="display: none; border-top: 1px solid var(--border);">
+                    <i data-lucide="search-x" class="empty-state-icon"></i>
+                    <h3>Nenhum aluno encontrado</h3>
+                    <p>Verifique o termo digitado ou tente buscar por um RA diferente.</p>
+                </div>
+            {% else %}
+                <!-- Estado sem nenhum aluno cadastrado no banco -->
+                <div class="empty-state">
+                    <i data-lucide="users" class="empty-state-icon"></i>
+                    <h3>Nenhum aluno cadastrado</h3>
+                    <p>Parece que ainda não há alunos no sistema. Comece registrando o primeiro aluno da instituição.</p>
+                    <a href="{% url 'alunos:cadastrar' %}" class="btn-add">
+                        <i data-lucide="user-plus" style="width: 18px; height: 18px;"></i>
+                        Cadastrar aluno agora
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="footer">
+            ULYSSES • Sistema Educacional &copy; 2024
+        </div>
+
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <i data-lucide="check-circle" style="width: 18px; height: 18px; color: #4ade80;"></i>
+        <span>RA copiado para a área de transferência!</span>
+    </div>
+
+    <script>
+        // Inicializa os ícones do Lucide
+        lucide.createIcons();
+
+        // Função de Filtragem (JS Puro mantido)
+        function filterStudents() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('.student-row');
+            const noResults = document.getElementById('noResults');
+            const table = document.getElementById('studentsTable');
+            const counter = document.getElementById('studentCount');
+            const tableHead = document.querySelector('table thead');
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                // Pega o texto do nome e do RA para busca
+                const studentName = row.querySelector('.student-name').textContent.toLowerCase();
+                const studentRA = row.querySelector('.badge-ra').textContent.toLowerCase();
+                // Opcional: incluir série na busca
+                const studentSerie = row.querySelector('.badge-serie').textContent.toLowerCase();
+
+                if (studentName.includes(input) || studentRA.includes(input) || studentSerie.includes(input)) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // Atualiza o contador
+            if (counter) counter.textContent = visibleCount;
+
+            // Gerencia exibição da tabela vs estado vazio
+            if (noResults && table) {
+                if (visibleCount === 0) {
+                    if(tableHead) tableHead.style.display = 'none'; // Esconde o header também
+                    noResults.style.display = 'block';
+                } else {
+                    if(tableHead) tableHead.style.display = 'table-header-group';
+                    noResults.style.display = 'none';
+                }
+            }
+        }
+
+        // Função para copiar RA (JS Puro mantido e melhorado)
+        function copyRA(raText) {
+            // Remove espaços em branco extras que possam vir do template
+            const cleanRAText = raText.trim();
+            
+            navigator.clipboard.writeText(cleanRAText).then(() => {
+                const toast = document.getElementById('toast');
+                toast.classList.add('show');
+                
+                // Remove o toast após 2.5 segundos
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 2500);
+            }).catch(err => {
+                console.error('Erro ao copiar RA: ', err);
+                alert('Não foi possível copiar o RA automaticamente.');
+            });
+        }
+    </script>
+
+</body>
+</html>

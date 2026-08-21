@@ -1,0 +1,372 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intensivo ULYSSES</title>
+
+    <!-- Tipografia Plus Jakarta Sans e Ícones Lucide -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            /* Paleta de Cores (Light Mode - Padrão) */
+            --bg-body: #f8fafc;
+            --surface: #ffffff;
+            --surface-hover: #f1f5f9;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
+            --primary-border: #bfdbfe;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --dot-pattern: #cbd5e1;
+
+            /* Utilitários */
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 10px 25px -5px rgba(37, 99, 235, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Paleta de Cores (Dark Mode Automático) */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0f172a;
+                --surface: #1e293b;
+                --surface-hover: #334155;
+                --primary: #3b82f6;
+                --primary-hover: #60a5fa;
+                --primary-light: rgba(59, 130, 246, 0.12);
+                --primary-border: rgba(59, 130, 246, 0.3);
+                --text-main: #f1f5f9;
+                --text-muted: #94a3b8;
+                --border: #334155;
+                --dot-pattern: #334155;
+                --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+                --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background: var(--bg-body);
+            background-image: radial-gradient(var(--dot-pattern) 1px, transparent 1px);
+            background-size: 24px 24px;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            -webkit-font-smoothing: antialiased;
+            transition: background-color var(--transition), color var(--transition);
+        }
+
+        /* HEADER */
+        .header {
+            width: 100%;
+            background: var(--surface);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--border);
+            height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            transition: var(--transition);
+        }
+
+        .logo {
+            font-size: 19px;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .professor-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 16px;
+            background: var(--surface);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .professor-link:hover {
+            background: var(--surface-hover);
+            border-color: var(--text-muted);
+            transform: translateY(-1px);
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            max-width: 680px;
+            width: 100%;
+            padding: 40px 24px;
+            margin: auto 0;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 20px;
+            margin-bottom: 24px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            border: 1px solid var(--primary-border);
+        }
+
+        h1 {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 16px;
+            line-height: 1.15;
+            letter-spacing: -0.03em;
+        }
+
+        p.subtitle {
+            font-size: 17px;
+            color: var(--text-muted);
+            margin-bottom: 36px;
+            line-height: 1.6;
+            max-width: 520px;
+            font-weight: 500;
+        }
+
+        /* BUTTONS */
+        .botoes {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            width: 100%;
+            max-width: 340px;
+        }
+
+        .botao {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            height: 48px;
+            padding: 0 24px;
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 600;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .botao-primary {
+            background: var(--primary);
+            color: #ffffff;
+            box-shadow: var(--shadow-md);
+        }
+
+        .botao-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .botao-secondary {
+            background: var(--surface);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .botao-secondary:hover {
+            background: var(--surface-hover);
+            border-color: var(--text-muted);
+            transform: translateY(-2px);
+        }
+
+        /* FEATURES / HIGHLIGHTS */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            width: 100%;
+            margin-top: 48px;
+            padding-top: 32px;
+            border-top: 1px solid var(--border);
+        }
+
+        .feature-card {
+            background: var(--surface);
+            padding: 20px 16px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary);
+        }
+
+        .feature-icon {
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .feature-card h4 {
+            font-size: 16px;
+            color: var(--text-main);
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .feature-card p {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* FOOTER */
+        .footer {
+            width: 100%;
+            text-align: center;
+            padding: 24px 0;
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        @media (max-width: 640px) {
+            .header { padding: 0 16px; }
+            h1 { font-size: 32px; }
+            p.subtitle { font-size: 15px; }
+            .features {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <a href="{% url 'home' %}" class="logo">
+            <i data-lucide="graduation-cap" style="width: 24px; height: 24px;"></i>
+            ULYSSES
+        </a>
+
+        <a href="{% url 'area_professor' %}" class="professor-link">
+            <i data-lucide="settings" style="width: 16px; height: 16px;"></i>
+            Área do Professor
+        </a>
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="main-content">
+
+        <span class="badge">
+            <i data-lucide="sparkles" style="width: 14px; height: 14px;"></i>
+            Plataforma Educacional
+        </span>
+
+        <h1>INTENSIVO ULYSSES</h1>
+
+        <p class="subtitle">
+            Acesse os simulados, acompanhe seu desempenho
+            e supere seus limites na preparação acadêmica.
+        </p>
+
+        <!-- BOTÕES DE AÇÃO -->
+        <div class="botoes">
+            <a href="{% url 'turma' %}" class="botao botao-primary">
+                <i data-lucide="rocket" style="width: 18px; height: 18px;"></i>
+                Iniciar Treinamento
+            </a>
+
+            <a href="{% url 'alunos:ranking' %}" class="botao botao-secondary">
+                <i data-lucide="trophy" style="width: 18px; height: 18px; color: #d97706;"></i>
+                Ver Ranking
+            </a>
+        </div>
+
+        <!-- DESTAQUES -->
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i data-lucide="laptop" style="width: 22px; height: 22px;"></i>
+                </div>
+                <h4>100%</h4>
+                <p>Digital</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i data-lucide="target" style="width: 22px; height: 22px;"></i>
+                </div>
+                <h4>Foco</h4>
+                <p>Desempenho</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i data-lucide="shield-check" style="width: 22px; height: 22px;"></i>
+                </div>
+                <h4>Gestão</h4>
+                <p>Por RA</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        ULYSSES • Sistema Educacional
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,28 @@
+from django.db import models
+
+
+class Aluno(models.Model):
+
+    SERIES = [
+        ('6', '6º Ano'),
+        ('7', '7º Ano'),
+        ('8', '8º Ano'),
+        ('9', '9º Ano'),
+    ]
+
+    nome = models.CharField(
+        max_length=150
+    )
+
+    ra = models.CharField(
+        max_length=30,
+        unique=True
+    )
+
+    serie = models.CharField(
+        max_length=10,
+        choices=SERIES
+    )
+
+    def __str__(self):
+        return f"{self.nome} - RA: {self.ra}"

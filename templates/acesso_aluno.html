@@ -1,0 +1,436 @@
+{% extends 'base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesso do Aluno | ULYSSES</title>
+
+    <!-- Tipografia Plus Jakarta Sans e Ícones Lucide -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            /* Paleta de Cores (Light Mode - Padrão) */
+            --bg-body: #f8fafc;
+            --surface: #ffffff;
+            --surface-hover: #f1f5f9;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --danger: #ef4444;
+            --danger-light: #fef2f2;
+            --danger-border: #fecaca;
+            --success: #16a34a;
+            --success-light: #f0fdf4;
+            --success-border: #bbf7d0;
+            --dot-pattern: #cbd5e1;
+
+            /* Utilitários */
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Paleta de Cores (Dark Mode Automático) */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0f172a;
+                --surface: #1e293b;
+                --surface-hover: #334155;
+                --primary: #3b82f6;
+                --primary-hover: #60a5fa;
+                --primary-light: rgba(59, 130, 246, 0.12);
+                --text-main: #f1f5f9;
+                --text-muted: #94a3b8;
+                --border: #334155;
+                --danger: #f87171;
+                --danger-light: rgba(239, 68, 68, 0.12);
+                --danger-border: rgba(239, 68, 68, 0.3);
+                --success: #4ade80;
+                --success-light: rgba(34, 197, 94, 0.12);
+                --success-border: rgba(34, 197, 94, 0.3);
+                --dot-pattern: #334155;
+                --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+                --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background: var(--bg-body);
+            background-image: radial-gradient(var(--dot-pattern) 1px, transparent 1px);
+            background-size: 24px 24px;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            -webkit-font-smoothing: antialiased;
+            transition: background-color var(--transition), color var(--transition);
+        }
+
+        /* HEADER */
+        .header {
+            width: 100%;
+            max-width: 1000px;
+            height: 68px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-size: 19px;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-back-home {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border-radius: var(--radius-md);
+            transition: var(--transition);
+        }
+
+        .btn-back-home:hover {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        /* CONTEÚDO PRINCIPAL */
+        .main-content {
+            width: 100%;
+            max-width: 400px;
+            margin: auto 0;
+            padding: 32px 0;
+        }
+
+        /* CARD DE LOGIN */
+        .card-login {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 32px 28px;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+        }
+
+        /* CABEÇALHO DO CARD */
+        .card-login-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .icon-badge {
+            width: 52px;
+            height: 52px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .card-login-header h1 {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+
+        .card-login-header p {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        /* MENSAGENS DO DJANGO */
+        .messages {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            padding: 12px 14px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-align: left;
+        }
+
+        .message.error {
+            background: var(--danger-light);
+            color: var(--danger);
+            border: 1px solid var(--danger-border);
+        }
+
+        .message.success {
+            background: var(--success-light);
+            color: var(--success);
+            border: 1px solid var(--success-border);
+        }
+
+        /* FORMULÁRIO */
+        form .form-group {
+            margin-bottom: 20px;
+        }
+
+        form label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-main);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            color: var(--text-muted);
+            pointer-events: none;
+            transition: color 0.2s ease;
+        }
+
+        form input[type="text"] {
+            width: 100%;
+            height: 48px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 0 14px 0 42px;
+            font-size: 15px;
+            font-family: inherit;
+            font-weight: 600;
+            color: var(--text-main);
+            outline: none;
+            transition: var(--transition);
+            background: var(--bg-body);
+            letter-spacing: 0.5px;
+        }
+
+        form input[type="text"]:focus {
+            background: var(--surface);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        form input[type="text"]:focus + .input-icon,
+        .input-wrapper:focus-within .input-icon {
+            color: var(--primary);
+        }
+
+        /* BOTÃO SUBMIT */
+        .btn-submit {
+            width: 100%;
+            height: 48px;
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-submit:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        /* RODAPÉ DO CARD */
+        .card-login-footer {
+            margin-top: 24px;
+            padding-top: 18px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .card-login-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: color 0.15s ease;
+        }
+
+        .card-login-footer a:hover {
+            text-decoration: underline;
+            color: var(--primary-hover);
+        }
+
+        /* FOOTER PRINCIPAL */
+        .footer {
+            width: 100%;
+            text-align: center;
+            padding: 24px 0;
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        @media (max-width: 480px) {
+            body { padding: 0 16px; }
+            .card-login { padding: 24px 20px; }
+            .card-login-header h1 { font-size: 20px; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <a href="{% url 'home' %}" class="logo">
+            <i data-lucide="graduation-cap" style="width: 22px; height: 22px;"></i>
+            ULYSSES
+        </a>
+
+        <a href="{% url 'home' %}" class="btn-back-home">
+            <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+            Voltar para a Home
+        </a>
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="main-content">
+
+        <div class="card-login">
+
+            <div class="card-login-header">
+                <div class="icon-badge">
+                    <i data-lucide="shield-check" style="width: 24px; height: 24px;"></i>
+                </div>
+
+                <h1>Acesso ao Exame</h1>
+
+                <p>
+                    Informe o seu Registro Acadêmico (RA)
+                    para iniciar o caderno de questões.
+                </p>
+            </div>
+
+            {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                        <li class="message {{ message.tags }}">
+                            {% if message.tags == 'error' %}
+                                <i data-lucide="alert-circle" style="width: 18px; height: 18px; flex-shrink: 0;"></i>
+                            {% else %}
+                                <i data-lucide="check-circle-2" style="width: 18px; height: 18px; flex-shrink: 0;"></i>
+                            {% endif %}
+                            <span>{{ message }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <form method="post" action="{% url 'alunos:acesso_aluno' %}">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="ra">Número do RA</label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="text" 
+                            id="ra" 
+                            name="ra" 
+                            placeholder="Ex: 20261234" 
+                            required 
+                            autofocus 
+                            autocomplete="off"
+                        >
+                        <i data-lucide="user" class="input-icon" style="width: 18px; height: 18px;"></i>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    <span>Acessar Questões</span>
+                    <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+                </button>
+            </form>
+
+            <div class="card-login-footer">
+                Não sabe o seu RA?
+                <a href="{% url 'alunos:lista_alunos' %}">
+                    Consulte a lista aqui
+                    <i data-lucide="external-link" style="width: 12px; height: 12px;"></i>
+                </a>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        ULYSSES • Sistema Educacional
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+
+</body>
+</html>

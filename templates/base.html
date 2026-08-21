@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Intensivo ULYSSES{% endblock %}</title>
+
+    <!-- Tipografia Plus Jakarta Sans e Ícones Lucide -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Arquivo CSS do Base -->
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <a href="{% url 'home' %}" class="logo">
+            <i data-lucide="graduation-cap" style="width: 24px; height: 24px;"></i>
+            ULYSSES
+        </a>
+
+        <a href="{% url 'area_professor' %}" class="professor-link">
+            <i data-lucide="settings" style="width: 16px; height: 16px;"></i>
+            Área do Professor
+        </a>
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="main-content">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        ULYSSES • Sistema Educacional
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

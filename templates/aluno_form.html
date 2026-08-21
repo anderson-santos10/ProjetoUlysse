@@ -1,0 +1,406 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastrar Aluno | ULYSSES</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-body: #f8fafc;
+            --surface: #ffffff;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --danger: #ef4444;
+            --danger-light: #fef2f2;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* HEADER */
+        .header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            height: 64px;
+            display: flex;
+            align-items: center;
+            padding: 0 32px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .logo {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        /* CONTAINER */
+        .container {
+            width: 100%;
+            max-width: 680px;
+            margin: 32px auto 64px;
+            padding: 0 24px;
+        }
+
+        /* BREADCRUMB */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .breadcrumb a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--primary);
+        }
+
+        /* TÍTULO DA PÁGINA */
+        .title {
+            margin-bottom: 24px;
+        }
+
+        .title h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.02em;
+            margin-bottom: 4px;
+        }
+
+        .title p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* CARD */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+            background: #ffffff;
+        }
+
+        .card-header h2 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 2px;
+        }
+
+        .card-header p {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        /* FORMULÁRIO */
+        .form-body {
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            height: 40px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 0 12px;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.2s ease;
+            background-color: #f8fafc;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            background-color: var(--surface);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .helptext {
+            display: block;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .field-errors {
+            list-style: none;
+            margin-top: 6px;
+        }
+
+        .field-errors li {
+            color: var(--danger);
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .errorlist {
+            list-style: none;
+            background: var(--danger-light);
+            border: 1px solid #fecaca;
+            border-radius: var(--radius-md);
+            padding: 10px 14px;
+            margin-bottom: 16px;
+        }
+
+        .errorlist li {
+            color: var(--danger);
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* AÇÕES / BOTÕES */
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border);
+            margin-top: 24px;
+            padding-top: 20px;
+            gap: 12px;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            height: 40px;
+            padding: 0 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 500;
+            background: var(--surface);
+            transition: all 0.15s ease;
+        }
+
+        .btn-back:hover {
+            background: #f1f5f9;
+            color: var(--text-main);
+        }
+
+        .btn-save {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            height: 40px;
+            padding: 0 20px;
+            border: none;
+            border-radius: var(--radius-md);
+            background: var(--primary);
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .btn-save:hover {
+            background: var(--primary-hover);
+        }
+
+        /* RODAPÉ */
+        .footer {
+            text-align: center;
+            margin-top: 32px;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        @media (max-width: 640px) {
+            .header { padding: 0 16px; }
+            .container { padding: 0 16px; margin-top: 20px; }
+            .card-header, .form-body { padding: 16px; }
+            .actions {
+                flex-direction: column-reverse;
+                align-items: stretch;
+            }
+            .btn-back, .btn-save {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <a href="{% url 'home' %}" class="logo">
+            <i data-lucide="graduation-cap"></i>
+            ULYSSES
+        </a>
+    </header>
+
+    <main class="container">
+
+        <div class="breadcrumb">
+            <a href="{% url 'alunos:lista_alunos' %}">Alunos</a>
+            <i data-lucide="chevron-right" style="width: 14px; height: 14px;"></i>
+            <span>Cadastro</span>
+        </div>
+
+        <div class="title">
+            <h1>Cadastrar aluno</h1>
+            <p>Adicione um novo aluno ao sistema ULYSSES.</p>
+        </div>
+
+        <div class="card">
+
+            <div class="card-header">
+                <h2>Informações do aluno</h2>
+                <p>Preencha os dados abaixo para realizar o cadastro.</p>
+            </div>
+
+            <div class="form-body">
+                <form method="post" target="_self">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <ul class="errorlist">
+                            {% for error in form.non_field_errors %}
+                                <li>
+                                    <i data-lucide="alert-circle" style="width: 16px; height: 16px;"></i>
+                                    {{ error }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+
+                    <!-- Campo Nome -->
+                    <div class="form-group">
+                        <label for="{{ form.nome.id_for_label }}">Nome Completo</label>
+                        {{ form.nome }}
+                        {% if form.nome.errors %}
+                            <ul class="field-errors">
+                                {% for error in form.nome.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+
+                    <!-- Campo RA -->
+                    <div class="form-group">
+                        <label for="{{ form.ra.id_for_label }}">RA (Registro Aluno)</label>
+                        {{ form.ra }}
+                        {% if form.ra.errors %}
+                            <ul class="field-errors">
+                                {% for error in form.ra.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+
+                    <!-- Campo Série (Menu Select) -->
+                    <div class="form-group">
+                        <label for="{{ form.serie.id_for_label }}">Série / Ano Letivo</label>
+                        {{ form.serie }}
+                        {% if form.serie.errors %}
+                            <ul class="field-errors">
+                                {% for error in form.serie.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+
+                    <div class="actions">
+                        <a href="{% url 'area_professor' %}" class="btn-back">
+                            <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+                            Voltar
+                        </a>
+
+                        <button type="submit" class="btn-save">
+                            <i data-lucide="user-plus" style="width: 16px; height: 16px;"></i>
+                            Cadastrar aluno
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+
+        <div class="footer">
+            ULYSSES • Sistema Educacional
+        </div>
+
+    </main>
+
+    <script>
+        lucide.createIcons();
+    </script>
+
+</body>
+</html>
