@@ -80,19 +80,13 @@ class Questao(models.Model):
 
 
 class Resultado(models.Model):
-    aluno = models.ForeignKey(
-        Aluno,
-        on_delete=models.CASCADE,
-        related_name='resultados'
-    )
-
+    aluno = models.ForeignKey(Aluno, on_delete=models.CASCADE, related_name='resultados')
     acertos = models.IntegerField()
     erros = models.IntegerField()
     total_questoes = models.IntegerField()
     nota = models.DecimalField(max_digits=4, decimal_places=2)
-
+    xp_ganho = models.PositiveIntegerField(default=0)
     tempo_segundos = models.PositiveIntegerField(default=0)
-
     data = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

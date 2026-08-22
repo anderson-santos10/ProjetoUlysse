@@ -4,7 +4,6 @@
 <html lang="pt-br">
 
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -19,7 +18,6 @@
     >
 
     <script src="https://unpkg.com/lucide@latest"></script>
-
 
     <style>
 
@@ -109,15 +107,12 @@
                 1px solid var(--border);
 
             display: flex;
-
             align-items: center;
-
             justify-content: space-between;
 
             padding: 0 32px;
 
             position: sticky;
-
             top: 0;
 
             z-index: 10;
@@ -136,10 +131,15 @@
             text-decoration: none;
 
             display: flex;
-
             align-items: center;
 
             gap: 8px;
+        }
+
+
+        .logo svg {
+            width: 20px;
+            height: 20px;
         }
 
 
@@ -151,7 +151,6 @@
             font-weight: 500;
 
             display: flex;
-
             align-items: center;
 
             gap: 8px;
@@ -296,9 +295,7 @@
             position: absolute;
 
             top: 0;
-
             left: 0;
-
             right: 0;
 
             height: 4px;
@@ -345,6 +342,12 @@
             align-items: center;
 
             gap: 6px;
+        }
+
+
+        .numero svg {
+            width: 18px;
+            height: 18px;
         }
 
 
@@ -490,7 +493,6 @@
             appearance: none;
 
             width: 18px;
-
             height: 18px;
 
             border: 2px solid #cbd5e1;
@@ -518,16 +520,19 @@
             position: absolute;
 
             top: 4px;
-
             left: 4px;
 
             width: 6px;
-
             height: 6px;
 
             background: white;
 
             border-radius: 50%;
+        }
+
+
+        .alternativa input:disabled {
+            cursor: default;
         }
 
 
@@ -601,6 +606,14 @@
             display: flex;
 
             gap: 12px;
+        }
+
+
+        .feedback svg {
+            flex-shrink: 0;
+
+            width: 22px;
+            height: 22px;
         }
 
 
@@ -692,11 +705,19 @@
             font-family: inherit;
 
             text-decoration: none;
+
+            transition: background .2s ease;
         }
 
 
         .btn-responder:hover {
             background: var(--primary-hover);
+        }
+
+
+        .btn-responder svg {
+            width: 18px;
+            height: 18px;
         }
 
 
@@ -840,6 +861,88 @@
 
 
         /* =========================
+           BLOQUEIO
+        ========================= */
+
+        .bloqueio {
+            text-align: center;
+
+            padding: 40px 32px;
+        }
+
+
+        .bloqueio-icon {
+            width: 64px;
+            height: 64px;
+
+            margin: 0 auto 20px;
+
+            border-radius: 50%;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background: var(--warning-light);
+
+            color: var(--warning);
+
+            border: 1px solid #fde68a;
+        }
+
+
+        .bloqueio-icon svg {
+            width: 30px;
+            height: 30px;
+        }
+
+
+        .bloqueio h2 {
+            font-size: 24px;
+
+            margin-bottom: 10px;
+        }
+
+
+        .bloqueio p {
+            color: var(--text-muted);
+
+            font-size: 14px;
+
+            line-height: 1.6;
+
+            margin-bottom: 20px;
+        }
+
+
+        .contador-bloqueio {
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 12px 20px;
+
+            background: var(--warning-light);
+
+            border: 1px solid #fde68a;
+
+            border-radius: 10px;
+
+            color: var(--warning);
+
+            font-size: 20px;
+
+            font-weight: 800;
+
+            font-variant-numeric: tabular-nums;
+        }
+
+
+        /* =========================
            FOOTER
         ========================= */
 
@@ -907,6 +1010,29 @@
                 gap: 8px;
             }
 
+
+            .resultado-item {
+                padding: 14px 8px;
+            }
+
+
+            .resultado-item strong {
+                font-size: 20px;
+            }
+
+
+            .aluno {
+                max-width: 200px;
+            }
+
+
+            .aluno span {
+                overflow: hidden;
+
+                text-overflow: ellipsis;
+
+                white-space: nowrap;
+            }
         }
 
     </style>
@@ -939,9 +1065,7 @@
                 Aluno:
 
                 <strong>
-
                     {{ aluno.nome }}
-
                 </strong>
 
             </span>
@@ -951,7 +1075,6 @@
     {% endif %}
 
 </header>
-
 
 
 <main class="container">
@@ -976,9 +1099,7 @@
         </div>
 
 
-        {% if questao_atual and not questionario_finalizado %}
-
-            <!-- CRONÔMETRO -->
+        {% if questao_atual and not questionario_finalizado and not questionario_bloqueado %}
 
             <div class="cronometro">
 
@@ -998,8 +1119,44 @@
     </div>
 
 
+    <!-- =========================
+         BLOQUEIO
+    ========================= -->
 
-    {% if questionario_finalizado %}
+    {% if questionario_bloqueado and not questionario_finalizado %}
+
+        <div class="questao-card bloqueio">
+
+            <div class="bloqueio-icon">
+
+                <i data-lucide="lock"></i>
+
+            </div>
+
+
+            <h2>
+                Questionário bloqueado
+            </h2>
+
+
+            <p>
+                Você já realizou um questionário recentemente.
+                <br>
+                Aguarde o período de 8 horas para realizar uma nova tentativa.
+            </p>
+
+
+            <div
+                class="contador-bloqueio"
+                id="contador-bloqueio"
+            >
+                00:00:00
+            </div>
+
+        </div>
+
+
+    {% elif questionario_finalizado %}
 
 
         <!-- =========================
@@ -1022,7 +1179,6 @@
             </div>
 
 
-
             <div class="resultado-nota">
 
                 <span class="nota-label">
@@ -1038,7 +1194,6 @@
                 </span>
 
             </div>
-
 
 
             <div class="resultado-estatisticas">
@@ -1086,23 +1241,15 @@
             </div>
 
 
-
-            <!-- TEMPO TOTAL -->
-
             <div class="resultado-tempo">
 
                 <i data-lucide="timer"></i>
 
                 <span>
-                    Tempo total:
+                    Questionário concluído
                 </span>
 
-                <strong id="tempo-final">
-                    {{ tempo_segundos|default:0 }}
-                </strong>
-
             </div>
-
 
 
             <div class="botoes-navegacao">
@@ -1122,7 +1269,6 @@
 
 
         </div>
-
 
 
     {% elif questao_atual %}
@@ -1150,7 +1296,6 @@
             </div>
 
 
-
             <!-- CABEÇALHO -->
 
             <div class="questao-topo">
@@ -1167,7 +1312,6 @@
                     de {{ total_questoes }}
 
                 </div>
-
 
 
                 <div class="informacoes">
@@ -1203,9 +1347,7 @@
 
                 </div>
 
-
             </div>
-
 
 
             <!-- ENUNCIADO -->
@@ -1222,7 +1364,6 @@
             </div>
 
 
-
             <!-- =========================
                  ALTERNATIVAS
             ========================= -->
@@ -1235,8 +1376,6 @@
                 {% csrf_token %}
 
 
-                <!-- CAMPO DO TEMPO -->
-
                 <input
                     type="hidden"
                     name="tempo_segundos"
@@ -1245,31 +1384,28 @@
                 >
 
 
-
                 <div class="alternativas">
 
 
                     <!-- A -->
 
-                    <label
-                        class="
-                            alternativa
+                    <label class="
+                        alternativa
 
-                            {% if resposta_mostrada %}
+                        {% if resposta_mostrada %}
 
-                                {% if questao_atual.resposta_correta == 'A' %}
+                            {% if questao_atual.resposta_correta == 'A' %}
 
-                                    alternativa-correta
+                                alternativa-correta
 
-                                {% elif resposta_escolhida == 'A' %}
+                            {% elif resposta_escolhida == 'A' %}
 
-                                    alternativa-errada
-
-                                {% endif %}
+                                alternativa-errada
 
                             {% endif %}
-                        "
-                    >
+
+                        {% endif %}
+                    ">
 
                         <input
                             type="radio"
@@ -1290,36 +1426,31 @@
                         </span>
 
                         <span class="texto-alternativa">
-
                             {{ questao_atual.alternativa_a }}
-
                         </span>
 
                     </label>
 
 
-
                     <!-- B -->
 
-                    <label
-                        class="
-                            alternativa
+                    <label class="
+                        alternativa
 
-                            {% if resposta_mostrada %}
+                        {% if resposta_mostrada %}
 
-                                {% if questao_atual.resposta_correta == 'B' %}
+                            {% if questao_atual.resposta_correta == 'B' %}
 
-                                    alternativa-correta
+                                alternativa-correta
 
-                                {% elif resposta_escolhida == 'B' %}
+                            {% elif resposta_escolhida == 'B' %}
 
-                                    alternativa-errada
-
-                                {% endif %}
+                                alternativa-errada
 
                             {% endif %}
-                        "
-                    >
+
+                        {% endif %}
+                    ">
 
                         <input
                             type="radio"
@@ -1340,36 +1471,31 @@
                         </span>
 
                         <span class="texto-alternativa">
-
                             {{ questao_atual.alternativa_b }}
-
                         </span>
 
                     </label>
 
 
-
                     <!-- C -->
 
-                    <label
-                        class="
-                            alternativa
+                    <label class="
+                        alternativa
 
-                            {% if resposta_mostrada %}
+                        {% if resposta_mostrada %}
 
-                                {% if questao_atual.resposta_correta == 'C' %}
+                            {% if questao_atual.resposta_correta == 'C' %}
 
-                                    alternativa-correta
+                                alternativa-correta
 
-                                {% elif resposta_escolhida == 'C' %}
+                            {% elif resposta_escolhida == 'C' %}
 
-                                    alternativa-errada
-
-                                {% endif %}
+                                alternativa-errada
 
                             {% endif %}
-                        "
-                    >
+
+                        {% endif %}
+                    ">
 
                         <input
                             type="radio"
@@ -1390,36 +1516,31 @@
                         </span>
 
                         <span class="texto-alternativa">
-
                             {{ questao_atual.alternativa_c }}
-
                         </span>
 
                     </label>
 
 
-
                     <!-- D -->
 
-                    <label
-                        class="
-                            alternativa
+                    <label class="
+                        alternativa
 
-                            {% if resposta_mostrada %}
+                        {% if resposta_mostrada %}
 
-                                {% if questao_atual.resposta_correta == 'D' %}
+                            {% if questao_atual.resposta_correta == 'D' %}
 
-                                    alternativa-correta
+                                alternativa-correta
 
-                                {% elif resposta_escolhida == 'D' %}
+                            {% elif resposta_escolhida == 'D' %}
 
-                                    alternativa-errada
-
-                                {% endif %}
+                                alternativa-errada
 
                             {% endif %}
-                        "
-                    >
+
+                        {% endif %}
+                    ">
 
                         <input
                             type="radio"
@@ -1440,16 +1561,13 @@
                         </span>
 
                         <span class="texto-alternativa">
-
                             {{ questao_atual.alternativa_d }}
-
                         </span>
 
                     </label>
 
 
                 </div>
-
 
 
                 <!-- =========================
@@ -1481,7 +1599,6 @@
             </form>
 
 
-
             <!-- =========================
                  FEEDBACK
             ========================= -->
@@ -1498,15 +1615,11 @@
                         <div class="feedback-conteudo">
 
                             <div class="feedback-titulo">
-
                                 Resposta correta!
-
                             </div>
 
                             <div class="feedback-texto">
-
                                 Muito bem! Você acertou esta questão.
-
                             </div>
 
                         </div>
@@ -1523,15 +1636,11 @@
                         <div class="feedback-conteudo">
 
                             <div class="feedback-titulo">
-
                                 Você errou esta questão.
-
                             </div>
 
                             <div class="feedback-texto">
-
                                 A resposta correta está destacada em verde.
-
                             </div>
 
                         </div>
@@ -1539,7 +1648,6 @@
                     </div>
 
                 {% endif %}
-
 
 
                 <!-- =========================
@@ -1554,16 +1662,6 @@
                     >
 
                         {% csrf_token %}
-
-
-                        <!-- Envia também o tempo -->
-
-                        <input
-                            type="hidden"
-                            name="tempo_segundos"
-                            id="tempo_segundos_proxima"
-                            value="0"
-                        >
 
 
                         <button
@@ -1609,6 +1707,12 @@
 
         <div class="questao-card resultado-final">
 
+            <div class="bloqueio-icon">
+
+                <i data-lucide="file-question"></i>
+
+            </div>
+
             <h2>
                 Nenhuma questão disponível
             </h2>
@@ -1626,13 +1730,11 @@
 </main>
 
 
-
 <footer class="footer">
 
     ULYSSES • Sistema Educacional
 
 </footer>
-
 
 
 <script>
@@ -1644,17 +1746,11 @@
        CRONÔMETRO
     ========================================= */
 
-    {% if questao_atual and not questionario_finalizado %}
+    {% if questao_atual and not questionario_finalizado and not questionario_bloqueado %}
 
-        let tempoInicial = localStorage.getItem(
-            "ulysses_tempo_inicio"
-        );
+        let tempoInicial =
+            localStorage.getItem("ulysses_tempo_inicio");
 
-
-        /*
-         * Se ainda não existe um horário de início,
-         * cria agora.
-         */
 
         if (!tempoInicial) {
 
@@ -1672,10 +1768,6 @@
 
             const agora = Date.now();
 
-
-            /*
-             * Calcula quantos segundos já passaram.
-             */
 
             const segundos =
                 Math.floor(
@@ -1711,73 +1803,114 @@
             }
 
 
-            /*
-             * Guarda o tempo no campo hidden
-             * do formulário.
-             */
-
             const campoTempo =
                 document.getElementById("tempo_segundos");
 
 
             if (campoTempo) {
 
-                campoTempo.value = segundos;
-
-            }
-
-
-            /*
-             * Campo utilizado pelo botão
-             * Próxima questão / Finalizar.
-             */
-
-            const campoProxima =
-                document.getElementById(
-                    "tempo_segundos_proxima"
-                );
-
-
-            if (campoProxima) {
-
-                campoProxima.value = segundos;
+                campoTempo.value =
+                    segundos;
 
             }
 
         }
 
 
-        /*
-         * Atualiza imediatamente.
-         */
-
         atualizarCronometro();
 
-
-        /*
-         * Atualiza a cada segundo.
-         */
 
         setInterval(
             atualizarCronometro,
             1000
         );
 
+    {% endif %}
+
+
+    /* =========================================
+       CONTADOR DO BLOQUEIO
+    ========================================= */
+
+    {% if questionario_bloqueado %}
+
+        let segundosRestantes =
+            {{ segundos_restantes|default:0 }};
+
+
+        function atualizarBloqueio() {
+
+            const contador =
+                document.getElementById(
+                    "contador-bloqueio"
+                );
+
+
+            if (!contador) {
+                return;
+            }
+
+
+            if (segundosRestantes <= 0) {
+
+                contador.textContent =
+                    "00:00:00";
+
+                setTimeout(
+                    () => location.reload(),
+                    1000
+                );
+
+                return;
+
+            }
+
+
+            const horas =
+                Math.floor(
+                    segundosRestantes / 3600
+                );
+
+
+            const minutos =
+                Math.floor(
+                    (segundosRestantes % 3600) / 60
+                );
+
+
+            const segundos =
+                segundosRestantes % 60;
+
+
+            contador.textContent =
+                String(horas).padStart(2, "0")
+                + ":"
+                + String(minutos).padStart(2, "0")
+                + ":"
+                + String(segundos).padStart(2, "0");
+
+
+            segundosRestantes--;
+
+        }
+
+
+        atualizarBloqueio();
+
+
+        setInterval(
+            atualizarBloqueio,
+            1000
+        );
 
     {% endif %}
 
 
-
     /* =========================================
-       FINALIZAÇÃO DO QUESTIONÁRIO
+       FINALIZAÇÃO
     ========================================= */
 
     {% if questionario_finalizado %}
-
-        /*
-         * Quando o questionário termina,
-         * não precisamos mais continuar contando.
-         */
 
         localStorage.removeItem(
             "ulysses_tempo_inicio"
@@ -1786,13 +1919,14 @@
     {% endif %}
 
 
-
     /* =========================================
        ANTES DE RESPONDER
     ========================================= */
 
     const formulario =
-        document.getElementById("form-questao");
+        document.getElementById(
+            "form-questao"
+        );
 
 
     if (formulario) {
@@ -1846,5 +1980,4 @@
 
 
 </body>
-
 </html>
