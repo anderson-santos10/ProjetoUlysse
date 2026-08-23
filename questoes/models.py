@@ -29,8 +29,10 @@ class Questao(models.Model):
         ('D', 'D'),
     ]
 
+    # Número gerado automaticamente
     numero = models.PositiveIntegerField(
-        verbose_name='Número da questão'
+        verbose_name='Número da questão',
+        editable=False
     )
 
     serie = models.CharField(
@@ -79,8 +81,43 @@ class Questao(models.Model):
         auto_now_add=True
     )
 
+    class Meta:
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=['serie', 'numero'],
+                name='unique_numero_por_serie'
+            )
+        ]
+
+        ordering = ['serie', 'numero']
+
+    def save(self, *args, **kwargs):
+
+        # Só gera o número quando a questão é nova
+        if self._state.adding:
+
+            ultimo_numero = (
+                Questao.objects
+                .filter(serie=self.serie)
+                .order_by('-numero')
+                .values_list('numero', flat=True)
+                .first()
+            )
+
+            if ultimo_numero is None:
+                self.numero = 1
+            else:
+                self.numero = ultimo_numero + 1
+
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return f'Questão {self.numero} - {self.get_serie_display()}'
+
+        return (
+            f'Questão {self.numero} - '
+            f'{self.get_serie_display()}'
+        )
 
 
 class Resultado(models.Model):
@@ -115,4 +152,5 @@ class Resultado(models.Model):
     )
 
     def __str__(self):
+
         return f'{self.aluno.nome} - Nota {self.nota}'

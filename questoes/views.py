@@ -1,6 +1,6 @@
 import random
 from datetime import timedelta
-
+from .forms import QuestaoForm
 from django.views.generic import ListView, CreateView
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
@@ -816,33 +816,27 @@ class ListaQuestoesView(ListView):
 class CadastrarQuestaoView(CreateView):
 
     model = Questao
+    form_class = QuestaoForm
     template_name = 'questao_form.html'
-
-    fields = [
-        'numero',
-        'serie',
-        'dificuldade',
-        'enunciado',
-        'alternativa_a',
-        'alternativa_b',
-        'alternativa_c',
-        'alternativa_d',
-        'resposta_correta',
-    ]
 
     success_url = reverse_lazy('area_professor')
 
     def form_valid(self, form):
+
         print(
             "QUESTÃO SALVA:",
             form.cleaned_data
         )
+
         return super().form_valid(form)
 
     def form_invalid(self, form):
+
         print(
             "ERRO AO SALVAR QUESTÃO:"
         )
+
         print(form.errors)
+
         return super().form_invalid(form)
 

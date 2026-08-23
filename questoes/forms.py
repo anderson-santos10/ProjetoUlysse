@@ -9,7 +9,6 @@ class QuestaoForm(forms.ModelForm):
         model = Questao
 
         fields = [
-            'numero',
             'serie',
             'dificuldade',
             'enunciado',
@@ -21,12 +20,6 @@ class QuestaoForm(forms.ModelForm):
         ]
 
         widgets = {
-            'numero': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Ex: 1',
-                'min': 1,
-            }),
-
             'serie': forms.Select(attrs={
                 'class': 'form-control',
             }),
