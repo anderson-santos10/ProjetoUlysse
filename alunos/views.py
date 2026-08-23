@@ -2,13 +2,14 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.views.generic import ListView, CreateView, TemplateView
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView
 from django.db.models import Avg, Count, Sum
+
 from .models import Aluno
 from .forms import AlunoForm
 
 
 class ListaAlunosView(ListView):
+
     model = Aluno
     template_name = 'aluno_list.html'
     context_object_name = 'alunos'
@@ -16,6 +17,7 @@ class ListaAlunosView(ListView):
 
 
 class CadastrarAlunoView(CreateView):
+
     model = Aluno
     form_class = AlunoForm
     template_name = 'aluno_form.html'
@@ -34,25 +36,20 @@ class AcessoAlunoView(TemplateView):
 
             aluno = Aluno.objects.get(ra=ra)
 
-            # ==========================================
-            # LOGIN DO ALUNO
-            # ==========================================
-
             request.session['aluno_id'] = aluno.id
-
-            # ==========================================
-            # LIMPA O QUESTIONÁRIO ANTERIOR
-            # ==========================================
-
             request.session['questao_atual'] = 0
             request.session['respostas'] = {}
             request.session['questionario_finalizado'] = False
             request.session['acertos'] = 0
             request.session['total_questoes'] = 0
 
-            # ==========================================
-            # REDIRECIONA PARA ÁREA DO ALUNO
-            # ==========================================
+            request.session.pop('questoes_ordem', None)
+            request.session.pop('alternativas_ordem', None)
+            request.session.pop('inicio_questionario', None)
+            request.session.pop('resposta_mostrada', None)
+            request.session.pop('resposta_escolhida', None)
+            request.session.pop('resposta_correta', None)
+            request.session.pop('acertou', None)
 
             return redirect('alunos:aluno_logado')
 
@@ -72,7 +69,6 @@ class AlunoLogadoView(TemplateView):
 
     def get(self, request, *args, **kwargs):
 
-        # Verifica se existe aluno logado
         aluno_id = request.session.get('aluno_id')
 
         if not aluno_id:
@@ -84,7 +80,6 @@ class AlunoLogadoView(TemplateView):
 
         except Aluno.DoesNotExist:
 
-            # Remove sessão inválida
             request.session.pop('aluno_id', None)
 
             messages.error(
@@ -97,8 +92,8 @@ class AlunoLogadoView(TemplateView):
         return self.render_to_response({
             'aluno': aluno
         })
-        
-        
+
+
 class RankingView(TemplateView):
 
     template_name = 'ranking.html'
@@ -107,41 +102,59 @@ class RankingView(TemplateView):
 
         context = super().get_context_data(**kwargs)
 
-        # ==========================================
-        # RANKING DOS ALUNOS
-        # ==========================================
+        rankings = {}
 
-        alunos = (
-            Aluno.objects
-            .annotate(
-                pontos=Avg('resultados__nota'),
-                tentativas=Count('resultados'),
-                total_acertos=Sum('resultados__acertos'),
+        # =====================================================
+        # SÉRIES
+        # =====================================================
+        # Usa SERIES, pois seu model Aluno possui essa constante.
+        # Caso sua model utilize outro nome, ajuste somente aqui.
+        # =====================================================
+
+        for codigo, nome in Aluno.SERIES:
+
+            alunos = (
+                Aluno.objects
+                .filter(serie=codigo)
+                .annotate(
+                    pontos=Avg('resultados__nota'),
+                    tentativas=Count(
+                        'resultados',
+                        distinct=True
+                    ),
+                    total_acertos=Sum(
+                        'resultados__acertos'
+                    ),
+                )
+                .order_by(
+                    '-pontos',
+                    '-total_acertos',
+                    'nome'
+                )[:20]
             )
-            .filter(
-                tentativas__gt=0
-            )
-            .order_by(
-                '-pontos',
-                '-total_acertos',
-                'nome'
-            )[:20]
-        )
 
-        alunos_ranking = list(alunos)
+            alunos_ranking = list(alunos)
 
-        # Adiciona posição
-        for posicao, aluno in enumerate(
-            alunos_ranking,
-            start=1
-        ):
-            aluno.posicao = posicao
+            for posicao, aluno in enumerate(
+                alunos_ranking,
+                start=1
+            ):
 
-        context['alunos'] = alunos_ranking
+                aluno.posicao = posicao
+                aluno.pontos = aluno.pontos or 0
+                aluno.tentativas = aluno.tentativas or 0
+                aluno.total_acertos = aluno.total_acertos or 0
 
-        # ==========================================
+            rankings[codigo] = {
+                'nome': nome,
+                'alunos': alunos_ranking,
+            }
+
+        context['rankings'] = rankings
+
+        # =====================================================
         # ALUNO LOGADO
-        # ==========================================
+        # =====================================================
 
         aluno_id = self.request.session.get('aluno_id')
 
@@ -149,43 +162,58 @@ class RankingView(TemplateView):
 
         if aluno_id:
 
-            try:
+            resultado_aluno = (
+                Aluno.objects
+                .filter(id=aluno_id)
+                .annotate(
+                    pontos=Avg('resultados__nota'),
+                    tentativas=Count(
+                        'resultados',
+                        distinct=True
+                    ),
+                    total_acertos=Sum(
+                        'resultados__acertos'
+                    ),
+                )
+                .first()
+            )
 
-                resultado_aluno = (
-                    Aluno.objects
-                    .filter(id=aluno_id)
-                    .annotate(
-                        pontos=Avg('resultados__nota'),
-                        tentativas=Count('resultados'),
-                        total_acertos=Sum(
-                            'resultados__acertos'
-                        ),
-                    )
-                    .first()
+            if resultado_aluno:
+
+                resultado_aluno.pontos = (
+                    resultado_aluno.pontos or 0
                 )
 
-                if (
-                    resultado_aluno
-                    and resultado_aluno.tentativas > 0
-                ):
+                resultado_aluno.tentativas = (
+                    resultado_aluno.tentativas or 0
+                )
 
-                    # Busca todos os alunos para descobrir
-                    # a posição real do aluno
-                    todos_alunos = list(
+                resultado_aluno.total_acertos = (
+                    resultado_aluno.total_acertos or 0
+                )
+
+                # =============================================
+                # POSIÇÃO DO ALUNO NA SUA SÉRIE
+                # =============================================
+
+                if resultado_aluno.tentativas > 0:
+
+                    alunos_da_serie = list(
                         Aluno.objects
+                        .filter(
+                            serie=resultado_aluno.serie
+                        )
                         .annotate(
                             pontos=Avg(
                                 'resultados__nota'
                             ),
                             tentativas=Count(
-                                'resultados'
+                                'resultados',
+                                distinct=True
                             ),
                             total_acertos=Sum(
                                 'resultados__acertos'
                             ),
-                        )
-                        .filter(
-                            tentativas__gt=0
                         )
                         .order_by(
                             '-pontos',
@@ -195,21 +223,16 @@ class RankingView(TemplateView):
                     )
 
                     for posicao, aluno in enumerate(
-                        todos_alunos,
+                        alunos_da_serie,
                         start=1
                     ):
 
                         if aluno.id == aluno_id:
 
                             resultado_aluno.posicao = posicao
-
                             break
 
-                    usuario_logado = resultado_aluno
-
-            except Aluno.DoesNotExist:
-
-                usuario_logado = None
+                usuario_logado = resultado_aluno
 
         context['usuario_logado'] = usuario_logado
 

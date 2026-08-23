@@ -4,10 +4,14 @@ from django.db import models
 class Aluno(models.Model):
 
     SERIES = [
+        ('5', '5º Ano'),
         ('6', '6º Ano'),
         ('7', '7º Ano'),
         ('8', '8º Ano'),
         ('9', '9º Ano'),
+        ('1S', '1ª Série'),
+        ('2S', '2ª Série'),
+        ('3S', '3ª Série'),
     ]
 
     nome = models.CharField(

@@ -1,6 +1,11 @@
 from django.urls import path
-from prova.views import RankingView
-from .views import ListaAlunosView, CadastrarAlunoView, AcessoAlunoView, AlunoLogadoView
+from .views import (
+    ListaAlunosView,
+    CadastrarAlunoView,
+    AcessoAlunoView,
+    AlunoLogadoView,
+    RankingView,
+)
 
 app_name = 'alunos'
 

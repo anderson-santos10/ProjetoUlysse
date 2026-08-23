@@ -91,9 +91,9 @@
         }
 
 
-        /* =========================
+        /* =====================================================
            HEADER
-        ========================= */
+        ===================================================== */
 
         .header {
             height: 68px;
@@ -121,7 +121,6 @@
 
         .logo {
             font-size: 19px;
-
             font-weight: 800;
 
             color: var(--primary);
@@ -132,7 +131,6 @@
 
             display: flex;
             align-items: center;
-
             gap: 8px;
         }
 
@@ -169,18 +167,16 @@
 
         .aluno strong {
             color: var(--text-main);
-
             font-weight: 700;
         }
 
 
-        /* =========================
+        /* =====================================================
            CONTAINER
-        ========================= */
+        ===================================================== */
 
         .container {
             width: 100%;
-
             max-width: 760px;
 
             margin: 40px auto;
@@ -195,9 +191,7 @@
             margin-bottom: 24px;
 
             display: flex;
-
             justify-content: space-between;
-
             align-items: center;
 
             gap: 20px;
@@ -206,7 +200,6 @@
 
         .topo h1 {
             font-size: 24px;
-
             font-weight: 800;
 
             margin-bottom: 4px;
@@ -215,19 +208,18 @@
 
         .topo p {
             color: var(--text-muted);
-
             font-size: 14px;
         }
 
 
-        /* =========================
+        /* =====================================================
            CRONÔMETRO
-        ========================= */
+        ===================================================== */
 
         .cronometro {
             display: flex;
-
             align-items: center;
+            justify-content: center;
 
             gap: 8px;
 
@@ -248,8 +240,6 @@
             font-size: 16px;
 
             min-width: 115px;
-
-            justify-content: center;
         }
 
 
@@ -261,14 +251,13 @@
 
         .cronometro-tempo {
             font-variant-numeric: tabular-nums;
-
             letter-spacing: 1px;
         }
 
 
-        /* =========================
+        /* =====================================================
            CARD
-        ========================= */
+        ===================================================== */
 
         .questao-card {
             background: var(--surface);
@@ -287,9 +276,9 @@
         }
 
 
-        /* =========================
+        /* =====================================================
            PROGRESSO
-        ========================= */
+        ===================================================== */
 
         .progress-bar-container {
             position: absolute;
@@ -313,9 +302,9 @@
         }
 
 
-        /* =========================
-           CABEÇALHO DA QUESTÃO
-        ========================= */
+        /* =====================================================
+           TOPO QUESTÃO
+        ===================================================== */
 
         .questao-topo {
             display: flex;
@@ -355,10 +344,6 @@
             color: var(--primary);
         }
 
-
-        /* =========================
-           TAGS
-        ========================= */
 
         .informacoes {
             display: flex;
@@ -416,9 +401,9 @@
         }
 
 
-        /* =========================
+        /* =====================================================
            ENUNCIADO
-        ========================= */
+        ===================================================== */
 
         .enunciado-label {
             font-size: 11px;
@@ -448,9 +433,9 @@
         }
 
 
-        /* =========================
+        /* =====================================================
            ALTERNATIVAS
-        ========================= */
+        ===================================================== */
 
         .alternativas {
             display: flex;
@@ -479,6 +464,8 @@
             transition: all .2s ease;
 
             background: var(--surface);
+
+            user-select: none;
         }
 
 
@@ -504,6 +491,8 @@
             flex-shrink: 0;
 
             position: relative;
+
+            cursor: pointer;
         }
 
 
@@ -542,6 +531,8 @@
             color: var(--primary);
 
             font-size: 15px;
+
+            min-width: 20px;
         }
 
 
@@ -554,9 +545,9 @@
         }
 
 
-        /* =========================
-           RESPOSTA CORRETA
-        ========================= */
+        /* =====================================================
+           CORRETA / ERRADA
+        ===================================================== */
 
         .alternativa-correta {
             background: var(--success-light) !important;
@@ -573,10 +564,6 @@
         }
 
 
-        /* =========================
-           RESPOSTA ERRADA
-        ========================= */
-
         .alternativa-errada {
             background: var(--danger-light) !important;
 
@@ -592,9 +579,9 @@
         }
 
 
-        /* =========================
+        /* =====================================================
            FEEDBACK
-        ========================= */
+        ===================================================== */
 
         .feedback {
             margin-top: 20px;
@@ -658,9 +645,9 @@
         }
 
 
-        /* =========================
+        /* =====================================================
            BOTÕES
-        ========================= */
+        ===================================================== */
 
         .botoes-navegacao {
             display: flex;
@@ -721,9 +708,9 @@
         }
 
 
-        /* =========================
-           RESULTADO FINAL
-        ========================= */
+        /* =====================================================
+           RESULTADO
+        ===================================================== */
 
         .resultado-final {
             text-align: center;
@@ -829,10 +816,6 @@
         }
 
 
-        /* =========================
-           TEMPO FINAL
-        ========================= */
-
         .resultado-tempo {
             display: flex;
 
@@ -860,9 +843,9 @@
         }
 
 
-        /* =========================
+        /* =====================================================
            BLOQUEIO
-        ========================= */
+        ===================================================== */
 
         .bloqueio {
             text-align: center;
@@ -942,9 +925,9 @@
         }
 
 
-        /* =========================
+        /* =====================================================
            FOOTER
-        ========================= */
+        ===================================================== */
 
         .footer {
             text-align: center;
@@ -957,9 +940,9 @@
         }
 
 
-        /* =========================
+        /* =====================================================
            RESPONSIVO
-        ========================= */
+        ===================================================== */
 
         @media(max-width:600px) {
 
@@ -1077,12 +1060,9 @@
 </header>
 
 
+
 <main class="container">
 
-
-    <!-- =========================
-         TOPO
-    ========================= -->
 
     <div class="topo">
 
@@ -1119,11 +1099,9 @@
     </div>
 
 
-    <!-- =========================
-         BLOQUEIO
-    ========================= -->
 
     {% if questionario_bloqueado and not questionario_finalizado %}
+
 
         <div class="questao-card bloqueio">
 
@@ -1140,9 +1118,13 @@
 
 
             <p>
+
                 Você já realizou um questionário recentemente.
+
                 <br>
+
                 Aguarde o período de 8 horas para realizar uma nova tentativa.
+
             </p>
 
 
@@ -1156,15 +1138,11 @@
         </div>
 
 
+
     {% elif questionario_finalizado %}
 
 
-        <!-- =========================
-             RESULTADO FINAL
-        ========================= -->
-
         <div class="questao-card resultado-final">
-
 
             <div class="resultado-topo">
 
@@ -1197,7 +1175,6 @@
 
 
             <div class="resultado-estatisticas">
-
 
                 <div class="resultado-item acertos">
 
@@ -1237,7 +1214,6 @@
 
                 </div>
 
-
             </div>
 
 
@@ -1267,21 +1243,15 @@
 
             </div>
 
-
         </div>
+
 
 
     {% elif questao_atual %}
 
 
-        <!-- =========================
-             QUESTÃO
-        ========================= -->
-
         <div class="questao-card">
 
-
-            <!-- PROGRESSO -->
 
             <div class="progress-bar-container">
 
@@ -1296,10 +1266,8 @@
             </div>
 
 
-            <!-- CABEÇALHO -->
 
             <div class="questao-topo">
-
 
                 <div class="numero">
 
@@ -1315,7 +1283,6 @@
 
 
                 <div class="informacoes">
-
 
                     <span class="tag tag-serie">
 
@@ -1344,13 +1311,11 @@
 
                     {% endif %}
 
-
                 </div>
 
             </div>
 
 
-            <!-- ENUNCIADO -->
 
             <div class="enunciado-label">
                 Enunciado
@@ -1364,9 +1329,10 @@
             </div>
 
 
-            <!-- =========================
-                 ALTERNATIVAS
-            ========================= -->
+
+            <!-- =================================================
+                 FORMULÁRIO DA QUESTÃO
+            ================================================== -->
 
             <form
                 method="post"
@@ -1384,195 +1350,103 @@
                 >
 
 
+                <!-- =================================================
+                     ALTERNATIVAS
+                ================================================== -->
+
                 <div class="alternativas">
 
+                    {% if alternativas %}
 
-                    <!-- A -->
+                        {% for alternativa in alternativas %}
 
-                    <label class="
-                        alternativa
+                            <label
+                                class="
+                                    alternativa
 
-                        {% if resposta_mostrada %}
+                                    {% if resposta_mostrada %}
 
-                            {% if questao_atual.resposta_correta == 'A' %}
+                                        {% if alternativa.letra_original == resposta_correta %}
 
-                                alternativa-correta
+                                            alternativa-correta
 
-                            {% elif resposta_escolhida == 'A' %}
+                                        {% elif alternativa.letra_original == resposta_escolhida %}
 
-                                alternativa-errada
+                                            alternativa-errada
 
-                            {% endif %}
+                                        {% endif %}
 
-                        {% endif %}
-                    ">
+                                    {% endif %}
+                                "
+                            >
 
-                        <input
-                            type="radio"
-                            name="resposta"
-                            value="A"
+                                <input
+                                    type="radio"
+                                    name="resposta"
+                                    value="{{ alternativa.letra_original }}"
 
-                            {% if resposta_atual == 'A' %}
-                                checked
-                            {% endif %}
+                                    {% if resposta_atual == alternativa.letra_original %}
+                                        checked
+                                    {% endif %}
 
-                            {% if resposta_mostrada %}
-                                disabled
-                            {% endif %}
+                                    {% if resposta_mostrada %}
+                                        disabled
+                                    {% endif %}
+                                >
+
+
+                                <span class="letra">
+
+                                    {{ alternativa.letra }})
+
+                                </span>
+
+
+                                <span class="texto-alternativa">
+
+                                    {{ alternativa.texto }}
+
+                                </span>
+
+                            </label>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <!-- Isso ajuda a identificar imediatamente
+                             se o problema está vindo do View -->
+
+                        <div
+                            style="
+                                padding:20px;
+                                background:#fef2f2;
+                                border:1px solid #fecaca;
+                                border-radius:12px;
+                                color:#dc2626;
+                                text-align:center;
+                            "
                         >
 
-                        <span class="letra">
-                            A)
-                        </span>
+                            <strong>
+                                Nenhuma alternativa foi carregada.
+                            </strong>
 
-                        <span class="texto-alternativa">
-                            {{ questao_atual.alternativa_a }}
-                        </span>
+                            <br>
 
-                    </label>
+                            Verifique as alternativas da questão.
 
+                        </div>
 
-                    <!-- B -->
-
-                    <label class="
-                        alternativa
-
-                        {% if resposta_mostrada %}
-
-                            {% if questao_atual.resposta_correta == 'B' %}
-
-                                alternativa-correta
-
-                            {% elif resposta_escolhida == 'B' %}
-
-                                alternativa-errada
-
-                            {% endif %}
-
-                        {% endif %}
-                    ">
-
-                        <input
-                            type="radio"
-                            name="resposta"
-                            value="B"
-
-                            {% if resposta_atual == 'B' %}
-                                checked
-                            {% endif %}
-
-                            {% if resposta_mostrada %}
-                                disabled
-                            {% endif %}
-                        >
-
-                        <span class="letra">
-                            B)
-                        </span>
-
-                        <span class="texto-alternativa">
-                            {{ questao_atual.alternativa_b }}
-                        </span>
-
-                    </label>
-
-
-                    <!-- C -->
-
-                    <label class="
-                        alternativa
-
-                        {% if resposta_mostrada %}
-
-                            {% if questao_atual.resposta_correta == 'C' %}
-
-                                alternativa-correta
-
-                            {% elif resposta_escolhida == 'C' %}
-
-                                alternativa-errada
-
-                            {% endif %}
-
-                        {% endif %}
-                    ">
-
-                        <input
-                            type="radio"
-                            name="resposta"
-                            value="C"
-
-                            {% if resposta_atual == 'C' %}
-                                checked
-                            {% endif %}
-
-                            {% if resposta_mostrada %}
-                                disabled
-                            {% endif %}
-                        >
-
-                        <span class="letra">
-                            C)
-                        </span>
-
-                        <span class="texto-alternativa">
-                            {{ questao_atual.alternativa_c }}
-                        </span>
-
-                    </label>
-
-
-                    <!-- D -->
-
-                    <label class="
-                        alternativa
-
-                        {% if resposta_mostrada %}
-
-                            {% if questao_atual.resposta_correta == 'D' %}
-
-                                alternativa-correta
-
-                            {% elif resposta_escolhida == 'D' %}
-
-                                alternativa-errada
-
-                            {% endif %}
-
-                        {% endif %}
-                    ">
-
-                        <input
-                            type="radio"
-                            name="resposta"
-                            value="D"
-
-                            {% if resposta_atual == 'D' %}
-                                checked
-                            {% endif %}
-
-                            {% if resposta_mostrada %}
-                                disabled
-                            {% endif %}
-                        >
-
-                        <span class="letra">
-                            D)
-                        </span>
-
-                        <span class="texto-alternativa">
-                            {{ questao_atual.alternativa_d }}
-                        </span>
-
-                    </label>
-
+                    {% endif %}
 
                 </div>
 
 
-                <!-- =========================
-                     RESPONDER
-                ========================= -->
+
+                <!-- =================================================
+                     BOTÃO RESPONDER
+                ================================================== -->
 
                 {% if not resposta_mostrada %}
 
@@ -1595,13 +1469,13 @@
 
                 {% endif %}
 
-
             </form>
 
 
-            <!-- =========================
+
+            <!-- =================================================
                  FEEDBACK
-            ========================= -->
+            ================================================== -->
 
             {% if resposta_mostrada %}
 
@@ -1615,11 +1489,15 @@
                         <div class="feedback-conteudo">
 
                             <div class="feedback-titulo">
+
                                 Resposta correta!
+
                             </div>
 
                             <div class="feedback-texto">
+
                                 Muito bem! Você acertou esta questão.
+
                             </div>
 
                         </div>
@@ -1629,6 +1507,7 @@
 
                 {% else %}
 
+
                     <div class="feedback feedback-incorreto">
 
                         <i data-lucide="circle-x"></i>
@@ -1636,11 +1515,15 @@
                         <div class="feedback-conteudo">
 
                             <div class="feedback-titulo">
+
                                 Você errou esta questão.
+
                             </div>
 
                             <div class="feedback-texto">
+
                                 A resposta correta está destacada em verde.
+
                             </div>
 
                         </div>
@@ -1650,9 +1533,10 @@
                 {% endif %}
 
 
-                <!-- =========================
-                     PRÓXIMA QUESTÃO
-                ========================= -->
+
+                <!-- =================================================
+                     PRÓXIMA / FINALIZAR
+                ================================================== -->
 
                 <div class="botoes-navegacao">
 
@@ -1691,19 +1575,15 @@
 
                 </div>
 
-
             {% endif %}
 
 
         </div>
 
 
+
     {% else %}
 
-
-        <!-- =========================
-             SEM QUESTÕES
-        ========================= -->
 
         <div class="questao-card resultado-final">
 
@@ -1713,9 +1593,11 @@
 
             </div>
 
+
             <h2>
                 Nenhuma questão disponível
             </h2>
+
 
             <p>
                 Ainda não existem questões cadastradas para esta série.
@@ -1730,6 +1612,7 @@
 </main>
 
 
+
 <footer class="footer">
 
     ULYSSES • Sistema Educacional
@@ -1737,14 +1620,15 @@
 </footer>
 
 
+
 <script>
 
     lucide.createIcons();
 
 
-    /* =========================================
+    /* =====================================================
        CRONÔMETRO
-    ========================================= */
+    ===================================================== */
 
     {% if questao_atual and not questionario_finalizado and not questionario_bloqueado %}
 
@@ -1828,9 +1712,10 @@
     {% endif %}
 
 
-    /* =========================================
+
+    /* =====================================================
        CONTADOR DO BLOQUEIO
-    ========================================= */
+    ===================================================== */
 
     {% if questionario_bloqueado %}
 
@@ -1855,6 +1740,7 @@
 
                 contador.textContent =
                     "00:00:00";
+
 
                 setTimeout(
                     () => location.reload(),
@@ -1906,9 +1792,10 @@
     {% endif %}
 
 
-    /* =========================================
+
+    /* =====================================================
        FINALIZAÇÃO
-    ========================================= */
+    ===================================================== */
 
     {% if questionario_finalizado %}
 
@@ -1919,9 +1806,10 @@
     {% endif %}
 
 
-    /* =========================================
-       ANTES DE RESPONDER
-    ========================================= */
+
+    /* =====================================================
+       TEMPO ANTES DE RESPONDER
+    ===================================================== */
 
     const formulario =
         document.getElementById(

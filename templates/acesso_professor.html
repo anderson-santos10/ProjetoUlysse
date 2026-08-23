@@ -1,0 +1,470 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Acesso do Professor | ULYSSES</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-body: #f8fafc;
+            --surface: #ffffff;
+            --surface-hover: #f1f5f9;
+
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
+            --primary-glow: rgba(37, 99, 235, 0.15);
+
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+
+            --border: #e2e8f0;
+
+            --danger: #ef4444;
+            --danger-light: #fef2f2;
+            --danger-border: #fecaca;
+
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 10px 25px -5px rgba(37, 99, 235, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+            --shadow-lg: 0 20px 30px -10px rgba(15, 23, 42, 0.08);
+        }
+
+        /* MODO ESCURO AUTOMÁTICO */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0b0f19;
+                --surface: #111827;
+                --surface-hover: #1f2937;
+
+                --primary: #3b82f6;
+                --primary-hover: #60a5fa;
+                --primary-light: rgba(59, 130, 246, 0.12);
+                --primary-glow: rgba(59, 130, 246, 0.25);
+
+                --text-main: #f8fafc;
+                --text-muted: #94a3b8;
+
+                --border: #1f2937;
+
+                --danger: #f87171;
+                --danger-light: rgba(239, 68, 68, 0.12);
+                --danger-border: rgba(239, 68, 68, 0.3);
+
+                --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* HEADER */
+        .header {
+            width: 100%;
+            height: 68px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            transition: opacity 0.2s;
+        }
+
+        .logo:hover {
+            opacity: 0.9;
+        }
+
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s;
+            background: transparent;
+        }
+
+        .back-link:hover {
+            color: var(--text-main);
+            background: var(--surface-hover);
+        }
+
+        /* CONTAINER */
+        .container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        /* CARD DE LOGIN */
+        .card {
+            width: 100%;
+            max-width: 420px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 40px 32px;
+            box-shadow: var(--shadow-md);
+            text-align: center;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .icon-wrapper {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 20px;
+            border-radius: 16px;
+            background: var(--primary-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--primary-glow);
+        }
+
+        .icon-wrapper i {
+            width: 28px;
+            height: 28px;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .description {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 28px;
+        }
+
+        /* FORMULÁRIO */
+        .form {
+            text-align: left;
+        }
+
+        .field-group {
+            margin-bottom: 20px;
+        }
+
+        .label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .input-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon-left {
+            position: absolute;
+            left: 14px;
+            width: 18px;
+            height: 18px;
+            color: var(--text-muted);
+            pointer-events: none;
+            transition: color 0.2s;
+        }
+
+        input {
+            width: 100%;
+            height: 48px;
+            padding: 0 44px 0 42px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            background: var(--surface);
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        input::placeholder {
+            color: var(--text-muted);
+            opacity: 0.7;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-glow);
+        }
+
+        .input-container:focus-within .input-icon-left {
+            color: var(--primary);
+        }
+
+        /* BOTÃO MOSTRAR SENHA */
+        .toggle-password {
+            position: absolute;
+            right: 8px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+
+        .toggle-password:hover {
+            color: var(--text-main);
+        }
+
+        .toggle-password i {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* MENSAGEM DE ERRO */
+        .error {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--danger-light);
+            color: var(--danger);
+            border: 1px solid var(--danger-border);
+            border-radius: var(--radius-md);
+            padding: 12px 14px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: left;
+            animation: shake 0.3s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+        }
+
+        .error i {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        /* BOTÃO SUBMIT */
+        .button {
+            width: 100%;
+            height: 48px;
+            border: none;
+            border-radius: var(--radius-md);
+            background: var(--primary);
+            color: white;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+
+        .button:active {
+            transform: translateY(0);
+        }
+
+        .button i {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* FOOTER */
+        .footer {
+            text-align: center;
+            padding: 24px;
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        /* RESPONSIVO */
+        @media (max-width: 480px) {
+            .header {
+                padding: 0 16px;
+            }
+
+            .card {
+                padding: 30px 20px;
+                border-radius: var(--radius-md);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <a href="{% url 'home' %}" class="logo">
+            <i data-lucide="graduation-cap" style="width: 24px; height: 24px;"></i>
+            ULYSSES
+        </a>
+
+        <a href="{% url 'home' %}" class="back-link">
+            <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+            Voltar
+        </a>
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="container">
+        <div class="card">
+            
+            <div class="icon-wrapper">
+                <i data-lucide="shield-lock"></i>
+            </div>
+
+            <h1>Área do Professor</h1>
+            <p class="description">Esta área é restrita aos professores. Digite a senha de acesso para continuar.</p>
+
+            {% if erro %}
+                <div class="error" role="alert">
+                    <i data-lucide="alert-circle"></i>
+                    <span>{{ erro }}</span>
+                </div>
+            {% endif %}
+
+            <form method="POST" class="form">
+                {% csrf_token %}
+
+                <div class="field-group">
+                    <label for="senha" class="label">Senha de acesso</label>
+                    <div class="input-container">
+                        <i data-lucide="lock" class="input-icon-left"></i>
+                        <input 
+                            type="password" 
+                            id="senha" 
+                            name="senha" 
+                            placeholder="Digite sua senha" 
+                            required 
+                            autofocus
+                        >
+                        <button type="button" class="toggle-password" id="togglePassword" aria-label="Alternar visibilidade da senha">
+                            <i data-lucide="eye" id="eyeIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="button">
+                    <i data-lucide="log-in"></i>
+                    Entrar na Área do Professor
+                </button>
+            </form>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        ULYSSES • Sistema Educacional
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script>
+        // Inicializar ícones do Lucide
+        lucide.createIcons();
+
+        // Mostrar / Ocultar Senha
+        const toggleBtn = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('senha');
+
+        toggleBtn.addEventListener('click', () => {
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+
+            // Atualiza o ícone
+            toggleBtn.innerHTML = isPassword 
+                ? '<i data-lucide="eye-off"></i>' 
+                : '<i data-lucide="eye"></i>';
+            
+            lucide.createIcons();
+        });
+    </script>
+
+</body>
+
+</html>

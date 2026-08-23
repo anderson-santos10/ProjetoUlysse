@@ -6,10 +6,14 @@ from alunos.models import Aluno
 class Questao(models.Model):
 
     SERIE_CHOICES = [
+        ('5', '5º Ano'),
         ('6', '6º Ano'),
         ('7', '7º Ano'),
         ('8', '8º Ano'),
         ('9', '9º Ano'),
+        ('1S', '1ª Série'),
+        ('2S', '2ª Série'),
+        ('3S', '3ª Série'),
     ]
 
     DIFICULDADE_CHOICES = [
@@ -30,7 +34,7 @@ class Questao(models.Model):
     )
 
     serie = models.CharField(
-        max_length=1,
+        max_length=2,
         choices=SERIE_CHOICES,
         verbose_name='Série'
     )
@@ -80,14 +84,35 @@ class Questao(models.Model):
 
 
 class Resultado(models.Model):
-    aluno = models.ForeignKey(Aluno, on_delete=models.CASCADE, related_name='resultados')
+
+    aluno = models.ForeignKey(
+        Aluno,
+        on_delete=models.CASCADE,
+        related_name='resultados'
+    )
+
     acertos = models.IntegerField()
+
     erros = models.IntegerField()
+
     total_questoes = models.IntegerField()
-    nota = models.DecimalField(max_digits=4, decimal_places=2)
-    xp_ganho = models.PositiveIntegerField(default=0)
-    tempo_segundos = models.PositiveIntegerField(default=0)
-    data = models.DateTimeField(auto_now_add=True)
+
+    nota = models.DecimalField(
+        max_digits=4,
+        decimal_places=2
+    )
+
+    xp_ganho = models.PositiveIntegerField(
+        default=0
+    )
+
+    tempo_segundos = models.PositiveIntegerField(
+        default=0
+    )
+
+    data = models.DateTimeField(
+        auto_now_add=True
+    )
 
     def __str__(self):
         return f'{self.aluno.nome} - Nota {self.nota}'

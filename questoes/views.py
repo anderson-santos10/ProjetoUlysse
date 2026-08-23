@@ -1,9 +1,9 @@
+import random
 from datetime import timedelta
 
 from django.views.generic import ListView, CreateView
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
-from django.db.models import Max
 from django.utils import timezone
 
 from .models import Questao, Resultado
@@ -37,6 +37,39 @@ class ListaQuestoesView(ListView):
         ).order_by('numero')
 
     # =====================================================
+    # RETORNA QUESTÕES NA ORDEM SALVA NA SESSÃO
+    # =====================================================
+
+    def obter_questoes_questionario(self):
+
+        questoes_base = list(self.get_queryset())
+
+        if not questoes_base:
+            return []
+
+        questoes_ordem = self.request.session.get(
+            'questoes_ordem'
+        )
+
+        # Se ainda não existe uma ordem salva,
+        # mantém a ordem original.
+        if not questoes_ordem:
+            return questoes_base
+
+        questoes_dict = {
+            questao.id: questao
+            for questao in questoes_base
+        }
+
+        questoes = [
+            questoes_dict[questao_id]
+            for questao_id in questoes_ordem
+            if questao_id in questoes_dict
+        ]
+
+        return questoes
+
+    # =====================================================
     # VERIFICA BLOQUEIO DE 8 HORAS
     # =====================================================
 
@@ -52,7 +85,6 @@ class ListaQuestoesView(ListView):
             .first()
         )
 
-        # Nunca fez questionário
         if not ultima_tentativa:
             return False, None, 0
 
@@ -63,7 +95,6 @@ class ListaQuestoesView(ListView):
             timedelta(hours=8)
         )
 
-        # Ainda está dentro das 8 horas
         if agora < proxima_tentativa:
 
             segundos_restantes = int(
@@ -78,7 +109,6 @@ class ListaQuestoesView(ListView):
                 segundos_restantes
             )
 
-        # Já passou das 8 horas
         return False, None, 0
 
     # =====================================================
@@ -86,13 +116,6 @@ class ListaQuestoesView(ListView):
     # =====================================================
 
     def post(self, request, *args, **kwargs):
-
-        questoes = list(self.get_queryset())
-
-        if not questoes:
-            return redirect(
-                'questoes:lista_questoes'
-            )
 
         acao = request.POST.get('acao')
 
@@ -116,13 +139,26 @@ class ListaQuestoesView(ListView):
             except Aluno.DoesNotExist:
                 return redirect('home')
 
+            questoes = list(
+                Questao.objects.filter(
+                    serie=aluno.serie
+                ).order_by('numero')
+            )
+
+            if not questoes:
+                return redirect(
+                    'questoes:lista_questoes'
+                )
+
             # =============================================
             # VERIFICA BLOQUEIO
             # =============================================
 
-            bloqueado, proxima_tentativa, segundos_restantes = (
-                self.verificar_bloqueio(aluno)
-            )
+            (
+                bloqueado,
+                proxima_tentativa,
+                segundos_restantes
+            ) = self.verificar_bloqueio(aluno)
 
             if bloqueado:
 
@@ -152,6 +188,46 @@ class ListaQuestoesView(ListView):
             )
 
             # =============================================
+            # RANDOMIZA AS QUESTÕES
+            # =============================================
+
+            questoes_ids = [
+                questao.id
+                for questao in questoes
+            ]
+
+            random.shuffle(questoes_ids)
+
+            request.session[
+                'questoes_ordem'
+            ] = questoes_ids
+
+            # =============================================
+            # RANDOMIZA AS ALTERNATIVAS
+            # =============================================
+
+            alternativas_ordem = {}
+
+            for questao in questoes:
+
+                alternativas = [
+                    'A',
+                    'B',
+                    'C',
+                    'D'
+                ]
+
+                random.shuffle(alternativas)
+
+                alternativas_ordem[
+                    str(questao.id)
+                ] = alternativas
+
+            request.session[
+                'alternativas_ordem'
+            ] = alternativas_ordem
+
+            # =============================================
             # INICIA QUESTIONÁRIO
             # =============================================
 
@@ -172,6 +248,18 @@ class ListaQuestoesView(ListView):
             ] = False
 
             request.session[
+                'resposta_escolhida'
+            ] = None
+
+            request.session[
+                'resposta_correta'
+            ] = None
+
+            request.session[
+                'acertou'
+            ] = False
+
+            request.session[
                 'acertos'
             ] = 0
 
@@ -184,6 +272,17 @@ class ListaQuestoesView(ListView):
                 'inicio_questionario'
             ] = timezone.now().isoformat()
 
+            return redirect(
+                'questoes:lista_questoes'
+            )
+
+        # =================================================
+        # QUESTÕES NA ORDEM DO QUESTIONÁRIO
+        # =================================================
+
+        questoes = self.obter_questoes_questionario()
+
+        if not questoes:
             return redirect(
                 'questoes:lista_questoes'
             )
@@ -223,8 +322,6 @@ class ListaQuestoesView(ListView):
 
         if acao == 'responder':
 
-            # Segurança: não permite responder
-            # depois que o questionário terminou
             if request.session.get(
                 'questionario_finalizado',
                 False
@@ -236,6 +333,13 @@ class ListaQuestoesView(ListView):
             resposta = request.POST.get(
                 'resposta'
             )
+
+            # Garante que a resposta enviada
+            # corresponde a uma alternativa válida
+            if resposta not in ['A', 'B', 'C', 'D']:
+                return redirect(
+                    'questoes:lista_questoes'
+                )
 
             if resposta:
 
@@ -443,7 +547,11 @@ class ListaQuestoesView(ListView):
             **kwargs
         )
 
-        questoes = context['questoes']
+        # =================================================
+        # QUESTÕES NA ORDEM RANDOMIZADA
+        # =================================================
+
+        questoes = self.obter_questoes_questionario()
 
         # =================================================
         # ALUNO
@@ -523,6 +631,51 @@ class ListaQuestoesView(ListView):
             )
 
         # =================================================
+        # ALTERNATIVAS RANDOMIZADAS
+        # =================================================
+
+        alternativas = []
+
+        if questao_atual:
+
+            alternativas_ordem = (
+                self.request.session.get(
+                    'alternativas_ordem',
+                    {}
+                )
+            )
+
+            ordem = alternativas_ordem.get(
+                str(questao_atual.id),
+                ['A', 'B', 'C', 'D']
+            )
+
+            textos = {
+                'A': questao_atual.alternativa_a,
+                'B': questao_atual.alternativa_b,
+                'C': questao_atual.alternativa_c,
+                'D': questao_atual.alternativa_d,
+            }
+
+            letras_exibicao = [
+                'A',
+                'B',
+                'C',
+                'D'
+            ]
+
+            for letra_exibicao, letra_original in zip(
+                letras_exibicao,
+                ordem
+            ):
+
+                alternativas.append({
+                    'letra': letra_exibicao,
+                    'letra_original': letra_original,
+                    'texto': textos[letra_original],
+                })
+
+        # =================================================
         # CONTROLE DE EXIBIÇÃO
         # =================================================
 
@@ -576,6 +729,9 @@ class ListaQuestoesView(ListView):
                 bool(questoes)
                 and indice == len(questoes) - 1
             ),
+
+            # Alternativas
+            'alternativas': alternativas,
 
             # Resposta
             'resposta_atual':
@@ -660,7 +816,6 @@ class ListaQuestoesView(ListView):
 class CadastrarQuestaoView(CreateView):
 
     model = Questao
-
     template_name = 'questao_form.html'
 
     fields = [
@@ -672,35 +827,22 @@ class CadastrarQuestaoView(CreateView):
         'alternativa_b',
         'alternativa_c',
         'alternativa_d',
-        'resposta_correta'
+        'resposta_correta',
     ]
 
-    success_url = reverse_lazy(
-        'questoes:lista_questoes'
-    )
+    success_url = reverse_lazy('area_professor')
 
-
-# =========================================================
-# RANKING
-# =========================================================
-
-class RankingView(ListView):
-
-    model = Aluno
-
-    template_name = 'ranking.html'
-
-    context_object_name = 'ranking'
-
-    def get_queryset(self):
-
-        return Aluno.objects.annotate(
-            melhor_nota=Max(
-                'resultados__nota'
-            )
-        ).filter(
-            melhor_nota__isnull=False
-        ).order_by(
-            '-melhor_nota',
-            'nome'
+    def form_valid(self, form):
+        print(
+            "QUESTÃO SALVA:",
+            form.cleaned_data
         )
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        print(
+            "ERRO AO SALVAR QUESTÃO:"
+        )
+        print(form.errors)
+        return super().form_invalid(form)
+
