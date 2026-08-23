@@ -28,5 +28,10 @@ class Aluno(models.Model):
         choices=SERIES
     )
 
+    xp = models.PositiveIntegerField(
+        default=0,
+        verbose_name='XP'
+    )
+
     def __str__(self):
         return f"{self.nome} - RA: {self.ra}"

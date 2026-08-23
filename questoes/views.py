@@ -1,11 +1,12 @@
 import random
 from datetime import timedelta
-from .forms import QuestaoForm
+
 from django.views.generic import ListView, CreateView
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from django.utils import timezone
 
+from .forms import QuestaoForm
 from .models import Questao, Resultado
 from alunos.models import Aluno
 
@@ -51,8 +52,6 @@ class ListaQuestoesView(ListView):
             'questoes_ordem'
         )
 
-        # Se ainda não existe uma ordem salva,
-        # mantém a ordem original.
         if not questoes_ordem:
             return questoes_base
 
@@ -110,6 +109,91 @@ class ListaQuestoesView(ListView):
             )
 
         return False, None, 0
+
+    # =====================================================
+    # CALCULA XP
+    # =====================================================
+
+    def calcular_xp(self, questoes, respostas):
+
+        """
+        Calcula o XP ganho pelo aluno na prova.
+
+        XP base:
+
+        Fácil   = 10 XP
+        Médio   = 15 XP
+        Difícil = 20 XP
+
+        A partir do 3º acerto consecutivo:
+        +5 XP de bônus por acerto.
+
+        Qualquer erro zera a sequência.
+
+        Exemplo:
+
+        Acerto 1 → XP normal
+        Acerto 2 → XP normal
+        Acerto 3 → XP normal + 5
+        Acerto 4 → XP normal + 5
+        Acerto 5 → XP normal + 5
+
+        Se errar:
+
+        Erro → 0 XP e sequência volta para 0.
+        """
+
+        xp_total = 0
+
+        sequencia_acertos = 0
+
+        xp_dificuldade = {
+            'facil': 10,
+            'medio': 15,
+            'dificil': 20,
+        }
+
+        for questao in questoes:
+
+            resposta = respostas.get(
+                str(questao.id)
+            )
+
+            # =================================================
+            # ERRO
+            # =================================================
+
+            if resposta != questao.resposta_correta:
+
+                # Zera a sequência
+                sequencia_acertos = 0
+
+                continue
+
+            # =================================================
+            # ACERTO
+            # =================================================
+
+            sequencia_acertos += 1
+
+            # XP base da dificuldade
+            xp = xp_dificuldade.get(
+                questao.dificuldade,
+                0
+            )
+
+            # =================================================
+            # BÔNUS DE SEQUÊNCIA
+            # =================================================
+
+            if sequencia_acertos >= 3:
+
+                xp += 5
+
+            # Adiciona ao XP total da prova
+            xp_total += xp
+
+        return xp_total
 
     # =====================================================
     # POST
@@ -267,6 +351,10 @@ class ListaQuestoesView(ListView):
                 'total_questoes'
             ] = 0
 
+            request.session[
+                'xp_ganho'
+            ] = 0
+
             # Guarda início
             request.session[
                 'inicio_questionario'
@@ -334,41 +422,43 @@ class ListaQuestoesView(ListView):
                 'resposta'
             )
 
-            # Garante que a resposta enviada
-            # corresponde a uma alternativa válida
-            if resposta not in ['A', 'B', 'C', 'D']:
+            # Garante resposta válida
+            if resposta not in [
+                'A',
+                'B',
+                'C',
+                'D'
+            ]:
                 return redirect(
                     'questoes:lista_questoes'
                 )
 
-            if resposta:
+            respostas[
+                str(questao.id)
+            ] = resposta
 
-                respostas[
-                    str(questao.id)
-                ] = resposta
+            request.session[
+                'respostas'
+            ] = respostas
 
-                request.session[
-                    'respostas'
-                ] = respostas
+            request.session[
+                'resposta_mostrada'
+            ] = True
 
-                request.session[
-                    'resposta_mostrada'
-                ] = True
+            request.session[
+                'resposta_escolhida'
+            ] = resposta
 
-                request.session[
-                    'resposta_escolhida'
-                ] = resposta
+            request.session[
+                'resposta_correta'
+            ] = questao.resposta_correta
 
-                request.session[
-                    'resposta_correta'
-                ] = questao.resposta_correta
-
-                request.session[
-                    'acertou'
-                ] = (
-                    resposta ==
-                    questao.resposta_correta
-                )
+            request.session[
+                'acertou'
+            ] = (
+                resposta ==
+                questao.resposta_correta
+            )
 
             return redirect(
                 'questoes:lista_questoes'
@@ -470,6 +560,15 @@ class ListaQuestoesView(ListView):
             )
 
             # =============================================
+            # CALCULA XP
+            # =============================================
+
+            xp_ganho = self.calcular_xp(
+                questoes,
+                respostas
+            )
+
+            # =============================================
             # CALCULA TEMPO
             # =============================================
 
@@ -497,6 +596,16 @@ class ListaQuestoesView(ListView):
                 )
 
             # =============================================
+            # ADICIONA XP AO ALUNO
+            # =============================================
+
+            aluno.xp += xp_ganho
+
+            aluno.save(
+                update_fields=['xp']
+            )
+
+            # =============================================
             # SALVA RESULTADO
             # =============================================
 
@@ -506,6 +615,7 @@ class ListaQuestoesView(ListView):
                 erros=erros,
                 total_questoes=total,
                 nota=nota,
+                xp_ganho=xp_ganho,
                 tempo_segundos=tempo_segundos
             )
 
@@ -520,6 +630,10 @@ class ListaQuestoesView(ListView):
             request.session[
                 'total_questoes'
             ] = total
+
+            request.session[
+                'xp_ganho'
+            ] = xp_ganho
 
             request.session[
                 'questionario_finalizado'
@@ -778,6 +892,15 @@ class ListaQuestoesView(ListView):
                     'total_questoes',
                     0
                 ),
+
+            'xp_ganho':
+                self.request.session.get(
+                    'xp_ganho',
+                    0
+                ),
+
+            'xp_total':
+                aluno.xp if aluno else 0,
         })
 
         # =================================================
@@ -808,7 +931,6 @@ class ListaQuestoesView(ListView):
 
         return context
 
-
 # =========================================================
 # CADASTRAR QUESTÃO
 # =========================================================
@@ -819,7 +941,9 @@ class CadastrarQuestaoView(CreateView):
     form_class = QuestaoForm
     template_name = 'questao_form.html'
 
-    success_url = reverse_lazy('area_professor')
+    success_url = reverse_lazy(
+        'area_professor'
+    )
 
     def form_valid(self, form):
 
@@ -839,4 +963,3 @@ class CadastrarQuestaoView(CreateView):
         print(form.errors)
 
         return super().form_invalid(form)
-
