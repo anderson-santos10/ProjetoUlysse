@@ -1,0 +1,1539 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ nome_serie }} | ULYSSES</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+
+        /* =========================================================
+           VARIÁVEIS
+        ========================================================= */
+
+        :root {
+            --bg-body: #f8fafc;
+            --surface: #ffffff;
+            --surface-hover: #f1f5f9;
+
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
+
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+
+            --border: #e2e8f0;
+
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-pill: 9999px;
+
+            --shadow-sm:
+                0 1px 3px 0 rgba(0, 0, 0, 0.1),
+                0 1px 2px -1px rgba(0, 0, 0, 0.1);
+
+            --shadow-md:
+                0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                0 2px 4px -2px rgba(0, 0, 0, 0.1);
+
+            --transition:
+                all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+
+        /* =========================================================
+           DARK MODE
+        ========================================================= */
+
+        @media (prefers-color-scheme: dark) {
+
+            :root {
+                --bg-body: #0f172a;
+                --surface: #1e293b;
+                --surface-hover: #334155;
+
+                --primary: #3b82f6;
+                --primary-hover: #60a5fa;
+                --primary-light: rgba(59, 130, 246, 0.1);
+
+                --text-main: #f1f5f9;
+                --text-muted: #94a3b8;
+
+                --border: #334155;
+
+                --shadow-sm:
+                    0 1px 3px 0 rgba(0, 0, 0, 0.3);
+
+                --shadow-md:
+                    0 4px 6px -1px rgba(0, 0, 0, 0.4);
+            }
+        }
+
+
+        /* =========================================================
+           RESET
+        ========================================================= */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        body {
+            font-family:
+                'Plus Jakarta Sans',
+                system-ui,
+                -apple-system,
+                sans-serif;
+
+            background: var(--bg-body);
+            color: var(--text-main);
+
+            min-height: 100vh;
+
+            -webkit-font-smoothing: antialiased;
+
+            transition:
+                background-color var(--transition),
+                color var(--transition);
+        }
+
+
+        /* =========================================================
+           HEADER
+        ========================================================= */
+
+        .header {
+
+            background: var(--surface);
+
+            border-bottom:
+                1px solid var(--border);
+
+            height: 64px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 32px;
+
+            position: sticky;
+            top: 0;
+
+            z-index: 10;
+
+            box-shadow: var(--shadow-sm);
+        }
+
+
+        .logo {
+
+            font-size: 18px;
+
+            font-weight: 800;
+
+            color: var(--primary);
+
+            letter-spacing: -0.5px;
+
+            display: flex;
+            align-items: center;
+
+            gap: 10px;
+
+            text-decoration: none;
+        }
+
+
+        .header-right {
+
+            display: flex;
+            align-items: center;
+
+            gap: 10px;
+        }
+
+
+        .btn-back {
+
+            display: flex;
+            align-items: center;
+
+            gap: 6px;
+
+            padding: 8px 14px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius:
+                var(--radius-md);
+
+            background:
+                var(--surface);
+
+            color:
+                var(--text-main);
+
+            text-decoration: none;
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            transition:
+                var(--transition);
+        }
+
+
+        .btn-back:hover {
+
+            border-color:
+                var(--primary);
+
+            color:
+                var(--primary);
+
+            background:
+                var(--primary-light);
+        }
+
+
+        /* =========================================================
+           CONTAINER
+        ========================================================= */
+
+        .container {
+
+            width: 100%;
+
+            max-width: 1040px;
+
+            margin: 32px auto 64px;
+
+            padding: 0 24px;
+        }
+
+
+        /* =========================================================
+           BREADCRUMB
+        ========================================================= */
+
+        .breadcrumb {
+
+            display: flex;
+            align-items: center;
+
+            gap: 8px;
+
+            font-size: 13px;
+
+            color: var(--text-muted);
+
+            margin-bottom: 24px;
+
+            font-weight: 500;
+        }
+
+
+        .breadcrumb a {
+
+            color: var(--text-muted);
+
+            text-decoration: none;
+
+            transition:
+                color var(--transition);
+        }
+
+
+        .breadcrumb a:hover {
+
+            color:
+                var(--primary);
+        }
+
+
+        /* =========================================================
+           TÍTULO
+        ========================================================= */
+
+        .header-section {
+
+            margin-bottom: 32px;
+        }
+
+
+        .title h1 {
+
+            font-size: 28px;
+
+            font-weight: 800;
+
+            color: var(--text-main);
+
+            letter-spacing: -0.03em;
+
+            margin-bottom: 6px;
+        }
+
+
+        .title p {
+
+            color:
+                var(--text-muted);
+
+            font-size: 15px;
+        }
+
+
+        /* =========================================================
+           TOOLBAR
+        ========================================================= */
+
+        .toolbar {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 16px;
+
+            margin-bottom: 20px;
+
+            background:
+                var(--surface);
+
+            padding: 16px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius:
+                var(--radius-lg);
+
+            box-shadow:
+                var(--shadow-sm);
+        }
+
+
+        .search-box {
+
+            position: relative;
+
+            flex: 1;
+
+            max-width: 400px;
+        }
+
+
+        .search-box input {
+
+            width: 100%;
+
+            height: 42px;
+
+            padding:
+                0 12px 0 40px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius:
+                var(--radius-md);
+
+            font-size: 14px;
+
+            font-family: inherit;
+
+            font-weight: 500;
+
+            color:
+                var(--text-main);
+
+            outline: none;
+
+            transition:
+                var(--transition);
+
+            background:
+                var(--bg-body);
+        }
+
+
+        .search-box input:focus {
+
+            background:
+                var(--surface);
+
+            border-color:
+                var(--primary);
+
+            box-shadow:
+                0 0 0 3px var(--primary-light);
+        }
+
+
+        .search-icon {
+
+            position: absolute;
+
+            left: 14px;
+
+            top: 50%;
+
+            transform:
+                translateY(-50%);
+
+            color:
+                var(--text-muted);
+
+            width: 18px;
+            height: 18px;
+
+            pointer-events: none;
+        }
+
+
+        .counter {
+
+            font-size: 14px;
+
+            color:
+                var(--text-muted);
+
+            font-weight: 500;
+
+            white-space: nowrap;
+        }
+
+
+        .counter span {
+
+            color:
+                var(--text-main);
+
+            font-weight: 700;
+
+            font-size: 16px;
+        }
+
+
+        /* =========================================================
+           CARD / TABELA
+        ========================================================= */
+
+        .card {
+
+            background:
+                var(--surface);
+
+            border:
+                1px solid var(--border);
+
+            border-radius:
+                var(--radius-lg);
+
+            box-shadow:
+                var(--shadow-md);
+
+            overflow: hidden;
+        }
+
+
+        .table-container {
+
+            width: 100%;
+
+            overflow-x: auto;
+        }
+
+
+        table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+            text-align: left;
+
+            min-width: 600px;
+        }
+
+
+        th {
+
+            background:
+                var(--bg-body);
+
+            padding:
+                16px 24px;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+
+            color:
+                var(--text-muted);
+
+            border-bottom:
+                1px solid var(--border);
+
+            letter-spacing: 0.05em;
+        }
+
+
+        td {
+
+            padding:
+                16px 24px;
+
+            border-bottom:
+                1px solid var(--border);
+
+            font-size: 15px;
+
+            color:
+                var(--text-main);
+
+            vertical-align: middle;
+
+            transition:
+                background-color 0.1s ease;
+        }
+
+
+        tr:last-child td {
+
+            border-bottom: none;
+        }
+
+
+        tbody tr:hover td {
+
+            background:
+                var(--primary-light);
+        }
+
+
+        /* =========================================================
+           ALUNO
+        ========================================================= */
+
+        .student-info {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 14px;
+        }
+
+
+        .avatar {
+
+            width: 36px;
+            height: 36px;
+
+            background:
+                var(--primary-light);
+
+            color:
+                var(--primary);
+
+            border-radius:
+                var(--radius-pill);
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            flex-shrink: 0;
+
+            border:
+                1px solid var(--border);
+        }
+
+
+        .avatar i {
+
+            width: 18px;
+            height: 18px;
+
+            stroke-width: 2.5;
+        }
+
+
+        .student-name {
+
+            font-weight: 600;
+
+            color:
+                var(--text-main);
+
+            letter-spacing: -0.01em;
+        }
+
+
+        /* =========================================================
+           BADGE RA
+        ========================================================= */
+
+        .badge-ra {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 6px;
+
+            background:
+                var(--bg-body);
+
+            color:
+                var(--text-main);
+
+            padding:
+                6px 12px;
+
+            border-radius:
+                var(--radius-md);
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            font-family:
+                ui-monospace,
+                SFMono-Regular,
+                Menlo,
+                Monaco,
+                Consolas,
+                monospace;
+
+            border:
+                1px solid var(--border);
+
+            cursor: pointer;
+
+            transition:
+                var(--transition);
+        }
+
+
+        .badge-ra:hover {
+
+            background:
+                var(--surface-hover);
+
+            border-color:
+                var(--text-muted);
+
+            transform:
+                translateY(-1px);
+        }
+
+
+        .badge-ra:active {
+
+            transform:
+                translateY(0);
+        }
+
+
+        .badge-ra i {
+
+            width: 14px;
+            height: 14px;
+
+            color:
+                var(--primary);
+        }
+
+
+        /* =========================================================
+           BADGE SÉRIE
+        ========================================================= */
+
+        .badge-serie {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            background:
+                var(--surface-hover);
+
+            color:
+                var(--text-main);
+
+            padding:
+                4px 10px;
+
+            border-radius:
+                var(--radius-pill);
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            border:
+                1px solid var(--border);
+        }
+
+
+        /* =========================================================
+           ESTADO VAZIO
+        ========================================================= */
+
+        .empty-state {
+
+            text-align: center;
+
+            padding: 64px 24px;
+
+            background:
+                var(--surface);
+        }
+
+
+        .empty-state-icon {
+
+            width: 64px;
+            height: 64px;
+
+            color:
+                var(--primary);
+
+            margin:
+                0 auto 20px;
+
+            opacity: 0.8;
+
+            background:
+                var(--primary-light);
+
+            padding: 16px;
+
+            border-radius:
+                var(--radius-pill);
+        }
+
+
+        .empty-state h3 {
+
+            font-size: 18px;
+
+            font-weight: 700;
+
+            color:
+                var(--text-main);
+
+            margin-bottom: 8px;
+        }
+
+
+        .empty-state p {
+
+            color:
+                var(--text-muted);
+
+            font-size: 15px;
+
+            margin-bottom: 24px;
+
+            max-width: 400px;
+
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+
+        /* =========================================================
+           BOTÃO CADASTRAR
+        ========================================================= */
+
+        .btn-add {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            height: 42px;
+
+            padding:
+                0 20px;
+
+            background:
+                var(--primary);
+
+            color:
+                #ffffff;
+
+            text-decoration: none;
+
+            border-radius:
+                var(--radius-md);
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            transition:
+                var(--transition);
+        }
+
+
+        .btn-add:hover {
+
+            background:
+                var(--primary-hover);
+
+            transform:
+                translateY(-1px);
+        }
+
+
+        /* =========================================================
+           FOOTER
+        ========================================================= */
+
+        .footer {
+
+            text-align: center;
+
+            margin-top: 48px;
+
+            color:
+                var(--text-muted);
+
+            font-size: 13px;
+
+            font-weight: 500;
+        }
+
+
+        /* =========================================================
+           TOAST
+        ========================================================= */
+
+        .toast {
+
+            position: fixed;
+
+            bottom: 24px;
+            right: 24px;
+
+            background:
+                #0f172a;
+
+            color:
+                #ffffff;
+
+            padding:
+                12px 20px;
+
+            border-radius:
+                var(--radius-md);
+
+            font-size: 14px;
+
+            font-weight: 500;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            box-shadow:
+                0 10px 15px -3px rgba(0, 0, 0, 0.3);
+
+            opacity: 0;
+
+            transform:
+                translateY(20px) scale(0.95);
+
+            transition:
+                all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+            pointer-events: none;
+
+            z-index: 100;
+        }
+
+
+        .toast.show {
+
+            opacity: 1;
+
+            transform:
+                translateY(0) scale(1);
+        }
+
+
+        /* =========================================================
+           RESPONSIVIDADE
+        ========================================================= */
+
+        @media (max-width: 768px) {
+
+            .header {
+                padding: 0 20px;
+            }
+
+            .container {
+                padding: 0 16px;
+                margin-top: 24px;
+            }
+
+            .title h1 {
+                font-size: 24px;
+            }
+
+            .toolbar {
+
+                flex-direction: column;
+
+                align-items: stretch;
+
+                padding: 12px;
+
+                gap: 12px;
+            }
+
+            .search-box {
+                max-width: 100%;
+            }
+
+            .counter {
+
+                text-align: center;
+
+                border-top:
+                    1px solid var(--border);
+
+                padding-top: 8px;
+            }
+
+            th,
+            td {
+
+                padding:
+                    12px 16px;
+
+                font-size: 14px;
+            }
+
+            .avatar {
+
+                width: 32px;
+                height: 32px;
+            }
+
+            .btn-back span {
+                display: none;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================================================
+         HEADER
+    ========================================================= -->
+
+    <header class="header">
+
+        <a href="{% url 'home' %}" class="logo">
+
+            <i data-lucide="graduation-cap"></i>
+
+            ULYSSES
+
+        </a>
+
+
+        <div class="header-right">
+
+            <a
+                href="{% url 'alunos:series' %}"
+                class="btn-back"
+            >
+
+                <i
+                    data-lucide="arrow-left"
+                    style="width:16px;height:16px;"
+                ></i>
+
+                <span>Voltar para séries</span>
+
+            </a>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =========================================================
+         CONTEÚDO
+    ========================================================= -->
+
+    <main class="container">
+
+
+        <!-- BREADCRUMB -->
+
+        <div class="breadcrumb">
+
+            <a href="{% url 'home' %}">
+                Início
+            </a>
+
+            <i
+                data-lucide="chevron-right"
+                style="width:14px;height:14px;stroke-width:3;"
+            ></i>
+
+            <a href="{% url 'alunos:series' %}">
+                Séries
+            </a>
+
+            <i
+                data-lucide="chevron-right"
+                style="width:14px;height:14px;stroke-width:3;"
+            ></i>
+
+            <span>
+                {{ nome_serie }}
+            </span>
+
+        </div>
+
+
+
+        <!-- TÍTULO -->
+
+        <div class="header-section">
+
+            <div class="title">
+
+                <h1>
+                    Alunos — {{ nome_serie }}
+                </h1>
+
+                <p>
+                    Consulte os alunos cadastrados nesta série.
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =====================================================
+             TOOLBAR
+        ====================================================== -->
+
+        <div class="toolbar">
+
+            <div class="search-box">
+
+                <i
+                    data-lucide="search"
+                    class="search-icon"
+                ></i>
+
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Buscar por nome ou RA..."
+                    onkeyup="filterStudents()"
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <div class="counter">
+
+                Total de alunos encontrados:
+
+                <span id="studentCount">
+                    {{ alunos|length }}
+                </span>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =====================================================
+             TABELA
+        ====================================================== -->
+
+        <div class="card">
+
+
+            {% if alunos %}
+
+                <div class="table-container">
+
+                    <table id="studentsTable">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Aluno
+                                </th>
+
+                                <th>
+                                    Série / Ano
+                                </th>
+
+                                <th>
+                                    Registro Acadêmico (RA)
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            {% for aluno in alunos %}
+
+                                <tr class="student-row">
+
+
+                                    <!-- ALUNO -->
+
+                                    <td>
+
+                                        <div class="student-info">
+
+                                            <div class="avatar">
+
+                                                <i
+                                                    data-lucide="user"
+                                                ></i>
+
+                                            </div>
+
+
+                                            <span class="student-name">
+
+                                                {{ aluno.nome }}
+
+                                            </span>
+
+                                        </div>
+
+                                    </td>
+
+
+
+                                    <!-- SÉRIE -->
+
+                                    <td>
+
+                                        <span class="badge-serie">
+
+                                            {% if aluno.get_serie_display %}
+
+                                                {{ aluno.get_serie_display }}
+
+                                            {% else %}
+
+                                                {{ aluno.serie|default:"Não informada" }}
+
+                                            {% endif %}
+
+                                        </span>
+
+                                    </td>
+
+
+
+                                    <!-- RA -->
+
+                                    <td>
+
+                                        <span
+                                            class="badge-ra"
+                                            title="Clique para copiar o RA"
+                                            onclick="copyRA('{{ aluno.ra }}')"
+                                        >
+
+                                            <i data-lucide="copy"></i>
+
+                                            {{ aluno.ra }}
+
+                                        </span>
+
+                                    </td>
+
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     SEM RESULTADO NA BUSCA
+                ================================================== -->
+
+                <div
+                    id="noResults"
+                    class="empty-state"
+                    style="display:none;"
+                >
+
+                    <i
+                        data-lucide="search-x"
+                        class="empty-state-icon"
+                    ></i>
+
+                    <h3>
+                        Nenhum aluno encontrado
+                    </h3>
+
+                    <p>
+                        Verifique o nome ou RA digitado e tente novamente.
+                    </p>
+
+                </div>
+
+
+            {% else %}
+
+
+                <!-- =================================================
+                     NENHUM ALUNO NA SÉRIE
+                ================================================== -->
+
+                <div class="empty-state">
+
+                    <i
+                        data-lucide="users"
+                        class="empty-state-icon"
+                    ></i>
+
+
+                    <h3>
+                        Nenhum aluno cadastrado nesta série
+                    </h3>
+
+
+                    <p>
+
+                        Ainda não existem alunos cadastrados em
+                        <strong>{{ nome_serie }}</strong>.
+
+                    </p>
+
+
+                    <a
+                        href="{% url 'alunos:cadastrar' %}"
+                        class="btn-add"
+                    >
+
+                        <i
+                            data-lucide="user-plus"
+                            style="width:18px;height:18px;"
+                        ></i>
+
+                        Cadastrar aluno
+
+                    </a>
+
+                </div>
+
+            {% endif %}
+
+
+        </div>
+
+
+
+        <!-- FOOTER -->
+
+        <div class="footer">
+
+            ULYSSES • Sistema Educacional &copy; 2026
+
+        </div>
+
+
+    </main>
+
+
+
+    <!-- =========================================================
+         TOAST
+    ========================================================= -->
+
+    <div id="toast" class="toast">
+
+        <i
+            data-lucide="check-circle"
+            style="width:18px;height:18px;color:#4ade80;"
+        ></i>
+
+        <span>
+            RA copiado para a área de transferência!
+        </span>
+
+    </div>
+
+
+
+    <!-- =========================================================
+         JAVASCRIPT
+    ========================================================= -->
+
+    <script>
+
+        /*
+         * ========================================================
+         * INICIALIZA LUCIDE
+         * ========================================================
+         */
+
+        lucide.createIcons();
+
+
+
+        /*
+         * ========================================================
+         * FILTRAR ALUNOS
+         * ========================================================
+         */
+
+        function filterStudents() {
+
+            const input =
+                document
+                    .getElementById('searchInput')
+                    .value
+                    .toLowerCase()
+                    .trim();
+
+
+            const rows =
+                document.querySelectorAll('.student-row');
+
+
+            const noResults =
+                document.getElementById('noResults');
+
+
+            const table =
+                document.getElementById('studentsTable');
+
+
+            const counter =
+                document.getElementById('studentCount');
+
+
+            const tableHead =
+                document.querySelector('#studentsTable thead');
+
+
+            let visibleCount = 0;
+
+
+
+            rows.forEach(row => {
+
+                const studentName =
+                    row
+                        .querySelector('.student-name')
+                        .textContent
+                        .toLowerCase();
+
+
+                const studentRA =
+                    row
+                        .querySelector('.badge-ra')
+                        .textContent
+                        .toLowerCase();
+
+
+                const studentSerie =
+                    row
+                        .querySelector('.badge-serie')
+                        .textContent
+                        .toLowerCase();
+
+
+
+                /*
+                 * Busca por:
+                 *
+                 * - Nome
+                 * - RA
+                 * - Série
+                 */
+
+                if (
+                    studentName.includes(input) ||
+                    studentRA.includes(input) ||
+                    studentSerie.includes(input)
+                ) {
+
+                    row.style.display = '';
+
+                    visibleCount++;
+
+                } else {
+
+                    row.style.display = 'none';
+
+                }
+
+            });
+
+
+
+            /*
+             * Atualiza contador
+             */
+
+            if (counter) {
+
+                counter.textContent =
+                    visibleCount;
+
+            }
+
+
+
+            /*
+             * Controla estado sem resultados
+             */
+
+            if (noResults && table) {
+
+                if (visibleCount === 0) {
+
+                    tableHead.style.display = 'none';
+
+                    noResults.style.display = 'block';
+
+                } else {
+
+                    tableHead.style.display =
+                        'table-header-group';
+
+                    noResults.style.display =
+                        'none';
+
+                }
+
+            }
+
+        }
+
+
+
+        /*
+         * ========================================================
+         * COPIAR RA
+         * ========================================================
+         */
+
+        function copyRA(raText) {
+
+            const cleanRAText =
+                raText.trim();
+
+
+
+            navigator.clipboard
+                .writeText(cleanRAText)
+
+                .then(() => {
+
+                    const toast =
+                        document.getElementById('toast');
+
+
+                    toast.classList.add('show');
+
+
+
+                    setTimeout(() => {
+
+                        toast.classList.remove('show');
+
+                    }, 2500);
+
+                })
+
+                .catch(err => {
+
+                    console.error(
+                        'Erro ao copiar RA:',
+                        err
+                    );
+
+                    alert(
+                        'Não foi possível copiar o RA automaticamente.'
+                    );
+
+                });
+
+        }
+
+    </script>
+
+
+</body>
+
+</html>

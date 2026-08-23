@@ -237,3 +237,47 @@ class RankingView(TemplateView):
         context['usuario_logado'] = usuario_logado
 
         return context
+    
+class ListaSeriesView(TemplateView):
+
+    template_name = 'series.html'
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+
+        context['series'] = Aluno.SERIES
+
+        return context
+
+
+class AlunosPorSerieView(ListView):
+
+    model = Aluno
+
+    template_name = 'alunos_por_serie.html'
+
+    context_object_name = 'alunos'
+
+    def get_queryset(self):
+
+        serie = self.kwargs['serie']
+
+        return Aluno.objects.filter(
+            serie=serie
+        ).order_by('nome')
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+
+        serie = self.kwargs['serie']
+
+        series = dict(Aluno.SERIES)
+
+        context['nome_serie'] = series.get(
+            serie,
+            'Série não encontrada'
+        )
+
+        return context

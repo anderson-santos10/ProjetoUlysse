@@ -1,9 +1,11 @@
 from django.urls import path
 from .views import (
+    AlunosPorSerieView,
     ListaAlunosView,
     CadastrarAlunoView,
     AcessoAlunoView,
     AlunoLogadoView,
+    ListaSeriesView,
     RankingView,
 )
 
@@ -16,4 +18,6 @@ urlpatterns = [
     path('acesso/', AcessoAlunoView.as_view(), name='acesso_aluno'),
     path('logado/', AlunoLogadoView.as_view(), name='aluno_logado'),
     path('ranking/', RankingView.as_view(), name='ranking'),
+    path('series/', ListaSeriesView.as_view(), name='series'),
+    path('series/<str:serie>/', AlunosPorSerieView.as_view(), name='alunos_por_serie'),
 ]
