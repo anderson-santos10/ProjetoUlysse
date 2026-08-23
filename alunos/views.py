@@ -199,7 +199,7 @@ class RankingView(TemplateView):
         rankings = {}
 
         # =====================================================
-        # SÉRIES
+        # RANKING POR SÉRIE
         # =====================================================
 
         for codigo, nome in Aluno.SERIES:
@@ -246,8 +246,15 @@ class RankingView(TemplateView):
 
                 aluno.posicao = posicao
 
-                # XP armazenado diretamente no Aluno
+                # =================================================
+                # XP
+                # =================================================
+
                 aluno.xp = aluno.xp or 0
+
+                # =================================================
+                # ESTATÍSTICAS
+                # =================================================
 
                 aluno.pontos = (
                     aluno.pontos or 0
@@ -265,7 +272,10 @@ class RankingView(TemplateView):
                     aluno.tempo_total or 0
                 )
 
-                # Tempo formatado
+                # =================================================
+                # TEMPO FORMATADO
+                # =================================================
+
                 aluno.tempo_formatado = (
                     self.formatar_tempo(
                         aluno.tempo_total
@@ -319,10 +329,17 @@ class RankingView(TemplateView):
 
             if resultado_aluno:
 
-                # XP vem diretamente do campo Aluno.xp
+                # =================================================
+                # XP
+                # =================================================
+
                 resultado_aluno.xp = (
                     resultado_aluno.xp or 0
                 )
+
+                # =================================================
+                # ESTATÍSTICAS
+                # =================================================
 
                 resultado_aluno.pontos = (
                     resultado_aluno.pontos or 0
@@ -340,15 +357,19 @@ class RankingView(TemplateView):
                     resultado_aluno.tempo_total or 0
                 )
 
+                # =================================================
+                # TEMPO FORMATADO
+                # =================================================
+
                 resultado_aluno.tempo_formatado = (
                     self.formatar_tempo(
                         resultado_aluno.tempo_total
                     )
                 )
 
-                # =============================================
-                # POSIÇÃO DO ALUNO NA SÉRIE
-                # =============================================
+                # =================================================
+                # POSIÇÃO DO ALUNO NA SUA SÉRIE
+                # =================================================
 
                 alunos_da_serie = list(
                     Aluno.objects
@@ -403,7 +424,6 @@ class RankingView(TemplateView):
         )
 
         return context
-
 
 # =========================================================
 # LISTA DE SÉRIES

@@ -1,3 +1,4 @@
+
 {% load static %}
 
 <!DOCTYPE html>
@@ -52,30 +53,38 @@
                 0 2px 4px -2px rgba(0, 0, 0, 0.05);
 
             --gold: #d97706;
-            --gold-bg: linear-gradient(
-                180deg,
-                #fef3c7 0%,
-                #ffffff 100%
-            );
+
+            --gold-bg:
+                linear-gradient(
+                    180deg,
+                    #fef3c7 0%,
+                    #ffffff 100%
+                );
+
             --gold-border: #fcd34d;
 
             --silver: #475569;
-            --silver-bg: linear-gradient(
-                180deg,
-                #f1f5f9 0%,
-                #ffffff 100%
-            );
+
+            --silver-bg:
+                linear-gradient(
+                    180deg,
+                    #f1f5f9 0%,
+                    #ffffff 100%
+                );
+
             --silver-border: #cbd5e1;
 
             --bronze: #b45309;
-            --bronze-bg: linear-gradient(
-                180deg,
-                #ffedd5 0%,
-                #ffffff 100%
-            );
+
+            --bronze-bg:
+                linear-gradient(
+                    180deg,
+                    #ffedd5 0%,
+                    #ffffff 100%
+                );
+
             --bronze-border: #fed7aa;
         }
-
 
         @media (prefers-color-scheme: dark) {
 
@@ -94,33 +103,34 @@
 
                 --border: #1f2937;
 
-                --gold-bg: linear-gradient(
-                    180deg,
-                    rgba(245, 158, 11, 0.15) 0%,
-                    #111827 100%
-                );
+                --gold-bg:
+                    linear-gradient(
+                        180deg,
+                        rgba(245, 158, 11, 0.15) 0%,
+                        #111827 100%
+                    );
 
-                --silver-bg: linear-gradient(
-                    180deg,
-                    rgba(148, 163, 184, 0.15) 0%,
-                    #111827 100%
-                );
+                --silver-bg:
+                    linear-gradient(
+                        180deg,
+                        rgba(148, 163, 184, 0.15) 0%,
+                        #111827 100%
+                    );
 
-                --bronze-bg: linear-gradient(
-                    180deg,
-                    rgba(217, 119, 6, 0.15) 0%,
-                    #111827 100%
-                );
+                --bronze-bg:
+                    linear-gradient(
+                        180deg,
+                        rgba(217, 119, 6, 0.15) 0%,
+                        #111827 100%
+                    );
             }
         }
-
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
 
         body {
 
@@ -130,7 +140,6 @@
                 sans-serif;
 
             background: var(--bg-body);
-
             color: var(--text-main);
 
             min-height: 100vh;
@@ -139,7 +148,6 @@
 
             padding-bottom: 60px;
         }
-
 
         /* =====================================================
            HEADER
@@ -155,15 +163,12 @@
             height: 64px;
 
             display: flex;
-
             align-items: center;
-
             justify-content: space-between;
 
             padding: 0 32px;
 
             position: sticky;
-
             top: 0;
 
             z-index: 10;
@@ -171,11 +176,9 @@
             backdrop-filter: blur(8px);
         }
 
-
         .logo {
 
             font-size: 16px;
-
             font-weight: 800;
 
             color: var(--primary);
@@ -183,23 +186,25 @@
             letter-spacing: 1px;
 
             display: flex;
-
             align-items: center;
 
             gap: 10px;
         }
 
+        .logo i {
+
+            width: 20px;
+            height: 20px;
+        }
 
         .relogio {
 
             display: flex;
-
             align-items: center;
 
             gap: 8px;
 
             font-size: 14px;
-
             font-weight: 700;
 
             color: var(--text-muted);
@@ -218,23 +223,19 @@
             justify-content: center;
         }
 
-
         .relogio i {
 
             width: 17px;
-
             height: 17px;
 
             color: var(--primary);
         }
-
 
         #hora-atual {
 
             font-variant-numeric:
                 tabular-nums;
         }
-
 
         /* =====================================================
            CONTAINER
@@ -251,7 +252,6 @@
             padding: 0 20px;
         }
 
-
         /* =====================================================
            BREADCRUMB
         ===================================================== */
@@ -259,20 +259,17 @@
         .breadcrumb {
 
             display: flex;
-
             align-items: center;
 
             gap: 8px;
 
             font-size: 13px;
-
             font-weight: 500;
 
             color: var(--text-muted);
 
             margin-bottom: 24px;
         }
-
 
         .breadcrumb a {
 
@@ -283,12 +280,10 @@
             transition: color 0.2s;
         }
 
-
         .breadcrumb a:hover {
 
             color: var(--primary);
         }
-
 
         /* =====================================================
            TITLE
@@ -300,7 +295,6 @@
 
             margin-bottom: 28px;
         }
-
 
         .header-title h1 {
 
@@ -321,7 +315,6 @@
             gap: 12px;
         }
 
-
         .header-title p {
 
             color: var(--text-muted);
@@ -332,7 +325,6 @@
 
             font-weight: 400;
         }
-
 
         /* =====================================================
            SELETOR DE SÉRIE
@@ -361,7 +353,6 @@
             box-shadow: var(--shadow-sm);
         }
 
-
         .series-button {
 
             border: none;
@@ -385,15 +376,12 @@
             transition: all 0.2s;
         }
 
-
         .series-button:hover {
 
-            background:
-                var(--surface-hover);
+            background: var(--surface-hover);
 
             color: var(--text-main);
         }
-
 
         .series-button.active {
 
@@ -406,7 +394,6 @@
                 var(--primary-glow);
         }
 
-
         /* =====================================================
            RANKINGS
         ===================================================== */
@@ -416,12 +403,10 @@
             display: none;
         }
 
-
         .ranking-serie.active {
 
             display: block;
         }
-
 
         .serie-title {
 
@@ -429,7 +414,6 @@
 
             margin-bottom: 24px;
         }
-
 
         .serie-title h2 {
 
@@ -440,7 +424,6 @@
             color: var(--text-main);
         }
 
-
         .serie-title p {
 
             margin-top: 5px;
@@ -449,7 +432,6 @@
 
             color: var(--text-muted);
         }
-
 
         /* =====================================================
            USUÁRIO LOGADO
@@ -488,7 +470,6 @@
             overflow: hidden;
         }
 
-
         .user-highlight-card::after {
 
             content: '';
@@ -496,11 +477,9 @@
             position: absolute;
 
             right: -30px;
-
             top: -30px;
 
             width: 140px;
-
             height: 140px;
 
             background:
@@ -510,7 +489,6 @@
 
             pointer-events: none;
         }
-
 
         .user-info {
 
@@ -522,7 +500,6 @@
 
             z-index: 1;
         }
-
 
         .user-position-badge {
 
@@ -543,7 +520,6 @@
             text-align: center;
         }
 
-
         .user-position-badge .pos {
 
             font-size: 22px;
@@ -552,7 +528,6 @@
 
             line-height: 1;
         }
-
 
         .user-position-badge .lbl {
 
@@ -569,14 +544,12 @@
             font-weight: 600;
         }
 
-
         .user-details .name {
 
             font-size: 18px;
 
             font-weight: 700;
         }
-
 
         .user-details .tag {
 
@@ -589,7 +562,6 @@
             margin-top: 2px;
         }
 
-
         .user-stats {
 
             display: flex;
@@ -600,7 +572,6 @@
 
             z-index: 1;
         }
-
 
         .stat-item .val {
 
@@ -617,7 +588,6 @@
             gap: 4px;
         }
 
-
         .stat-item .lbl {
 
             font-size: 10px;
@@ -632,7 +602,6 @@
 
             margin-top: 2px;
         }
-
 
         /* =====================================================
            PÓDIO
@@ -651,11 +620,9 @@
             margin-bottom: 32px;
         }
 
-
         .podium-card {
 
-            background:
-                var(--surface);
+            background: var(--surface);
 
             border-radius:
                 var(--radius-lg);
@@ -681,13 +648,10 @@
                 transform 0.2s;
         }
 
-
         .podium-card:hover {
 
-            transform:
-                translateY(-6px);
+            transform: translateY(-6px);
         }
-
 
         .podium-card.first {
 
@@ -705,7 +669,6 @@
             padding-bottom: 28px;
         }
 
-
         .podium-card.second {
 
             order: 1;
@@ -718,7 +681,6 @@
                 var(--silver-bg);
         }
 
-
         .podium-card.third {
 
             order: 3;
@@ -730,7 +692,6 @@
             background:
                 var(--bronze-bg);
         }
-
 
         .podium-rank {
 
@@ -755,11 +716,9 @@
             margin-bottom: 12px;
         }
 
-
         .first .podium-rank {
 
-            background:
-                var(--gold);
+            background: var(--gold);
 
             width: 40px;
 
@@ -768,20 +727,15 @@
             font-size: 18px;
         }
 
-
         .second .podium-rank {
 
-            background:
-                var(--silver);
+            background: var(--silver);
         }
-
 
         .third .podium-rank {
 
-            background:
-                var(--bronze);
+            background: var(--bronze);
         }
-
 
         .podium-avatar {
 
@@ -813,7 +767,6 @@
                 var(--border);
         }
 
-
         .first .podium-avatar {
 
             width: 76px;
@@ -826,7 +779,6 @@
                 3px solid
                 var(--gold);
         }
-
 
         .podium-name {
 
@@ -841,16 +793,10 @@
             line-height: 1.2;
         }
 
-
         .first .podium-name {
 
             font-size: 17px;
         }
-
-
-        /* =====================================================
-           XP
-        ===================================================== */
 
         .podium-score {
 
@@ -861,14 +807,12 @@
             color: var(--primary);
         }
 
-
         .first .podium-score {
 
             font-size: 24px;
 
             color: var(--gold);
         }
-
 
         .podium-time {
 
@@ -894,7 +838,6 @@
             margin-top: 8px;
         }
 
-
         .podium-attempts {
 
             font-size: 11px;
@@ -906,15 +849,13 @@
             font-weight: 500;
         }
 
-
         /* =====================================================
            TABELA
         ===================================================== */
 
         .card-table {
 
-            background:
-                var(--surface);
+            background: var(--surface);
 
             border:
                 1px solid
@@ -929,17 +870,14 @@
             overflow: hidden;
         }
 
-
         table {
 
             width: 100%;
 
-            border-collapse:
-                collapse;
+            border-collapse: collapse;
 
             text-align: left;
         }
-
 
         th {
 
@@ -962,7 +900,6 @@
             letter-spacing: 0.08em;
         }
 
-
         td {
 
             padding: 16px 20px;
@@ -977,19 +914,16 @@
             vertical-align: middle;
         }
 
-
         tr:last-child td {
 
             border-bottom: none;
         }
-
 
         tr:hover td {
 
             background:
                 var(--surface-hover);
         }
-
 
         tr.is-current-user td {
 
@@ -998,7 +932,6 @@
 
             font-weight: 600;
         }
-
 
         .rank-col {
 
@@ -1011,7 +944,6 @@
             text-align: center;
         }
 
-
         .student-cell {
 
             display: flex;
@@ -1020,7 +952,6 @@
 
             gap: 12px;
         }
-
 
         .mini-avatar {
 
@@ -1047,14 +978,14 @@
 
             border:
                 1px solid var(--border);
-        }
 
+            flex-shrink: 0;
+        }
 
         .student-name-text {
 
             font-weight: 600;
         }
-
 
         .you-badge {
 
@@ -1076,7 +1007,6 @@
             margin-left: 8px;
         }
 
-
         .time-badge {
 
             display: inline-flex;
@@ -1095,14 +1025,14 @@
                 tabular-nums;
         }
 
-
         .score-val {
 
             font-weight: 800;
 
             color: var(--primary);
-        }
 
+            white-space: nowrap;
+        }
 
         .attempts-val {
 
@@ -1110,7 +1040,6 @@
 
             font-size: 13px;
         }
-
 
         /* =====================================================
            RANKING VAZIO
@@ -1135,7 +1064,6 @@
                 var(--shadow-sm);
         }
 
-
         .empty-ranking i {
 
             width: 48px;
@@ -1147,14 +1075,12 @@
             margin-bottom: 12px;
         }
 
-
         .empty-ranking h3 {
 
             font-size: 16px;
 
             font-weight: 600;
         }
-
 
         .empty-ranking p {
 
@@ -1164,7 +1090,6 @@
 
             margin-top: 6px;
         }
-
 
         /* =====================================================
            RESPONSIVO
@@ -1177,19 +1102,16 @@
                 padding: 0 16px;
             }
 
-
             .container {
 
                 padding: 0 14px;
             }
-
 
             .series-selector {
 
                 grid-template-columns:
                     repeat(2, 1fr);
             }
-
 
             .podium-container {
 
@@ -1198,24 +1120,20 @@
                 align-items: stretch;
             }
 
-
             .podium-card.first {
 
                 order: 1;
             }
-
 
             .podium-card.second {
 
                 order: 2;
             }
 
-
             .podium-card.third {
 
                 order: 3;
             }
-
 
             .user-highlight-card {
 
@@ -1225,7 +1143,6 @@
 
                 gap: 20px;
             }
-
 
             .user-stats {
 
@@ -1243,18 +1160,15 @@
                 padding-top: 16px;
             }
 
-
             .card-table {
 
                 overflow-x: auto;
             }
 
-
             table {
 
                 min-width: 600px;
             }
-
 
             .relogio {
 
@@ -1264,7 +1178,6 @@
 
                 padding: 7px 10px;
             }
-
 
             .header-title h1 {
 
@@ -1276,9 +1189,7 @@
 
 </head>
 
-
 <body>
-
 
     <!-- =====================================================
          HEADER
@@ -1293,7 +1204,6 @@
             ULYSSES
 
         </div>
-
 
         <div class="relogio">
 
@@ -1313,7 +1223,6 @@
     ===================================================== -->
 
     <main class="container">
-
 
         <!-- BREADCRUMB -->
 
@@ -1350,12 +1259,9 @@
 
             </h1>
 
-
             <p>
-
                 Cada série possui seu próprio ranking.
                 Alunos competem apenas com estudantes da mesma série.
-
             </p>
 
         </div>
@@ -1370,10 +1276,7 @@
             {% for codigo, ranking in rankings.items %}
 
                 <button
-                    class="
-                        series-button
-                        {% if forloop.first %}active{% endif %}
-                    "
+                    class="series-button {% if forloop.first %}active{% endif %}"
                     data-serie="{{ codigo }}"
                     onclick="mostrarSerie('{{ codigo }}')"
                 >
@@ -1394,13 +1297,9 @@
         {% for codigo, ranking in rankings.items %}
 
         <section
-            class="
-                ranking-serie
-                {% if forloop.first %}active{% endif %}
-            "
+            class="ranking-serie {% if forloop.first %}active{% endif %}"
             id="ranking-{{ codigo }}"
         >
-
 
             <!-- TÍTULO DA SÉRIE -->
 
@@ -1425,26 +1324,19 @@
 
             <div class="user-highlight-card">
 
-
                 <div class="user-info">
-
 
                     <div class="user-position-badge">
 
                         <div class="pos">
 
                             {% if usuario_logado.posicao %}
-
                                 #{{ usuario_logado.posicao }}
-
                             {% else %}
-
                                 —
-
                             {% endif %}
 
                         </div>
-
 
                         <div class="lbl">
                             Sua Posição
@@ -1462,11 +1354,8 @@
 
                         </div>
 
-
                         <span class="tag">
-
                             {{ ranking.nome }}
-
                         </span>
 
                     </div>
@@ -1476,7 +1365,6 @@
 
                 <div class="user-stats">
 
-
                     <!-- XP -->
 
                     <div class="stat-item">
@@ -1484,7 +1372,8 @@
                         <div class="val">
 
                             ⭐
-                            {{ usuario_logado.xp_total|default:0 }}
+
+                            {{ usuario_logado.xp|default:0 }}
 
                         </div>
 
@@ -1510,7 +1399,7 @@
                                 "
                             ></i>
 
-                            {{ usuario_logado.tempo_total|default:"--:--" }}
+                            {{ usuario_logado.tempo_formatado|default:"00min 00s" }}
 
                         </div>
 
@@ -1527,7 +1416,7 @@
 
                         <div class="val">
 
-                            {{ usuario_logado.tentativas }}
+                            {{ usuario_logado.tentativas|default:0 }}
 
                         </div>
 
@@ -1536,7 +1425,6 @@
                         </div>
 
                     </div>
-
 
                 </div>
 
@@ -1571,13 +1459,11 @@
                             2
                         </div>
 
-
                         <div class="podium-avatar">
 
                             {{ segundo.nome|slice:":1"|upper }}
 
                         </div>
-
 
                         <div class="podium-name">
 
@@ -1585,13 +1471,11 @@
 
                         </div>
 
-
                         <div class="podium-score">
 
-                            ⭐ {{ segundo.xp_total|default:0 }} XP
+                            ⭐ {{ segundo.xp|default:0 }} XP
 
                         </div>
-
 
                         <div class="podium-time">
 
@@ -1603,14 +1487,13 @@
                                 "
                             ></i>
 
-                            {{ segundo.tempo_total|default:"--:--" }}
+                            {{ segundo.tempo_formatado|default:"00min 00s" }}
 
                         </div>
 
-
                         <div class="podium-attempts">
 
-                            {{ segundo.tentativas }}
+                            {{ segundo.tentativas|default:0 }}
 
                             {% if segundo.tentativas == 1 %}
                                 tentativa
@@ -1635,7 +1518,6 @@
 
                     <div class="podium-card first">
 
-
                         <i
                             data-lucide="crown"
                             style="
@@ -1648,11 +1530,9 @@
                             "
                         ></i>
 
-
                         <div class="podium-rank">
                             1
                         </div>
-
 
                         <div class="podium-avatar">
 
@@ -1660,20 +1540,17 @@
 
                         </div>
 
-
                         <div class="podium-name">
 
                             {{ primeiro.nome }}
 
                         </div>
 
-
                         <div class="podium-score">
 
-                            ⭐ {{ primeiro.xp_total|default:0 }} XP
+                            ⭐ {{ primeiro.xp|default:0 }} XP
 
                         </div>
-
 
                         <div class="podium-time">
 
@@ -1685,14 +1562,13 @@
                                 "
                             ></i>
 
-                            {{ primeiro.tempo_total|default:"--:--" }}
+                            {{ primeiro.tempo_formatado|default:"00min 00s" }}
 
                         </div>
 
-
                         <div class="podium-attempts">
 
-                            {{ primeiro.tentativas }}
+                            {{ primeiro.tentativas|default:0 }}
 
                             {% if primeiro.tentativas == 1 %}
                                 tentativa
@@ -1721,13 +1597,11 @@
                             3
                         </div>
 
-
                         <div class="podium-avatar">
 
                             {{ terceiro.nome|slice:":1"|upper }}
 
                         </div>
-
 
                         <div class="podium-name">
 
@@ -1735,13 +1609,11 @@
 
                         </div>
 
-
                         <div class="podium-score">
 
-                            ⭐ {{ terceiro.xp_total|default:0 }} XP
+                            ⭐ {{ terceiro.xp|default:0 }} XP
 
                         </div>
-
 
                         <div class="podium-time">
 
@@ -1753,14 +1625,13 @@
                                 "
                             ></i>
 
-                            {{ terceiro.tempo_total|default:"--:--" }}
+                            {{ terceiro.tempo_formatado|default:"00min 00s" }}
 
                         </div>
 
-
                         <div class="podium-attempts">
 
-                            {{ terceiro.tentativas }}
+                            {{ terceiro.tentativas|default:0 }}
 
                             {% if terceiro.tentativas == 1 %}
                                 tentativa
@@ -1825,13 +1696,8 @@
                                 {% if forloop.counter > 3 %}
 
                                 <tr
-                                    class="
-                                        {% if usuario_logado and usuario_logado.id == aluno.id %}
-                                            is-current-user
-                                        {% endif %}
-                                    "
+                                    class="{% if usuario_logado and usuario_logado.id == aluno.id %}is-current-user{% endif %}"
                                 >
-
 
                                     <td class="rank-col">
 
@@ -1844,13 +1710,11 @@
 
                                         <div class="student-cell">
 
-
                                             <div class="mini-avatar">
 
                                                 {{ aluno.nome|slice:":1"|upper }}
 
                                             </div>
-
 
                                             <span class="student-name-text">
 
@@ -1858,12 +1722,11 @@
 
                                             </span>
 
-
                                             {% if usuario_logado and usuario_logado.id == aluno.id %}
 
-                                            <span class="you-badge">
-                                                Você
-                                            </span>
+                                                <span class="you-badge">
+                                                    Você
+                                                </span>
 
                                             {% endif %}
 
@@ -1877,7 +1740,9 @@
                                     <td class="score-val">
 
                                         ⭐
-                                        {{ aluno.xp_total|default:0 }}
+
+                                        {{ aluno.xp|default:0 }}
+
                                         XP
 
                                     </td>
@@ -1897,7 +1762,7 @@
                                                 "
                                             ></i>
 
-                                            {{ aluno.tempo_total|default:"--:--" }}
+                                            {{ aluno.tempo_formatado|default:"00min 00s" }}
 
                                         </div>
 
@@ -1908,16 +1773,12 @@
 
                                     <td class="attempts-val">
 
-                                        {{ aluno.tentativas }}
+                                        {{ aluno.tentativas|default:0 }}
 
                                         {% if aluno.tentativas == 1 %}
-
                                             tentativa
-
                                         {% else %}
-
                                             tentativas
-
                                         {% endif %}
 
                                     </td>
@@ -1939,7 +1800,6 @@
 
             {% else %}
 
-
                 <!-- =================================================
                      RANKING VAZIO
                 ================================================= -->
@@ -1959,14 +1819,11 @@
 
                 </div>
 
-
             {% endif %}
-
 
         </section>
 
         {% endfor %}
-
 
     </main>
 
@@ -1976,7 +1833,6 @@
     ===================================================== -->
 
     <script>
-
 
         /* =====================================================
            ÍCONES
@@ -1993,24 +1849,17 @@
 
             const agora = new Date();
 
+            const horas = String(
+                agora.getHours()
+            ).padStart(2, '0');
 
-            const horas =
-                String(
-                    agora.getHours()
-                ).padStart(2, '0');
+            const minutos = String(
+                agora.getMinutes()
+            ).padStart(2, '0');
 
-
-            const minutos =
-                String(
-                    agora.getMinutes()
-                ).padStart(2, '0');
-
-
-            const segundos =
-                String(
-                    agora.getSeconds()
-                ).padStart(2, '0');
-
+            const segundos = String(
+                agora.getSeconds()
+            ).padStart(2, '0');
 
             document.getElementById(
                 'hora-atual'
@@ -2018,12 +1867,10 @@
                 `${horas}:${minutos}:${segundos}`;
         }
 
-
         setInterval(
             atualizarRelogio,
             1000
         );
-
 
         atualizarRelogio();
 
@@ -2034,35 +1881,26 @@
 
         function mostrarSerie(codigoSerie) {
 
-
             document
-                .querySelectorAll(
-                    '.ranking-serie'
-                )
-                .forEach(
-                    function (elemento) {
+                .querySelectorAll('.ranking-serie')
+                .forEach(function (elemento) {
 
-                        elemento.classList.remove(
-                            'active'
-                        );
+                    elemento.classList.remove(
+                        'active'
+                    );
 
-                    }
-                );
+                });
 
 
             document
-                .querySelectorAll(
-                    '.series-button'
-                )
-                .forEach(
-                    function (botao) {
+                .querySelectorAll('.series-button')
+                .forEach(function (botao) {
 
-                        botao.classList.remove(
-                            'active'
-                        );
+                    botao.classList.remove(
+                        'active'
+                    );
 
-                    }
-                );
+                });
 
 
             const targetSection =
@@ -2097,7 +1935,6 @@
         }
 
     </script>
-
 
 </body>
 
