@@ -6,49 +6,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Intensivo ULYSSES</title>
 
-    <!-- Tipografia Plus Jakarta Sans e Ícones Lucide -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
         :root {
-            /* Paleta de Cores (Light Mode - Padrão) */
+            /* Paleta Identificada no Sistema ULYSSES */
             --bg-body: #f8fafc;
             --surface: #ffffff;
             --surface-hover: #f1f5f9;
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --primary-light: #eff6ff;
-            --primary-border: #bfdbfe;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: #eef2ff;
+            --primary-glow: rgba(79, 70, 229, 0.12);
+            --primary-border: rgba(79, 70, 229, 0.2);
+
             --text-main: #0f172a;
             --text-muted: #64748b;
             --border: #e2e8f0;
             --dot-pattern: #cbd5e1;
 
             /* Utilitários */
-            --radius-md: 10px;
+            --radius-sm: 8px;
+            --radius-md: 12px;
             --radius-lg: 16px;
-            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 10px 25px -5px rgba(37, 99, 235, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 12px 20px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.03);
             --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Paleta de Cores (Dark Mode Automático) */
+        /* Dark Mode Nativo */
         @media (prefers-color-scheme: dark) {
             :root {
-                --bg-body: #0f172a;
-                --surface: #1e293b;
-                --surface-hover: #334155;
-                --primary: #3b82f6;
-                --primary-hover: #60a5fa;
-                --primary-light: rgba(59, 130, 246, 0.12);
-                --primary-border: rgba(59, 130, 246, 0.3);
-                --text-main: #f1f5f9;
+                --bg-body: #0b0f19;
+                --surface: #111827;
+                --surface-hover: #1f2937;
+                --primary: #6366f1;
+                --primary-hover: #818cf8;
+                --primary-light: rgba(99, 102, 241, 0.15);
+                --primary-glow: rgba(99, 102, 241, 0.2);
+                --primary-border: rgba(99, 102, 241, 0.3);
+
+                --text-main: #f8fafc;
                 --text-muted: #94a3b8;
-                --border: #334155;
-                --dot-pattern: #334155;
+                --border: #1f2937;
+                --dot-pattern: #1f2937;
+
                 --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
                 --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
             }
@@ -72,16 +82,15 @@
             justify-content: space-between;
             align-items: center;
             -webkit-font-smoothing: antialiased;
-            transition: background-color var(--transition), color var(--transition);
         }
 
-        /* HEADER */
+        /* HEADER STICKY */
         .header {
             width: 100%;
             background: var(--surface);
             backdrop-filter: blur(8px);
             border-bottom: 1px solid var(--border);
-            height: 68px;
+            height: 64px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -89,14 +98,13 @@
             position: sticky;
             top: 0;
             z-index: 10;
-            transition: var(--transition);
         }
 
         .logo {
-            font-size: 19px;
+            font-size: 16px;
             font-weight: 800;
             color: var(--primary);
-            letter-spacing: -0.5px;
+            letter-spacing: 1px;
             text-decoration: none;
             display: flex;
             align-items: center;
@@ -107,11 +115,11 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 9px 16px;
+            padding: 8px 14px;
             background: var(--surface);
             color: var(--text-main);
             border: 1px solid var(--border);
-            border-radius: var(--radius-md);
+            border-radius: var(--radius-sm);
             text-decoration: none;
             font-size: 13px;
             font-weight: 600;
@@ -120,8 +128,7 @@
 
         .professor-link:hover {
             background: var(--surface-hover);
-            border-color: var(--text-muted);
-            transform: translateY(-1px);
+            border-color: var(--border);
         }
 
         /* MAIN CONTENT */
@@ -163,7 +170,7 @@
         }
 
         p.subtitle {
-            font-size: 17px;
+            font-size: 16px;
             color: var(--text-muted);
             margin-bottom: 36px;
             line-height: 1.6;
@@ -175,7 +182,7 @@
         .botoes {
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 12px;
             width: 100%;
             max-width: 340px;
         }
@@ -189,7 +196,7 @@
             padding: 0 24px;
             border-radius: var(--radius-md);
             text-decoration: none;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             transition: var(--transition);
             cursor: pointer;
@@ -198,12 +205,13 @@
         .botao-primary {
             background: var(--primary);
             color: #ffffff;
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-sm);
         }
 
         .botao-primary:hover {
             background: var(--primary-hover);
             transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
 
         .botao-secondary {
@@ -215,8 +223,9 @@
 
         .botao-secondary:hover {
             background: var(--surface-hover);
-            border-color: var(--text-muted);
+            border-color: var(--primary);
             transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
 
         /* FEATURES / HIGHLIGHTS */
@@ -241,8 +250,9 @@
         }
 
         .feature-card:hover {
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             border-color: var(--primary);
+            box-shadow: var(--shadow-hover);
         }
 
         .feature-icon {
@@ -271,14 +281,15 @@
             text-align: center;
             padding: 24px 0;
             color: var(--text-muted);
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 500;
+            border-top: 1px solid var(--border);
         }
 
         @media (max-width: 640px) {
-            .header { padding: 0 16px; }
+            .header { padding: 0 20px; }
             h1 { font-size: 32px; }
-            p.subtitle { font-size: 15px; }
+            p.subtitle { font-size: 14px; }
             .features {
                 grid-template-columns: 1fr;
                 gap: 12px;
@@ -292,7 +303,7 @@
     <!-- HEADER -->
     <header class="header">
         <a href="{% url 'home' %}" class="logo">
-            <i data-lucide="graduation-cap" style="width: 24px; height: 24px;"></i>
+            <i data-lucide="graduation-cap"></i>
             ULYSSES
         </a>
 
@@ -327,6 +338,11 @@
             <a href="{% url 'alunos:ranking' %}" class="botao botao-secondary">
                 <i data-lucide="trophy" style="width: 18px; height: 18px; color: #d97706;"></i>
                 Ver Ranking
+            </a>
+
+            <a href="{% url 'alunos:regras' %}" class="botao botao-secondary">
+                <i data-lucide="book-open" style="width: 18px; height: 18px;"></i>
+                Regras do Jogo
             </a>
         </div>
 

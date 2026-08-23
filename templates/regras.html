@@ -1,0 +1,685 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regras do Jogo | ULYSSES</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-body: #f8fafc;
+            --surface: #ffffff;
+            --surface-hover: #f1f5f9;
+            --primary: #4f46e5;
+            --primary-light: #eef2ff;
+            --primary-glow: rgba(79, 70, 229, 0.12);
+            
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 12px 20px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.03);
+        }
+
+        /* Dark Mode Nativo */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0b0f19;
+                --surface: #111827;
+                --surface-hover: #1f2937;
+                --primary: #6366f1;
+                --primary-light: rgba(99, 102, 241, 0.15);
+                --primary-glow: rgba(99, 102, 241, 0.2);
+                --text-main: #f8fafc;
+                --text-muted: #94a3b8;
+                --border: #1f2937;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* HEADER */
+        .header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(8px);
+        }
+
+        .logo {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .btn-voltar-header {
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 14px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-voltar-header:hover {
+            background: var(--surface-hover);
+            border-color: var(--border);
+        }
+
+        /* CONTAINER */
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px 60px;
+        }
+
+        /* CABEÇALHO DA PÁGINA */
+        .cabecalho {
+            margin-bottom: 32px;
+        }
+
+        .cabecalho h1 {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--text-main);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cabecalho p {
+            font-size: 15px;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        /* SEÇÃO E CARDS DE CONTEÚDO */
+        .card-secao {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+            transition: border-color 0.2s ease;
+        }
+
+        .card-secao h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 16px;
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-secao h2 i {
+            color: var(--primary);
+        }
+
+        .card-secao p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .card-secao p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* REGRAS EM LISTA (PASSO A PASSO / FAIR PLAY) */
+        .regra-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .regra-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .regra-item:first-child {
+            padding-top: 0;
+        }
+
+        .icone-box {
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .regra-conteudo h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .regra-conteudo p {
+            font-size: 13px;
+            line-height: 1.5;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* GRID DE XP */
+        .xp-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .xp-card {
+            padding: 20px;
+            border-radius: var(--radius-md);
+            background: var(--bg-body);
+            border: 1px solid var(--border);
+            text-align: center;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .xp-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+
+        .xp-card strong {
+            display: block;
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .xp-card span {
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        /* DESTAQUE / CALLOUT BOX */
+        .destaque-box {
+            background: var(--primary-light);
+            border: 1px solid var(--primary-glow);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .destaque-box h4 {
+            color: var(--primary);
+            font-size: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .destaque-box p {
+            color: var(--text-main);
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .destaque-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* RANKING ITEMS */
+        .ranking-list {
+            margin-top: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 14px 18px;
+            background: var(--bg-body);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+        }
+
+        .ranking-posicao {
+            width: 36px;
+            height: 36px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 14px;
+        }
+
+        .ranking-conteudo strong {
+            display: block;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 2px;
+        }
+
+        .ranking-conteudo p {
+            font-size: 13px;
+            margin: 0;
+            color: var(--text-muted);
+        }
+
+        /* BOTÃO VOLTAR NO FINAL */
+        .acoes-footer {
+            display: flex;
+            justify-content: center;
+            margin-top: 32px;
+        }
+
+        .btn-voltar-main {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: var(--surface);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+        }
+
+        .btn-voltar-main:hover {
+            background: var(--surface-hover);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* RODAPÉ */
+        .footer {
+            text-align: center;
+            padding: 24px 0;
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 500;
+            border-top: 1px solid var(--border);
+        }
+
+        /* RESPONSIVO */
+        @media (max-width: 700px) {
+            .header {
+                padding: 0 20px;
+            }
+
+            .header-subtitle {
+                display: none;
+            }
+
+            .container {
+                padding: 24px 16px 40px;
+            }
+
+            .cabecalho h1 {
+                font-size: 24px;
+            }
+
+            .card-secao {
+                padding: 20px;
+            }
+
+            .xp-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .xp-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <a href="{% url 'home' %}" target="_self" class="logo">
+            <i data-lucide="graduation-cap"></i>
+            ULYSSES
+        </a>
+
+        <div class="header-right">
+            <span class="header-subtitle">Regras & Guia</span>
+            <a href="{% url 'home' %}" target="_self" class="btn-voltar-header">
+                <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+                Voltar
+            </a>
+        </div>
+    </header>
+
+    <!-- CONTAINER PRINCIPAL -->
+    <main class="container">
+
+        <!-- CABEÇALHO -->
+        <div class="cabecalho">
+            <h1>
+                <i data-lucide="book-open-check" style="color: var(--primary);"></i>
+                Regras do ULYSSES
+            </h1>
+            <p>Conheça o funcionamento do sistema e descubra como subir no ranking!</p>
+        </div>
+
+        <!-- OBJETIVO DO JOGO -->
+        <section class="card-secao">
+            <h2>
+                <i data-lucide="target" style="width: 22px; height: 22px;"></i>
+                Objetivo do jogo
+            </h2>
+            <p>O ULYSSES é um sistema de desafios educacionais criado para transformar seus estudos em uma competição saudável e motivadora.</p>
+            <p>Responda às questões, acumule XP, melhore seu desempenho e conquiste uma posição cada vez melhor no ranking da sua série.</p>
+        </section>
+
+        <!-- COMO FUNCIONA O QUESTIONÁRIO -->
+        <section class="card-secao">
+            <h2>
+                <i data-lucide="file-text" style="width: 22px; height: 22px;"></i>
+                Como funciona o questionário?
+            </h2>
+
+            <div class="regra-item">
+                <div class="icone-box">1</div>
+                <div class="regra-conteudo">
+                    <h3>Inicie um questionário</h3>
+                    <p>Clique em <strong>"Novo Questionário"</strong> para começar uma nova rodada de perguntas.</p>
+                </div>
+            </div>
+
+            <div class="regra-item">
+                <div class="icone-box">2</div>
+                <div class="regra-conteudo">
+                    <h3>Responda às questões</h3>
+                    <p>Escolha uma das quatro alternativas disponíveis. Depois de responder, o sistema mostrará se você acertou ou errou.</p>
+                </div>
+            </div>
+
+            <div class="regra-item">
+                <div class="icone-box">3</div>
+                <div class="regra-conteudo">
+                    <h3>Avance</h3>
+                    <p>Depois de verificar sua resposta, avance sequencialmente para a próxima questão.</p>
+                </div>
+            </div>
+
+            <div class="regra-item">
+                <div class="icone-box">4</div>
+                <div class="regra-conteudo">
+                    <h3>Finalize o questionário</h3>
+                    <p>Ao responder todas as questões, finalize a sessão para registrar sua pontuação, XP e tempo de execução.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SISTEMA DE XP -->
+        <section class="card-secao">
+            <h2>
+                <i data-lucide="star" style="width: 22px; height: 22px;"></i>
+                Como funciona o XP?
+            </h2>
+            <p>Cada questão possui um nível de dificuldade e concede uma quantidade diferente de pontuação (XP).</p>
+
+            <div class="xp-grid">
+                <div class="xp-card">
+                    <strong>+10 XP</strong>
+                    <span>Questão Fácil</span>
+                </div>
+                <div class="xp-card">
+                    <strong>+15 XP</strong>
+                    <span>Questão Média</span>
+                </div>
+                <div class="xp-card">
+                    <strong>+20 XP</strong>
+                    <span>Questão Difícil</span>
+                </div>
+                <div class="xp-card">
+                    <strong>+100 XP</strong>
+                    <span>Conclusão da rodada</span>
+                </div>
+            </div>
+
+            <div class="destaque-box">
+                <h4>
+                    <i data-lucide="flame" style="width: 18px; height: 18px;"></i>
+                    Bônus por sequência
+                </h4>
+                <p>A partir do terceiro acerto consecutivo, você recebe <strong>+5 XP</strong> de bônus extra em cada novo acerto.</p>
+                <p style="color: var(--text-muted); font-size: 12px;">Nota: Se você errar uma questão, a sequência de acertos é zerada.</p>
+            </div>
+        </section>
+
+        <!-- CRITÉRIO DE TEMPO -->
+        <section class="card-secao">
+            <h2>
+                <i data-lucide="timer" style="width: 22px; height: 22px;"></i>
+                O tempo também importa!
+            </h2>
+            <p>O tempo utilizado para concluir o questionário fica registrado e é um fator importante na sua avaliação.</p>
+
+            <div class="destaque-box">
+                <h4>
+                    <i data-lucide="award" style="width: 18px; height: 18px;"></i>
+                    Critério de desempate
+                </h4>
+                <p>Quando dois alunos possuem a mesma pontuação acumulada, aquele que concluir os questionários em <strong>menor tempo</strong> fica posicionado à frente no ranking.</p>
+            </div>
+        </section>
+
+        <!-- INTERVALO DE BLOQUEIO -->
+        <section class="card-secao">
+            <h2>
+                <i data-lucide="clock" style="width: 22px; height: 22px;"></i>
+                Intervalo entre questionários
+            </h2>
+            <p>Depois de finalizar um questionário, o aluno precisa aguardar <strong>8 horas</strong> para poder iniciar uma nova tentativa.</p>
+
+            <div class="destaque-box">
+                <h4>
+                    <i data-lucide="alert-circle" style="width: 18px; height: 18px;"></i>
+                    Atenção ao contador
+                </h4>
+                <p>O contador regressivo começa no exato momento em que o questionário é finalizado.</p>
+                <p>Assim que o período de 8 horas terminar, a opção para iniciar um novo questionário será automaticamente liberada.</p>
+            </div>
+        </section>
+
+        <!-- RANKING -->
+        <section class="card-secao">
+            <h2>
+                <i data-lucide="trophy" style="width: 22px; height: 22px;"></i>
+                Ranking
+            </h2>
+            <p>O ranking é segmentado por série e exibe a colocação dos alunos com base nos seguintes critérios prioritários:</p>
+
+            <div class="ranking-list">
+                <div class="ranking-item">
+                    <div class="ranking-posicao">1</div>
+                    <div class="ranking-conteudo">
+                        <strong>Maior XP</strong>
+                        <p>O total de XP acumulado é o principal critério de posicionamento.</p>
+                    </div>
+                </div>
+
+                <div class="ranking-item">
+                    <div class="ranking-posicao">2</div>
+                    <div class="ranking-conteudo">
+                        <strong>Maior Média</strong>
+                        <p>Em caso de empate no XP, a média de acertos das notas é utilizada.</p>
+                    </div>
+                </div>
+
+                <div class="ranking-item">
+                    <div class="ranking-posicao">3</div>
+                    <div class="ranking-conteudo">
+                        <strong>Mais Acertos Total</strong>
+                        <p>Persistindo o empate, o número absoluto de acertos é considerado.</p>
+                    </div>
+                </div>
+
+                <div class="ranking-item">
+                    <div class="ranking-posicao" style="background: var(--text-muted);">
+                        <i data-lucide="zap" style="width: 18px; height: 18px;"></i>
+                    </div>
+                    <div class="ranking-conteudo">
+                        <strong>Menor Tempo Total</strong>
+                        <p>Se todos os critérios anteriores empatarem, quem acumulou o menor tempo fica na frente.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAIR PLAY -->
+        <section class="card-secao">
+            <h2>
+                <i data-lucide="shield-check" style="width: 22px; height: 22px;"></i>
+                Jogue de forma justa
+            </h2>
+
+            <div class="regra-item">
+                <div class="icone-box">
+                    <i data-lucide="book-open" style="width: 20px; height: 20px;"></i>
+                </div>
+                <div class="regra-conteudo">
+                    <h3>Estude antes de jogar</h3>
+                    <p>Use o ULYSSES para testar seus conhecimentos e identificar tópicos que precisam de revisão.</p>
+                </div>
+            </div>
+
+            <div class="regra-item">
+                <div class="icone-box">
+                    <i data-lucide="brain" style="width: 20px; height: 20px;"></i>
+                </div>
+                <div class="regra-conteudo">
+                    <h3>Pense antes de responder</h3>
+                    <p>Cada resposta influencia diretamente seu rendimento final e sua média.</p>
+                </div>
+            </div>
+
+            <div class="regra-item">
+                <div class="icone-box">
+                    <i data-lucide="trending-up" style="width: 20px; height: 20px;"></i>
+                </div>
+                <div class="regra-conteudo">
+                    <h3>Busque evolução contínua</h3>
+                    <p>O objetivo principal é acompanhar seu próprio aprendizado e progredir a cada questionário.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- BOTÃO VOLTAR -->
+        <div class="acoes-footer">
+            <a href="{% url 'home' %}" class="btn-voltar-main">
+                <i data-lucide="arrow-left" style="width: 18px; height: 18px;"></i>
+                Voltar para o início
+            </a>
+        </div>
+
+    </main>
+
+    <!-- RODAPÉ -->
+    <footer class="footer">
+        ULYSSES • Sistema Educacional
+    </footer>
+
+    <!-- Inicialização dos Ícones Lucide -->
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

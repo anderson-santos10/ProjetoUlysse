@@ -154,7 +154,9 @@ class AlunoLogadoView(TemplateView):
             'aluno': aluno
         })
 
+class RegrasView(TemplateView):
 
+    template_name = 'regras.html'
 # =========================================================
 # RANKING
 # =========================================================
@@ -210,27 +212,47 @@ class RankingView(TemplateView):
                     serie=codigo
                 )
                 .annotate(
+
+                    # Nota média
                     pontos=Avg(
                         'resultados__nota'
                     ),
 
+                    # Número de tentativas
                     tentativas=Count(
                         'resultados',
                         distinct=True
                     ),
 
+                    # Total de acertos
                     total_acertos=Sum(
                         'resultados__acertos'
                     ),
 
+                    # Tempo total
                     tempo_total=Sum(
                         'resultados__tempo_segundos'
                     ),
                 )
+
+                # =================================================
+                # CRITÉRIOS DO RANKING
+                # =================================================
                 .order_by(
+
+                    # 1º - Maior XP
                     '-xp',
+
+                    # 2º - Maior média
                     '-pontos',
+
+                    # 3º - Maior número de acertos
                     '-total_acertos',
+
+                    # 4º - MENOR TEMPO
+                    'tempo_total',
+
+                    # 5º - Nome
                     'nome'
                 )[:20]
             )
@@ -307,6 +329,7 @@ class RankingView(TemplateView):
                     id=aluno_id
                 )
                 .annotate(
+
                     pontos=Avg(
                         'resultados__nota'
                     ),
@@ -377,6 +400,7 @@ class RankingView(TemplateView):
                         serie=resultado_aluno.serie
                     )
                     .annotate(
+
                         pontos=Avg(
                             'resultados__nota'
                         ),
@@ -394,10 +418,25 @@ class RankingView(TemplateView):
                             'resultados__tempo_segundos'
                         ),
                     )
+
+                    # =================================================
+                    # MESMA REGRA DO RANKING
+                    # =================================================
                     .order_by(
+
+                        # 1º - Maior XP
                         '-xp',
+
+                        # 2º - Maior média
                         '-pontos',
+
+                        # 3º - Maior número de acertos
                         '-total_acertos',
+
+                        # 4º - MENOR TEMPO
+                        'tempo_total',
+
+                        # 5º - Nome
                         'nome'
                     )
                 )

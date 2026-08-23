@@ -7,6 +7,7 @@ from .views import (
     AlunoLogadoView,
     ListaSeriesView,
     RankingView,
+    RegrasView,
 )
 
 app_name = 'alunos'
@@ -20,4 +21,5 @@ urlpatterns = [
     path('ranking/', RankingView.as_view(), name='ranking'),
     path('series/', ListaSeriesView.as_view(), name='series'),
     path('series/<str:serie>/', AlunosPorSerieView.as_view(), name='alunos_por_serie'),
+     path('regras/', RegrasView.as_view(), name='regras'),
 ]
