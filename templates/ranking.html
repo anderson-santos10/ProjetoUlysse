@@ -1,13 +1,10 @@
-
 {% load static %}
 
 <!DOCTYPE html>
 <html lang="pt-br">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Ranking | ULYSSES</title>
@@ -26,15 +23,18 @@
 
     <style>
 
-        :root {
+        /* =====================================================
+           VARIÁVEIS
+        ===================================================== */
 
+        :root {
             --bg-body: #f8fafc;
             --surface: #ffffff;
             --surface-hover: #f1f5f9;
 
             --primary: #4f46e5;
             --primary-light: #eef2ff;
-            --primary-glow: rgba(79, 70, 229, 0.15);
+            --primary-glow: rgba(79, 70, 229, 0.12);
 
             --text-main: #0f172a;
             --text-muted: #64748b;
@@ -43,7 +43,7 @@
 
             --radius-sm: 8px;
             --radius-md: 12px;
-            --radius-lg: 20px;
+            --radius-lg: 16px;
 
             --shadow-sm:
                 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -52,51 +52,54 @@
                 0 4px 6px -1px rgba(0, 0, 0, 0.05),
                 0 2px 4px -2px rgba(0, 0, 0, 0.05);
 
-            --gold: #d97706;
+            --shadow-hover:
+                0 12px 20px -3px rgba(0, 0, 0, 0.08),
+                0 4px 6px -4px rgba(0, 0, 0, 0.03);
 
+            /* Ranking */
+            --gold: #d97706;
             --gold-bg:
                 linear-gradient(
                     180deg,
                     #fef3c7 0%,
                     #ffffff 100%
                 );
-
             --gold-border: #fcd34d;
 
             --silver: #475569;
-
             --silver-bg:
                 linear-gradient(
                     180deg,
                     #f1f5f9 0%,
                     #ffffff 100%
                 );
-
             --silver-border: #cbd5e1;
 
             --bronze: #b45309;
-
             --bronze-bg:
                 linear-gradient(
                     180deg,
                     #ffedd5 0%,
                     #ffffff 100%
                 );
-
             --bronze-border: #fed7aa;
         }
+
+
+        /* =====================================================
+           DARK MODE
+        ===================================================== */
 
         @media (prefers-color-scheme: dark) {
 
             :root {
-
                 --bg-body: #0b0f19;
                 --surface: #111827;
                 --surface-hover: #1f2937;
 
                 --primary: #6366f1;
-                --primary-light: #1e1b4b;
-                --primary-glow: rgba(99, 102, 241, 0.2);
+                --primary-light: rgba(99, 102, 241, 0.15);
+                --primary-glow: rgba(99, 102, 241, 0.20);
 
                 --text-main: #f8fafc;
                 --text-muted: #94a3b8;
@@ -126,14 +129,23 @@
             }
         }
 
+
+        /* =====================================================
+           RESET
+        ===================================================== */
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        body {
 
+        /* =====================================================
+           BODY
+        ===================================================== */
+
+        body {
             font-family:
                 'Plus Jakarta Sans',
                 system-ui,
@@ -146,19 +158,19 @@
 
             -webkit-font-smoothing: antialiased;
 
-            padding-bottom: 60px;
+            padding-bottom: 40px;
         }
+
 
         /* =====================================================
            HEADER
+           Mesmo padrão da Área do Professor
         ===================================================== */
 
         .header {
-
             background: var(--surface);
 
-            border-bottom:
-                1px solid var(--border);
+            border-bottom: 1px solid var(--border);
 
             height: 64px;
 
@@ -176,9 +188,12 @@
             backdrop-filter: blur(8px);
         }
 
-        .logo {
 
+        /* LOGO */
+
+        .logo {
             font-size: 16px;
+
             font-weight: 800;
 
             color: var(--primary);
@@ -189,34 +204,47 @@
             align-items: center;
 
             gap: 10px;
+
+            text-decoration: none;
         }
 
         .logo i {
-
             width: 20px;
             height: 20px;
         }
 
-        .relogio {
 
+        /* ÁREA DIREITA */
+
+        .header-right {
+            display: flex;
+            align-items: center;
+
+            gap: 16px;
+        }
+
+
+        /* RELÓGIO */
+
+        .relogio {
             display: flex;
             align-items: center;
 
             gap: 8px;
 
-            font-size: 14px;
-            font-weight: 700;
+            font-size: 13px;
+
+            font-weight: 600;
 
             color: var(--text-muted);
 
-            background: var(--surface-hover);
+            background: var(--surface);
 
-            border:
-                1px solid var(--border);
+            border: 1px solid var(--border);
 
             padding: 8px 14px;
 
-            border-radius: 10px;
+            border-radius: var(--radius-sm);
 
             min-width: 110px;
 
@@ -224,46 +252,79 @@
         }
 
         .relogio i {
-
-            width: 17px;
-            height: 17px;
+            width: 16px;
+            height: 16px;
 
             color: var(--primary);
         }
 
         #hora-atual {
-
-            font-variant-numeric:
-                tabular-nums;
+            font-variant-numeric: tabular-nums;
         }
+
+
+        /* BOTÃO VOLTAR */
+
+        .voltar {
+            text-decoration: none;
+
+            color: var(--text-main);
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            padding: 8px 14px;
+
+            background: var(--surface);
+
+            border: 1px solid var(--border);
+
+            border-radius: var(--radius-sm);
+
+            transition: all 0.2s ease;
+
+            display: flex;
+            align-items: center;
+
+            gap: 6px;
+        }
+
+        .voltar:hover {
+            background: var(--surface-hover);
+
+            border-color: var(--border);
+        }
+
 
         /* =====================================================
            CONTAINER
         ===================================================== */
 
         .container {
-
             width: 100%;
 
             max-width: 1000px;
 
-            margin: 32px auto;
+            margin: 0 auto;
 
-            padding: 0 20px;
+            padding: 40px 20px 60px;
         }
+
 
         /* =====================================================
            BREADCRUMB
         ===================================================== */
 
         .breadcrumb {
-
             display: flex;
+
             align-items: center;
 
             gap: 8px;
 
             font-size: 13px;
+
             font-weight: 500;
 
             color: var(--text-muted);
@@ -272,7 +333,6 @@
         }
 
         .breadcrumb a {
-
             color: var(--text-muted);
 
             text-decoration: none;
@@ -281,28 +341,24 @@
         }
 
         .breadcrumb a:hover {
-
             color: var(--primary);
         }
 
+
         /* =====================================================
-           TITLE
+           TÍTULO
         ===================================================== */
 
         .header-title {
-
-            text-align: center;
-
-            margin-bottom: 28px;
+            margin-bottom: 32px;
         }
 
         .header-title h1 {
-
-            font-size: 32px;
+            font-size: 28px;
 
             font-weight: 800;
 
-            letter-spacing: -0.03em;
+            letter-spacing: -0.02em;
 
             color: var(--text-main);
 
@@ -310,34 +366,39 @@
 
             align-items: center;
 
-            justify-content: center;
+            gap: 10px;
 
-            gap: 12px;
+            margin-bottom: 6px;
+        }
+
+        .header-title h1 i {
+            width: 26px;
+            height: 26px;
+
+            color: #f59e0b;
         }
 
         .header-title p {
+            font-size: 15px;
 
             color: var(--text-muted);
 
-            font-size: 15px;
-
-            margin-top: 8px;
-
             font-weight: 400;
+
+            line-height: 1.5;
         }
+
 
         /* =====================================================
            SELETOR DE SÉRIE
         ===================================================== */
 
         .series-selector {
-
             display: grid;
 
-            grid-template-columns:
-                repeat(4, 1fr);
+            grid-template-columns: repeat(4, 1fr);
 
-            gap: 10px;
+            gap: 8px;
 
             margin-bottom: 32px;
 
@@ -345,46 +406,42 @@
 
             padding: 8px;
 
-            border:
-                1px solid var(--border);
+            border: 1px solid var(--border);
 
-            border-radius: 16px;
+            border-radius: var(--radius-lg);
 
             box-shadow: var(--shadow-sm);
         }
 
         .series-button {
-
             border: none;
 
             background: transparent;
 
             color: var(--text-muted);
 
-            padding: 12px 10px;
+            padding: 11px 10px;
 
-            border-radius: 10px;
+            border-radius: var(--radius-sm);
 
             font-family: inherit;
 
-            font-size: 14px;
+            font-size: 13px;
 
             font-weight: 700;
 
             cursor: pointer;
 
-            transition: all 0.2s;
+            transition: all 0.2s ease;
         }
 
         .series-button:hover {
-
             background: var(--surface-hover);
 
             color: var(--text-main);
         }
 
         .series-button.active {
-
             background: var(--primary);
 
             color: white;
@@ -394,51 +451,50 @@
                 var(--primary-glow);
         }
 
+
         /* =====================================================
-           RANKINGS
+           RANKING
         ===================================================== */
 
         .ranking-serie {
-
             display: none;
         }
 
         .ranking-serie.active {
-
             display: block;
         }
 
+
+        /* TÍTULO DA SÉRIE */
+
         .serie-title {
-
-            text-align: center;
-
             margin-bottom: 24px;
         }
 
         .serie-title h2 {
-
-            font-size: 22px;
+            font-size: 20px;
 
             font-weight: 800;
 
             color: var(--text-main);
+
+            letter-spacing: -0.01em;
+
+            margin-bottom: 4px;
         }
 
         .serie-title p {
-
-            margin-top: 5px;
-
             font-size: 13px;
 
             color: var(--text-muted);
         }
+
 
         /* =====================================================
            USUÁRIO LOGADO
         ===================================================== */
 
         .user-highlight-card {
-
             background:
                 linear-gradient(
                     135deg,
@@ -448,10 +504,9 @@
 
             color: #ffffff;
 
-            border-radius:
-                var(--radius-lg);
+            border-radius: var(--radius-lg);
 
-            padding: 20px 28px;
+            padding: 20px 24px;
 
             display: flex;
 
@@ -471,7 +526,6 @@
         }
 
         .user-highlight-card::after {
-
             content: '';
 
             position: absolute;
@@ -491,18 +545,16 @@
         }
 
         .user-info {
-
             display: flex;
 
             align-items: center;
 
-            gap: 20px;
+            gap: 18px;
 
             z-index: 1;
         }
 
         .user-position-badge {
-
             background:
                 rgba(255, 255, 255, 0.15);
 
@@ -512,8 +564,7 @@
                 1px solid
                 rgba(255, 255, 255, 0.25);
 
-            border-radius:
-                var(--radius-md);
+            border-radius: var(--radius-md);
 
             padding: 10px 16px;
 
@@ -521,7 +572,6 @@
         }
 
         .user-position-badge .pos {
-
             font-size: 22px;
 
             font-weight: 800;
@@ -530,7 +580,6 @@
         }
 
         .user-position-badge .lbl {
-
             font-size: 10px;
 
             text-transform: uppercase;
@@ -545,14 +594,12 @@
         }
 
         .user-details .name {
-
-            font-size: 18px;
+            font-size: 17px;
 
             font-weight: 700;
         }
 
         .user-details .tag {
-
             font-size: 13px;
 
             opacity: 0.85;
@@ -563,7 +610,6 @@
         }
 
         .user-stats {
-
             display: flex;
 
             gap: 28px;
@@ -574,8 +620,7 @@
         }
 
         .stat-item .val {
-
-            font-size: 18px;
+            font-size: 17px;
 
             font-weight: 800;
 
@@ -589,7 +634,6 @@
         }
 
         .stat-item .lbl {
-
             font-size: 10px;
 
             opacity: 0.8;
@@ -603,12 +647,12 @@
             margin-top: 2px;
         }
 
+
         /* =====================================================
            PÓDIO
         ===================================================== */
 
         .podium-container {
-
             display: flex;
 
             align-items: flex-end;
@@ -621,11 +665,9 @@
         }
 
         .podium-card {
-
             background: var(--surface);
 
-            border-radius:
-                var(--radius-lg);
+            border-radius: var(--radius-lg);
 
             padding: 24px 16px;
 
@@ -641,60 +683,66 @@
 
             position: relative;
 
-            box-shadow:
-                var(--shadow-md);
+            box-shadow: var(--shadow-md);
 
             transition:
-                transform 0.2s;
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
         }
 
         .podium-card:hover {
+            transform: translateY(-4px);
 
-            transform: translateY(-6px);
+            box-shadow: var(--shadow-hover);
         }
 
-        .podium-card.first {
 
+        /* PRIMEIRO */
+
+        .podium-card.first {
             order: 2;
 
             border:
                 2px solid
                 var(--gold-border);
 
-            background:
-                var(--gold-bg);
+            background: var(--gold-bg);
 
             padding-top: 36px;
 
             padding-bottom: 28px;
         }
 
-        .podium-card.second {
 
+        /* SEGUNDO */
+
+        .podium-card.second {
             order: 1;
 
             border:
                 1px solid
                 var(--silver-border);
 
-            background:
-                var(--silver-bg);
+            background: var(--silver-bg);
         }
 
-        .podium-card.third {
 
+        /* TERCEIRO */
+
+        .podium-card.third {
             order: 3;
 
             border:
                 1px solid
                 var(--bronze-border);
 
-            background:
-                var(--bronze-bg);
+            background: var(--bronze-bg);
         }
 
-        .podium-rank {
 
+        /* POSIÇÃO */
+
+        .podium-rank {
             width: 32px;
 
             height: 32px;
@@ -717,7 +765,6 @@
         }
 
         .first .podium-rank {
-
             background: var(--gold);
 
             width: 40px;
@@ -728,25 +775,24 @@
         }
 
         .second .podium-rank {
-
             background: var(--silver);
         }
 
         .third .podium-rank {
-
             background: var(--bronze);
         }
 
-        .podium-avatar {
 
+        /* AVATAR */
+
+        .podium-avatar {
             width: 60px;
 
             height: 60px;
 
             border-radius: 50%;
 
-            background:
-                var(--surface-hover);
+            background: var(--surface-hover);
 
             display: flex;
 
@@ -768,7 +814,6 @@
         }
 
         .first .podium-avatar {
-
             width: 76px;
 
             height: 76px;
@@ -780,8 +825,10 @@
                 var(--gold);
         }
 
-        .podium-name {
 
+        /* NOME */
+
+        .podium-name {
             font-weight: 700;
 
             font-size: 15px;
@@ -794,12 +841,13 @@
         }
 
         .first .podium-name {
-
             font-size: 17px;
         }
 
-        .podium-score {
 
+        /* XP */
+
+        .podium-score {
             font-size: 20px;
 
             font-weight: 800;
@@ -808,14 +856,15 @@
         }
 
         .first .podium-score {
-
             font-size: 24px;
 
             color: var(--gold);
         }
 
-        .podium-time {
 
+        /* TEMPO */
+
+        .podium-time {
             display: inline-flex;
 
             align-items: center;
@@ -838,8 +887,10 @@
             margin-top: 8px;
         }
 
-        .podium-attempts {
 
+        /* TENTATIVAS */
+
+        .podium-attempts {
             font-size: 11px;
 
             color: var(--text-muted);
@@ -849,29 +900,26 @@
             font-weight: 500;
         }
 
+
         /* =====================================================
            TABELA
         ===================================================== */
 
         .card-table {
-
             background: var(--surface);
 
             border:
                 1px solid
                 var(--border);
 
-            border-radius:
-                var(--radius-lg);
+            border-radius: var(--radius-lg);
 
-            box-shadow:
-                var(--shadow-sm);
+            box-shadow: var(--shadow-sm);
 
             overflow: hidden;
         }
 
         table {
-
             width: 100%;
 
             border-collapse: collapse;
@@ -880,9 +928,7 @@
         }
 
         th {
-
-            background:
-                var(--surface-hover);
+            background: var(--surface-hover);
 
             padding: 16px 20px;
 
@@ -901,7 +947,6 @@
         }
 
         td {
-
             padding: 16px 20px;
 
             border-bottom:
@@ -915,26 +960,24 @@
         }
 
         tr:last-child td {
-
             border-bottom: none;
         }
 
         tr:hover td {
-
-            background:
-                var(--surface-hover);
+            background: var(--surface-hover);
         }
 
         tr.is-current-user td {
-
             background:
                 var(--primary-glow) !important;
 
             font-weight: 600;
         }
 
-        .rank-col {
 
+        /* POSIÇÃO */
+
+        .rank-col {
             font-weight: 700;
 
             color: var(--text-muted);
@@ -944,8 +987,10 @@
             text-align: center;
         }
 
-        .student-cell {
 
+        /* ALUNO */
+
+        .student-cell {
             display: flex;
 
             align-items: center;
@@ -954,13 +999,11 @@
         }
 
         .mini-avatar {
-
             width: 36px;
 
             height: 36px;
 
-            background:
-                var(--surface-hover);
+            background: var(--surface-hover);
 
             color: var(--text-main);
 
@@ -983,14 +1026,14 @@
         }
 
         .student-name-text {
-
             font-weight: 600;
         }
 
-        .you-badge {
 
-            background:
-                var(--primary);
+        /* VOCÊ */
+
+        .you-badge {
+            background: var(--primary);
 
             color: white;
 
@@ -1007,8 +1050,10 @@
             margin-left: 8px;
         }
 
-        .time-badge {
 
+        /* TEMPO */
+
+        .time-badge {
             display: inline-flex;
 
             align-items: center;
@@ -1025,8 +1070,10 @@
                 tabular-nums;
         }
 
-        .score-val {
 
+        /* XP */
+
+        .score-val {
             font-weight: 800;
 
             color: var(--primary);
@@ -1034,38 +1081,36 @@
             white-space: nowrap;
         }
 
-        .attempts-val {
 
+        /* TENTATIVAS */
+
+        .attempts-val {
             color: var(--text-muted);
 
             font-size: 13px;
         }
+
 
         /* =====================================================
            RANKING VAZIO
         ===================================================== */
 
         .empty-ranking {
-
-            background:
-                var(--surface);
+            background: var(--surface);
 
             border:
                 1px solid var(--border);
 
-            border-radius:
-                var(--radius-lg);
+            border-radius: var(--radius-lg);
 
             text-align: center;
 
             padding: 48px 20px;
 
-            box-shadow:
-                var(--shadow-sm);
+            box-shadow: var(--shadow-sm);
         }
 
         .empty-ranking i {
-
             width: 48px;
 
             height: 48px;
@@ -1076,14 +1121,12 @@
         }
 
         .empty-ranking h3 {
-
             font-size: 16px;
 
             font-weight: 600;
         }
 
         .empty-ranking p {
-
             color: var(--text-muted);
 
             font-size: 14px;
@@ -1091,52 +1134,48 @@
             margin-top: 6px;
         }
 
+
         /* =====================================================
            RESPONSIVO
         ===================================================== */
 
-        @media (max-width: 640px) {
+        @media (max-width: 700px) {
 
             .header {
-
-                padding: 0 16px;
+                padding: 0 20px;
             }
 
             .container {
+                padding: 24px 16px 40px;
+            }
 
-                padding: 0 14px;
+            .header-title h1 {
+                font-size: 24px;
             }
 
             .series-selector {
-
-                grid-template-columns:
-                    repeat(2, 1fr);
+                grid-template-columns: repeat(2, 1fr);
             }
 
             .podium-container {
-
                 flex-direction: column;
 
                 align-items: stretch;
             }
 
             .podium-card.first {
-
                 order: 1;
             }
 
             .podium-card.second {
-
                 order: 2;
             }
 
             .podium-card.third {
-
                 order: 3;
             }
 
             .user-highlight-card {
-
                 flex-direction: column;
 
                 align-items: flex-start;
@@ -1145,11 +1184,9 @@
             }
 
             .user-stats {
-
                 width: 100%;
 
-                justify-content:
-                    space-between;
+                justify-content: space-between;
 
                 text-align: left;
 
@@ -1161,35 +1198,72 @@
             }
 
             .card-table {
-
                 overflow-x: auto;
             }
 
             table {
-
                 min-width: 600px;
             }
 
             .relogio {
-
-                font-size: 13px;
+                font-size: 12px;
 
                 min-width: 100px;
 
                 padding: 7px 10px;
             }
+        }
 
-            .header-title h1 {
 
-                font-size: 26px;
+        @media (max-width: 480px) {
+
+            .logo {
+                font-size: 15px;
+            }
+
+            .header-right {
+                gap: 8px;
+            }
+
+            .voltar {
+                padding: 8px 10px;
+            }
+
+            .voltar span {
+                display: none;
+            }
+
+            .header-title p {
+                font-size: 14px;
+            }
+
+            .user-info {
+                gap: 12px;
+            }
+
+            .user-position-badge {
+                padding: 9px 12px;
+            }
+
+            .user-details .name {
+                font-size: 15px;
+            }
+
+            .user-stats {
+                gap: 12px;
+            }
+
+            .stat-item .val {
+                font-size: 14px;
             }
         }
 
     </style>
-
 </head>
 
+
 <body>
+
 
     <!-- =====================================================
          HEADER
@@ -1197,21 +1271,44 @@
 
     <header class="header">
 
-        <div class="logo">
+        <a
+            href="{% url 'home' %}"
+            class="logo"
+        >
 
             <i data-lucide="graduation-cap"></i>
 
             ULYSSES
 
-        </div>
+        </a>
 
-        <div class="relogio">
 
-            <i data-lucide="clock"></i>
+        <div class="header-right">
 
-            <span id="hora-atual">
-                00:00:00
-            </span>
+            <div class="relogio">
+
+                <i data-lucide="clock"></i>
+
+                <span id="hora-atual">
+                    00:00:00
+                </span>
+
+            </div>
+
+
+            <a
+                href="{% url 'home' %}"
+                class="voltar"
+            >
+
+                <i
+                    data-lucide="arrow-left"
+                    style="width: 16px; height: 16px;"
+                ></i>
+
+                <span>Voltar</span>
+
+            </a>
 
         </div>
 
@@ -1223,6 +1320,7 @@
     ===================================================== -->
 
     <main class="container">
+
 
         <!-- BREADCRUMB -->
 
@@ -1250,10 +1348,7 @@
 
             <h1>
 
-                <i
-                    data-lucide="trophy"
-                    style="color: #f59e0b;"
-                ></i>
+                <i data-lucide="trophy"></i>
 
                 Ranking ULYSSES
 
@@ -1301,6 +1396,7 @@
             id="ranking-{{ codigo }}"
         >
 
+
             <!-- TÍTULO DA SÉRIE -->
 
             <div class="serie-title">
@@ -1326,14 +1422,21 @@
 
                 <div class="user-info">
 
+
+                    <!-- POSIÇÃO -->
+
                     <div class="user-position-badge">
 
                         <div class="pos">
 
                             {% if usuario_logado.posicao %}
+
                                 #{{ usuario_logado.posicao }}
+
                             {% else %}
+
                                 —
+
                             {% endif %}
 
                         </div>
@@ -1345,17 +1448,22 @@
                     </div>
 
 
+                    <!-- INFORMAÇÕES -->
+
                     <div class="user-details">
 
                         <div class="name">
 
                             {{ usuario_logado.nome }}
+
                             (Você)
 
                         </div>
 
                         <span class="tag">
+
                             {{ ranking.nome }}
+
                         </span>
 
                     </div>
@@ -1363,7 +1471,10 @@
                 </div>
 
 
+                <!-- ESTATÍSTICAS -->
+
                 <div class="user-stats">
+
 
                     <!-- XP -->
 
@@ -1392,11 +1503,7 @@
 
                             <i
                                 data-lucide="timer"
-                                style="
-                                    width: 16px;
-                                    height: 16px;
-                                    opacity: 0.9;
-                                "
+                                style="width: 16px; height: 16px;"
                             ></i>
 
                             {{ usuario_logado.tempo_formatado|default:"00min 00s" }}
@@ -1481,10 +1588,7 @@
 
                             <i
                                 data-lucide="clock"
-                                style="
-                                    width: 12px;
-                                    height: 12px;
-                                "
+                                style="width: 12px; height: 12px;"
                             ></i>
 
                             {{ segundo.tempo_formatado|default:"00min 00s" }}
@@ -1496,9 +1600,13 @@
                             {{ segundo.tentativas|default:0 }}
 
                             {% if segundo.tentativas == 1 %}
+
                                 tentativa
+
                             {% else %}
+
                                 tentativas
+
                             {% endif %}
 
                         </div>
@@ -1556,10 +1664,7 @@
 
                             <i
                                 data-lucide="clock"
-                                style="
-                                    width: 12px;
-                                    height: 12px;
-                                "
+                                style="width: 12px; height: 12px;"
                             ></i>
 
                             {{ primeiro.tempo_formatado|default:"00min 00s" }}
@@ -1571,9 +1676,13 @@
                             {{ primeiro.tentativas|default:0 }}
 
                             {% if primeiro.tentativas == 1 %}
+
                                 tentativa
+
                             {% else %}
+
                                 tentativas
+
                             {% endif %}
 
                         </div>
@@ -1619,10 +1728,7 @@
 
                             <i
                                 data-lucide="clock"
-                                style="
-                                    width: 12px;
-                                    height: 12px;
-                                "
+                                style="width: 12px; height: 12px;"
                             ></i>
 
                             {{ terceiro.tempo_formatado|default:"00min 00s" }}
@@ -1634,9 +1740,13 @@
                             {{ terceiro.tentativas|default:0 }}
 
                             {% if terceiro.tentativas == 1 %}
+
                                 tentativa
+
                             {% else %}
+
                                 tentativas
+
                             {% endif %}
 
                         </div>
@@ -1722,6 +1832,7 @@
 
                                             </span>
 
+
                                             {% if usuario_logado and usuario_logado.id == aluno.id %}
 
                                                 <span class="you-badge">
@@ -1756,10 +1867,7 @@
 
                                             <i
                                                 data-lucide="timer"
-                                                style="
-                                                    width: 14px;
-                                                    height: 14px;
-                                                "
+                                                style="width: 14px; height: 14px;"
                                             ></i>
 
                                             {{ aluno.tempo_formatado|default:"00min 00s" }}
@@ -1776,9 +1884,13 @@
                                         {{ aluno.tentativas|default:0 }}
 
                                         {% if aluno.tentativas == 1 %}
+
                                             tentativa
+
                                         {% else %}
+
                                             tentativas
+
                                         {% endif %}
 
                                     </td>
@@ -1799,6 +1911,7 @@
 
 
             {% else %}
+
 
                 <!-- =================================================
                      RANKING VAZIO
@@ -1834,6 +1947,7 @@
 
     <script>
 
+
         /* =====================================================
            ÍCONES
         ===================================================== */
@@ -1865,6 +1979,7 @@
                 'hora-atual'
             ).textContent =
                 `${horas}:${minutos}:${segundos}`;
+
         }
 
         setInterval(
