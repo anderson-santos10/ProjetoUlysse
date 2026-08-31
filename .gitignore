@@ -1,22 +1,33 @@
+# Ambiente virtual
 venv/
 env/
 .venv/
 
-db.sqlite3
-*.sqlite3
-
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
 
-*.log
-media/
+# Django
+db.sqlite3
+db.sqlite3-journal
+
+# Variáveis de ambiente
+.env
+.env.*
+
+# Arquivos estáticos gerados
 staticfiles/
 
-.env
+# Uploads / mídia
+media/
 
+# VS Code
 .vscode/
+
+# PyCharm
 .idea/
 
+# Sistema operacional
 .DS_Store
 Thumbs.db
