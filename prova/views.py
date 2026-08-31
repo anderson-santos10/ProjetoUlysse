@@ -18,7 +18,7 @@ class AcessoProfessorView(TemplateView):
     def post(self, request, *args, **kwargs):
         senha = request.POST.get("senha")
 
-        if senha == "1234":
+        if senha == "UL824695.":
             request.session["professor_autenticado"] = True
             return redirect("area_professor")
 
