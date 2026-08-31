@@ -28,12 +28,9 @@ DEBUG = os.environ.get("DEBUG", "True").lower() == "true"
 
 
 ALLOWED_HOSTS = [
-    host.strip()
-    for host in os.environ.get(
-        "ALLOWED_HOSTS",
-        "127.0.0.1,localhost",
-    ).split(",")
-    if host.strip()
+    "projetoulysse-production.up.railway.app",
+    "localhost",
+    "127.0.0.1",
 ]
 
 
