@@ -29,6 +29,28 @@ def _running_tests():
     return "test" in sys.argv
 
 
+def _load_local_env_file(path):
+    """Carrega .env local sem sobrescrever variáveis já definidas (ex.: Railway)."""
+    if _running_tests() or _env_bool("SARESP_IGNORE_DOTENV", default=False):
+        return
+    if not path.is_file():
+        return
+    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        if line.startswith("export "):
+            line = line[len("export "):].strip()
+        key, _, value = line.partition("=")
+        key = key.strip()
+        value = value.strip().strip("'").strip('"')
+        if key and key not in os.environ:
+            os.environ[key] = value
+
+
+_load_local_env_file(BASE_DIR / ".env")
+
+
 # ============================================================
 # SECURITY
 # ============================================================
@@ -44,7 +66,9 @@ if not SECRET_KEY:
     else:
         raise ImproperlyConfigured(
             "Defina a variável de ambiente SECRET_KEY. "
-            "Em desenvolvimento local, use DEBUG=True."
+            "Em produção (Railway), cadastre SECRET_KEY em Variables "
+            "e disponibilize-a também no build se collectstatic rodar no build. "
+            "Em desenvolvimento local, use um arquivo .env ou DEBUG=True."
         )
 
 

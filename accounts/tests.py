@@ -1,3 +1,6 @@
+import os
+import subprocess
+import sys
 from pathlib import Path
 
 from django.conf import settings
@@ -40,6 +43,67 @@ class SettingsSecurityTests(TestCase):
 
     def test_debug_em_testes_nao_fica_true_sem_env(self):
         self.assertFalse(settings.DEBUG)
+
+    def test_settings_exige_secret_key_por_variavel_de_ambiente(self):
+        source = (PROJECT_ROOT / "saresp" / "settings.py").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn('os.environ.get("SECRET_KEY"', source)
+        self.assertIn("ImproperlyConfigured", source)
+        self.assertNotIn(
+            'SECRET_KEY = "django-insecure-e6go^1$c2p3^mcm"',
+            source,
+        )
+
+    def _settings_subprocess(self, extra_env, expect_success):
+        env = os.environ.copy()
+        env.pop("SECRET_KEY", None)
+        env["DEBUG"] = "False"
+        env["SARESP_IGNORE_DOTENV"] = "1"
+        env["DJANGO_SETTINGS_MODULE"] = "saresp.settings"
+        env["PYTHONPATH"] = str(PROJECT_ROOT)
+        env.update(extra_env)
+        script = (
+            "import os\n"
+            "os.environ['DJANGO_SETTINGS_MODULE'] = 'saresp.settings'\n"
+            "from django.core.exceptions import ImproperlyConfigured\n"
+            "try:\n"
+            "    import django\n"
+            "    django.setup()\n"
+            "except ImproperlyConfigured as exc:\n"
+            "    texto = str(exc)\n"
+            "    assert 'SECRET_KEY' in texto\n"
+            "    print('SECRET_KEY configurada: NAO')\n"
+            "    raise SystemExit(2)\n"
+            "print('SECRET_KEY configurada: SIM')\n"
+        )
+        result = subprocess.run(
+            [sys.executable, "-c", script],
+            cwd=str(PROJECT_ROOT),
+            env=env,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        combined = (result.stdout or "") + (result.stderr or "")
+        self.assertNotIn("django-insecure-e6go^1$c2p3^mcm", combined)
+        if expect_success:
+            self.assertEqual(result.returncode, 0, combined)
+            self.assertIn("SECRET_KEY configurada: SIM", result.stdout)
+            self.assertNotIn(extra_env.get("SECRET_KEY", ""), result.stdout)
+        else:
+            self.assertEqual(result.returncode, 2, combined)
+            self.assertIn("SECRET_KEY configurada: NAO", result.stdout)
+        return result
+
+    def test_django_inicializa_quando_secret_key_existe(self):
+        self._settings_subprocess(
+            {"SECRET_KEY": "chave-de-teste-nao-usar-em-producao"},
+            expect_success=True,
+        )
+
+    def test_producao_sem_secret_key_falha_com_mensagem_clara(self):
+        self._settings_subprocess({}, expect_success=False)
 
     def test_base_css_existe_e_esta_no_staticfiles_dirs(self):
         css_path = PROJECT_ROOT / "static" / "css" / "base.css"
