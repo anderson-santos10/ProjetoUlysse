@@ -1,0 +1,59 @@
+{% extends "layouts/staff.html" %}
+
+{% block title %}Desempenho {{ turma }} | ULYSSES{% endblock %}
+{% block area_label %}Área do Professor{% endblock %}
+
+{% block page_header %}
+    {% include "components/page_header.html" with title="Desempenho da turma" description="Indicadores somente de provas cuja matrícula histórica é desta turma. Tentativas anteriores às turmas não entram neste recorte." %}
+{% endblock %}
+
+{% block content %}
+    <p class="muted">{{ turma.get_serie_display }} {{ turma.nome }} · {{ turma.ano_letivo }}</p>
+    <div class="nav-inline">
+        <a class="btn btn-outline" href="{% url 'alunos:detalhe_turma' turma.pk %}">Voltar à turma</a>
+        <a class="btn btn-outline" href="{% url 'desempenho' %}?turma={{ turma.pk }}">Análise geral filtrada</a>
+    </div>
+    <div class="stat-grid stat-grid--4 mt-lg">
+        <div class="stat-tile">
+            <span>Alunos vinculados</span>
+            <strong>{{ alunos_ativos }}</strong>
+        </div>
+        <div class="stat-tile">
+            <span>Provas com esta turma</span>
+            <strong>{{ indicadores.provas }}</strong>
+        </div>
+        <div class="stat-tile">
+            <span>Média</span>
+            <strong>{% if indicadores.media is not None %}{{ indicadores.media|floatformat:1 }}{% else %}—{% endif %}</strong>
+        </div>
+        <div class="stat-tile">
+            <span>Taxa de acertos</span>
+            <strong>{% if indicadores.taxa is not None %}{{ indicadores.taxa|floatformat:1 }}%{% else %}—{% endif %}</strong>
+        </div>
+    </div>
+    {% if questoes_dificuldade %}
+        <h2 class="mt-lg">Questões com menor taxa (amostra mínima)</h2>
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Questão</th>
+                        <th>Tentativas</th>
+                        <th>Taxa</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in questoes_dificuldade %}
+                        <tr>
+                            <td>#{{ item.questao.numero }}</td>
+                            <td>{{ item.tentativas }}</td>
+                            <td>{% if item.taxa is not None %}{{ item.taxa|floatformat:1 }}%{% else %}—{% endif %}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        {% include "components/empty_state.html" with icon="bar-chart-3" title="Ainda não há provas desta turma." description="Quando os alunos finalizarem simulados com vínculo ativo, os indicadores aparecerão aqui." %}
+    {% endif %}
+{% endblock %}

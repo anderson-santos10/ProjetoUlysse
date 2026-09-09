@@ -1,0 +1,4 @@
+<nav class="subnav" aria-label="Seções de desempenho">
+    <a href="{% url 'desempenho' %}?periodo={{ periodo }}{% if serie_filtro %}&serie={{ serie_filtro }}{% endif %}{% if turma_filtro %}&turma={{ turma_filtro.pk }}{% endif %}" {% if request.resolver_match.url_name == 'desempenho' %}aria-current="page"{% endif %}>Visão geral</a>
+    <a href="{% url 'desempenho_questoes' %}?periodo={{ periodo }}{% if serie_filtro %}&serie={{ serie_filtro }}{% endif %}{% if turma_filtro %}&turma={{ turma_filtro.pk }}{% endif %}" {% if request.resolver_match.url_name == 'desempenho_questoes' or request.resolver_match.url_name == 'desempenho_questao' %}aria-current="page"{% endif %}>Por questão</a>
+</nav>

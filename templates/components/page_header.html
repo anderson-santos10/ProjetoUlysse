@@ -1,0 +1,13 @@
+<div class="page-header">
+    <div class="page-header__text">
+        <h1>{{ title }}</h1>
+        {% if description %}
+            <p>{{ description }}</p>
+        {% endif %}
+    </div>
+    {% if action_url and action_label %}
+        <div class="page-header__actions">
+            <a class="btn btn-primary" href="{{ action_url }}">{{ action_label }}</a>
+        </div>
+    {% endif %}
+</div>

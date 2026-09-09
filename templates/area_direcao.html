@@ -1,0 +1,43 @@
+{% extends "layouts/staff.html" %}
+
+{% block title %}Direção | ULYSSES{% endblock %}
+{% block area_label %}Direção{% endblock %}
+
+{% block page_header %}
+    {% include "components/page_header.html" with title="Área da direção" description="Acesso identificado do perfil diretor. Não há módulos extras de direção nesta etapa. A gestão pedagógica continua no painel do professor." %}
+{% endblock %}
+
+{% block content %}
+    <div class="card-grid">
+        <a class="card card--action" href="{% url 'area_professor' %}">
+            <div class="card-icon"><i data-lucide="home"></i></div>
+            <div>
+                <h2>Painel pedagógico</h2>
+                <p class="muted">Alunos, questões e resultados.</p>
+            </div>
+        </a>
+        {% if perms.questoes.view_resultado %}
+            <a class="card card--action" href="{% url 'questoes:resultados' %}">
+                <div class="card-icon"><i data-lucide="clipboard-list"></i></div>
+                <div>
+                    <h2>Resultados</h2>
+                    <p class="muted">Consulta das tentativas registradas.</p>
+                </div>
+            </a>
+            <a class="card card--action" href="{% url 'desempenho' %}">
+                <div class="card-icon"><i data-lucide="bar-chart-3"></i></div>
+                <div>
+                    <h2>Desempenho</h2>
+                    <p class="muted">Indicadores pedagógicos das tentativas.</p>
+                </div>
+            </a>
+        {% endif %}
+        <div class="card card--action card--disabled" aria-disabled="true">
+            <div class="card-icon"><i data-lucide="building-2"></i></div>
+            <div>
+                <h2>Gestão institucional <span class="badge">Em breve</span></h2>
+                <p class="muted">Esta função ainda não existe no sistema.</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

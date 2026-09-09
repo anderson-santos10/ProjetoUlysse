@@ -1,0 +1,99 @@
+{% extends "layouts/staff.html" %}
+
+{% block title %}{{ avaliacao.titulo }} | ULYSSES{% endblock %}
+{% block area_label %}Área do Professor{% endblock %}
+
+{% block page_header %}
+    {% include "components/page_header.html" with title=avaliacao.titulo description=avaliacao.descricao %}
+{% endblock %}
+
+{% block content %}
+    <div class="stat-grid">
+        <div class="stat-tile">
+            <span>Turma</span>
+            <strong>{{ avaliacao.turma }}</strong>
+        </div>
+        <div class="stat-tile">
+            <span>Status</span>
+            <strong>{{ avaliacao.get_status_display }}</strong>
+        </div>
+        <div class="stat-tile">
+            <span>Tentativas máximas</span>
+            <strong>{{ avaliacao.tentativas_maximas }}</strong>
+        </div>
+        <div class="stat-tile">
+            <span>Tempo limite</span>
+            <strong>{% if avaliacao.tempo_limite_minutos %}{{ avaliacao.tempo_limite_minutos }} min{% else %}Sem limite{% endif %}</strong>
+        </div>
+    </div>
+
+    <div class="nav-inline mt-lg no-print">
+        <a class="btn btn-outline" href="{% url 'questoes:lista_avaliacoes' %}">Voltar</a>
+        {% if avaliacao.status == "rascunho" %}
+            {% if perms.questoes.change_avaliacao %}
+                <a class="btn btn-outline" href="{% url 'questoes:editar_avaliacao' avaliacao.pk %}">Editar</a>
+                <form method="post" action="{% url 'questoes:publicar_avaliacao' avaliacao.pk %}" data-loading-form>
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Publicar e congelar versões</button>
+                </form>
+            {% endif %}
+        {% elif avaliacao.status == "publicada" %}
+            {% if perms.questoes.change_avaliacao %}
+                <form method="post" action="{% url 'questoes:encerrar_avaliacao' avaliacao.pk %}" data-loading-form>
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline">Encerrar</button>
+                </form>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <h2>Questões</h2>
+    {% if itens %}
+        <ol>
+            {% for item in itens %}
+                <li>
+                    Questão #{{ item.questao.numero }}
+                    {% if item.questao_versao %}
+                        · versão {{ item.questao_versao.versao }} congelada
+                    {% else %}
+                        · versão ainda não congelada
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ol>
+    {% else %}
+        <p class="muted">Nenhuma questão neste rascunho.</p>
+    {% endif %}
+
+    <h2>Resultados desta avaliação</h2>
+    {% if resultados %}
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Aluno</th>
+                        <th>Nota</th>
+                        <th>Acertos</th>
+                        <th>Tempo</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in resultados %}
+                        <tr>
+                            <td>{{ item.aluno.nome }}</td>
+                            <td>{{ item.nota }}</td>
+                            <td>{{ item.acertos }}/{{ item.total_questoes }}</td>
+                            <td>{{ item.tempo_segundos }} s</td>
+                            <td class="actions">
+                                <a class="btn btn-outline" href="{% url 'questoes:resultado_detalhe' item.pk %}">Ver</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        {% include "components/empty_state.html" with icon="bar-chart-3" title="Ainda não há tentativas nesta avaliação." description="O ranking interno aparece após a primeira finalização." %}
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,143 @@
+{% extends "layouts/staff.html" %}
+
+{% block title %}{{ turma }} | ULYSSES{% endblock %}
+{% block area_label %}Área do Professor{% endblock %}
+
+{% block page_header %}
+    {% include "components/page_header.html" with title=turma description="Alunos desta turma são os vínculos ativos. Transferência encerra o vínculo anterior sem apagá-lo." %}
+{% endblock %}
+
+{% block content %}
+    <div class="stat-grid stat-grid--4">
+        <div class="stat-tile">
+            <span>Série</span>
+            <strong>{{ turma.get_serie_display }}</strong>
+        </div>
+        <div class="stat-tile">
+            <span>Ano letivo</span>
+            <strong>{{ turma.ano_letivo }}</strong>
+        </div>
+        <div class="stat-tile">
+            <span>Professor</span>
+            <strong>{{ turma.professor_responsavel.get_username }}</strong>
+        </div>
+        <div class="stat-tile">
+            <span>Situação</span>
+            <strong>{% if turma.ativa %}Ativa{% else %}Inativa{% endif %}</strong>
+        </div>
+    </div>
+
+    <div class="nav-inline mt-lg">
+        <a class="btn btn-outline" href="{% url 'alunos:lista_turmas' %}">Todas as turmas</a>
+        {% if perms.questoes.view_resultado %}
+            <a class="btn btn-outline" href="{% url 'alunos:desempenho_turma' turma.pk %}">Desempenho</a>
+        {% endif %}
+        {% if perms.questoes.view_relatorio_pedagogico %}
+            <a class="btn btn-outline" href="{% url 'relatorio_turma' turma.pk %}">Relatório</a>
+        {% endif %}
+        <a class="btn btn-outline" href="{% url 'alunos:ranking_turma' turma.pk %}">Ranking da turma</a>
+        {% if perms.alunos.change_turma %}
+            <a class="btn btn-outline" href="{% url 'alunos:editar_turma' turma.pk %}">Editar</a>
+            <form method="post" action="{% url 'alunos:alternar_turma' turma.pk %}" data-loading-form>
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline">
+                    {% if turma.ativa %}Desativar{% else %}Reativar{% endif %}
+                </button>
+            </form>
+        {% endif %}
+    </div>
+
+    <h2 class="mt-lg">Alunos vinculados</h2>
+    {% if alunos_turma %}
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Aluno</th>
+                        <th>RA</th>
+                        <th>Série</th>
+                        <th>Início do vínculo</th>
+                        <th>Provas</th>
+                        <th>Média</th>
+                        {% if perms.alunos.change_matricula %}
+                            <th></th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for aluno in alunos_turma %}
+                        <tr>
+                            <td>{{ aluno.nome }}</td>
+                            <td>{{ aluno.ra }}</td>
+                            <td>{{ aluno.get_serie_display }}</td>
+                            <td>{% if aluno.vinculo %}{{ aluno.vinculo.data_inicio|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+                            <td>{{ aluno.total_resultados }}</td>
+                            <td>{% if aluno.media_nota is not None %}{{ aluno.media_nota|floatformat:1 }}{% else %}—{% endif %}</td>
+                            {% if perms.alunos.change_matricula %}
+                                <td>
+                                    {% if aluno.vinculo %}
+                                        <form method="post" action="{% url 'alunos:encerrar_matricula' aluno.vinculo.pk %}" data-loading-form>
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-ghost">Encerrar vínculo</button>
+                                        </form>
+                                    {% endif %}
+                                </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        {% include "components/empty_state.html" with icon="users" title="Nenhum aluno vinculado." description="Matricule alunos da mesma série. Não é possível matricular em turma inativa." %}
+    {% endif %}
+
+    {% if perms.alunos.add_matricula and turma.ativa %}
+        <div class="card mt-lg">
+            <h2>Matricular aluno</h2>
+            <p class="muted">Somente alunos da mesma série e sem vínculo ativo.</p>
+            <form method="post" action="{% url 'alunos:matricular_aluno' turma.pk %}" data-loading-form>
+                {% csrf_token %}
+                {% include "components/form_field.html" with field=form_matricular.aluno label="Aluno" %}
+                <button type="submit" class="btn btn-primary">Vincular</button>
+            </form>
+        </div>
+    {% endif %}
+
+    {% if perms.alunos.change_matricula and alunos_turma %}
+        <div class="card mt-lg">
+            <h2>Transferir aluno</h2>
+            <p class="muted">Encerra o vínculo nesta turma e cria um novo na destino. Resultados antigos permanecem nesta turma histórica.</p>
+            <form method="post" action="{% url 'alunos:transferir_aluno' turma.pk %}" data-loading-form>
+                {% csrf_token %}
+                {% include "components/form_field.html" with field=form_transferir.aluno label="Aluno" %}
+                {% include "components/form_field.html" with field=form_transferir.turma_destino label="Turma de destino" %}
+                <button type="submit" class="btn btn-primary">Transferir</button>
+            </form>
+        </div>
+    {% endif %}
+
+    {% if historico_vinculos %}
+        <h2 class="mt-lg">Vínculos encerrados nesta turma</h2>
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Aluno</th>
+                        <th>Início</th>
+                        <th>Fim</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in historico_vinculos %}
+                        <tr>
+                            <td>{{ item.aluno.nome }}</td>
+                            <td>{{ item.data_inicio|date:"d/m/Y" }}</td>
+                            <td>{% if item.data_fim %}{{ item.data_fim|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends "layouts/staff.html" %}
+
+{% block title %}Coordenação | ULYSSES{% endblock %}
+{% block area_label %}Coordenação{% endblock %}
+
+{% block page_header %}
+    {% include "components/page_header.html" with title="Área da coordenação" description="Acesso identificado do perfil coordenador. As ferramentas de gestão estão no painel pedagógico. Não há módulos extras de coordenação nesta etapa." %}
+{% endblock %}
+
+{% block content %}
+    <div class="card-grid">
+        <a class="card card--action" href="{% url 'area_professor' %}">
+            <div class="card-icon"><i data-lucide="home"></i></div>
+            <div>
+                <h2>Painel pedagógico</h2>
+                <p class="muted">Alunos, questões e resultados.</p>
+            </div>
+        </a>
+        {% if perms.alunos.change_aluno %}
+            <a class="card card--action" href="{% url 'alunos:lista_alunos' %}">
+                <div class="card-icon"><i data-lucide="users"></i></div>
+                <div>
+                    <h2>Editar alunos</h2>
+                    <p class="muted">Sua permissão permite alterar cadastros.</p>
+                </div>
+            </a>
+        {% endif %}
+        {% if perms.questoes.change_questao %}
+            <a class="card card--action" href="{% url 'questoes:gestao' %}">
+                <div class="card-icon"><i data-lucide="file-text"></i></div>
+                <div>
+                    <h2>Editar questões</h2>
+                    <p class="muted">Sua permissão permite alterar o banco.</p>
+                </div>
+            </a>
+        {% endif %}
+        {% if perms.alunos.view_turma %}
+            <a class="card card--action" href="{% url 'alunos:lista_turmas' %}">
+                <div class="card-icon"><i data-lucide="school"></i></div>
+                <div>
+                    <h2>Turmas</h2>
+                    <p class="muted">Cadastrar turmas e gerenciar vínculos.</p>
+                </div>
+            </a>
+        {% endif %}
+        {% if perms.questoes.view_resultado %}
+            <a class="card card--action" href="{% url 'desempenho' %}">
+                <div class="card-icon"><i data-lucide="bar-chart-3"></i></div>
+                <div>
+                    <h2>Desempenho</h2>
+                    <p class="muted">Médias, acertos e provas por período.</p>
+                </div>
+            </a>
+        {% endif %}
+        <div class="card card--action card--disabled" aria-disabled="true">
+            <div class="card-icon"><i data-lucide="calendar"></i></div>
+            <div>
+                <h2>Calendário pedagógico <span class="badge">Em breve</span></h2>
+                <p class="muted">Esta função ainda não existe no sistema.</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

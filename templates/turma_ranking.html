@@ -1,0 +1,48 @@
+{% extends "layouts/staff.html" %}
+
+{% block title %}Ranking {{ turma }} | ULYSSES{% endblock %}
+{% block area_label %}Área do Professor{% endblock %}
+
+{% block page_header %}
+    {% include "components/page_header.html" with title="Ranking interno da turma" description="Somente alunos com vínculo ativo. Foto só com autorização. RA mascarado. O ranking público por série permanece inalterado." %}
+{% endblock %}
+
+{% block content %}
+    <div class="nav-inline">
+        <a class="btn btn-outline" href="{% url 'alunos:detalhe_turma' turma.pk %}">Voltar à turma</a>
+        <a class="btn btn-outline" href="{% url 'alunos:ranking' %}">Ranking público</a>
+    </div>
+    {% if alunos_ranking %}
+        <div class="table-wrap mt-lg">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Posição</th>
+                        <th>Aluno</th>
+                        <th>RA</th>
+                        <th>XP</th>
+                        <th>Tentativas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for aluno in alunos_ranking %}
+                        <tr>
+                            <td>{{ aluno.posicao }}</td>
+                            <td>
+                                <div class="mini-avatar">
+                                    {% include "components/aluno_avatar.html" with aluno=aluno %}
+                                </div>
+                                {{ aluno.nome }}
+                            </td>
+                            <td>{{ aluno.ra_mascarado }}</td>
+                            <td>{{ aluno.xp }}</td>
+                            <td>{{ aluno.tentativas }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        {% include "components/empty_state.html" with icon="trophy" title="Ainda não há alunos nesta turma." description="Vincule alunos para montar o ranking interno." %}
+    {% endif %}
+{% endblock %}

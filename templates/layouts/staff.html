@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ULYSSES{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@0.469.0"></script>
+    <link rel="stylesheet" href="{% static 'css/tokens.css' %}">
+    <link rel="stylesheet" href="{% static 'css/reset.css' %}">
+    <link rel="stylesheet" href="{% static 'css/layout.css' %}">
+    <link rel="stylesheet" href="{% static 'css/components.css' %}">
+    <link rel="stylesheet" href="{% static 'css/utilities.css' %}">
+    <link rel="stylesheet" href="{% static 'css/admin-flow.css' %}">
+    <link rel="stylesheet" href="{% static 'css/print.css' %}" media="print">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="layout-staff {% block body_class %}{% endblock %}">
+    <a class="skip-link" href="#main-content">Pular para o conteúdo</a>
+    <header class="site-header">
+        <div class="site-header__left">
+            <button type="button" class="menu-toggle" data-sidebar-toggle aria-controls="staff-sidebar" aria-expanded="false" aria-label="Abrir menu">
+                <i data-lucide="menu" class="icon"></i>
+            </button>
+            {% include "components/brand.html" %}
+            <span class="area-chip">{% block area_label %}Equipe{% endblock %}</span>
+        </div>
+        <div class="site-header__right">
+            {% if user.is_authenticated %}
+                <span class="muted">{{ user.get_username }}</span>
+                <form method="post" action="{% url 'logout' %}" data-loading-form>
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline">Sair da conta</button>
+                </form>
+            {% endif %}
+        </div>
+    </header>
+    <div class="staff-body">
+        <button type="button" class="sidebar__overlay" data-sidebar-overlay aria-label="Fechar menu" tabindex="-1"></button>
+        <aside class="sidebar" id="staff-sidebar" data-sidebar>
+            {% include "components/nav_staff.html" %}
+        </aside>
+        <div class="staff-content">
+            {% block page_header %}{% endblock %}
+            {% include "components/messages.html" %}
+            <main id="main-content">
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+    <script src="{% static 'js/core/icons.js' %}"></script>
+    <script src="{% static 'js/core/sidebar.js' %}"></script>
+    <script src="{% static 'js/components/form-submit.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

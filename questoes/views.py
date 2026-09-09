@@ -1,14 +1,39 @@
 import random
-from datetime import timedelta
 
-from django.views.generic import ListView, CreateView
+from django.contrib import messages
+from datetime import datetime
+from decimal import Decimal, InvalidOperation
+from django.db import transaction
+from django.db.models import Prefetch, Q
+from django.views.generic import ListView, CreateView, UpdateView, DetailView
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
+from django.http import HttpResponseRedirect
 from django.utils import timezone
 
-from .forms import QuestaoForm
-from .models import Questao, Resultado
+from accounts.mixins import PermissionRequiredMixin
+from accounts.querystring import without_page
+from alunos.escopo import queryset_resultados_visiveis
 from alunos.models import Aluno
+from alunos.security import formatar_tempo
+from alunos.session import (
+    aluno_session_exists,
+    bind_linked_aluno_session,
+    clear_aluno_session,
+)
+from alunos.matriculas import matricula_ativa_em
+
+from .cooldown import verificar_bloqueio as verificar_bloqueio_aluno
+from .forms import QuestaoForm
+from .models import Questao, RespostaResultado, Resultado
+from .persistencia import persistir_respostas_resultado
+from .scoring import calcular_xp as calcular_xp_prova
+from .versionamento import (
+    VersaoTentativaInvalida,
+    aplicar_edicao_com_versao,
+    mapa_versoes_atuais,
+    resolver_versoes_tentativa,
+)
 
 
 class ListaQuestoesView(ListView):
@@ -16,6 +41,47 @@ class ListaQuestoesView(ListView):
     model = Questao
     template_name = 'questoes_list.html'
     context_object_name = 'questoes'
+
+    def dispatch(self, request, *args, **kwargs):
+        bind_linked_aluno_session(request)
+
+        aluno_id = request.session.get('aluno_id')
+
+        if not aluno_session_exists(aluno_id):
+            if aluno_id:
+                clear_aluno_session(request.session)
+                messages.error(
+                    request,
+                    'Aluno não encontrado. Faça o acesso novamente.',
+                )
+            return redirect('alunos:acesso_aluno')
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def _parse_inicio_questionario(self, inicio):
+        if not inicio:
+            return None
+        try:
+            parsed = timezone.datetime.fromisoformat(inicio)
+        except (TypeError, ValueError):
+            return None
+        if timezone.is_naive(parsed):
+            parsed = timezone.make_aware(
+                parsed,
+                timezone.get_current_timezone(),
+            )
+        return parsed
+
+    def _resultado_desta_tentativa(self, aluno, inicio):
+        inicio_dt = self._parse_inicio_questionario(inicio)
+        if aluno is None or inicio_dt is None:
+            return None
+        return (
+            Resultado.objects
+            .filter(aluno=aluno, data__gte=inicio_dt)
+            .order_by('data')
+            .first()
+        )
 
     # =====================================================
     # QUESTÕES DA SÉRIE DO ALUNO
@@ -35,7 +101,7 @@ class ListaQuestoesView(ListView):
 
         return Questao.objects.filter(
             serie=aluno.serie
-        ).order_by('numero')
+        ).select_related('versao_atual').order_by('numero')
 
     # =====================================================
     # RETORNA QUESTÕES NA ORDEM SALVA NA SESSÃO
@@ -73,127 +139,38 @@ class ListaQuestoesView(ListView):
     # =====================================================
 
     def verificar_bloqueio(self, aluno):
+        return verificar_bloqueio_aluno(aluno)
 
-        if not aluno:
-            return False, None, 0
+    def _post_bloqueado_por_cooldown(self, request):
+        aluno_id = request.session.get('aluno_id')
 
-        ultima_tentativa = (
-            Resultado.objects
-            .filter(aluno=aluno)
-            .order_by('-data')
-            .first()
-        )
+        if not aluno_id:
+            return False
 
-        if not ultima_tentativa:
-            return False, None, 0
+        try:
+            aluno = Aluno.objects.get(id=aluno_id)
+        except Aluno.DoesNotExist:
+            return False
 
-        agora = timezone.now()
+        (
+            bloqueado,
+            proxima_tentativa,
+            segundos_restantes,
+        ) = self.verificar_bloqueio(aluno)
 
-        proxima_tentativa = (
-            ultima_tentativa.data +
-            timedelta(hours=8)
-        )
+        if not bloqueado:
+            return False
 
-        if agora < proxima_tentativa:
-
-            segundos_restantes = int(
-                (
-                    proxima_tentativa - agora
-                ).total_seconds()
-            )
-
-            return (
-                True,
-                proxima_tentativa,
-                segundos_restantes
-            )
-
-        return False, None, 0
+        request.session['questionario_bloqueado'] = True
+        request.session['segundos_restantes'] = segundos_restantes
+        return True
 
     # =====================================================
     # CALCULA XP
     # =====================================================
 
-    def calcular_xp(self, questoes, respostas):
-
-        """
-        Calcula o XP ganho pelo aluno na prova.
-
-        XP base:
-
-        Fácil   = 10 XP
-        Médio   = 15 XP
-        Difícil = 20 XP
-
-        A partir do 3º acerto consecutivo:
-        +5 XP de bônus por acerto.
-
-        Qualquer erro zera a sequência.
-
-        Exemplo:
-
-        Acerto 1 → XP normal
-        Acerto 2 → XP normal
-        Acerto 3 → XP normal + 5
-        Acerto 4 → XP normal + 5
-        Acerto 5 → XP normal + 5
-
-        Se errar:
-
-        Erro → 0 XP e sequência volta para 0.
-        """
-
-        xp_total = 0
-
-        sequencia_acertos = 0
-
-        xp_dificuldade = {
-            'facil': 10,
-            'medio': 15,
-            'dificil': 20,
-        }
-
-        for questao in questoes:
-
-            resposta = respostas.get(
-                str(questao.id)
-            )
-
-            # =================================================
-            # ERRO
-            # =================================================
-
-            if resposta != questao.resposta_correta:
-
-                # Zera a sequência
-                sequencia_acertos = 0
-
-                continue
-
-            # =================================================
-            # ACERTO
-            # =================================================
-
-            sequencia_acertos += 1
-
-            # XP base da dificuldade
-            xp = xp_dificuldade.get(
-                questao.dificuldade,
-                0
-            )
-
-            # =================================================
-            # BÔNUS DE SEQUÊNCIA
-            # =================================================
-
-            if sequencia_acertos >= 3:
-
-                xp += 5
-
-            # Adiciona ao XP total da prova
-            xp_total += xp
-
-        return xp_total
+    def calcular_xp(self, questoes, respostas, versoes=None):
+        return calcular_xp_prova(questoes, respostas, versoes=versoes)
 
     # =====================================================
     # POST
@@ -202,6 +179,16 @@ class ListaQuestoesView(ListView):
     def post(self, request, *args, **kwargs):
 
         acao = request.POST.get('acao')
+
+        if acao in (
+            'novo_questionario',
+            'responder',
+            'avancar',
+            'finalizar',
+        ) and self._post_bloqueado_por_cooldown(request):
+            return redirect(
+                'questoes:lista_questoes'
+            )
 
         # =================================================
         # NOVO QUESTIONÁRIO
@@ -226,7 +213,7 @@ class ListaQuestoesView(ListView):
             questoes = list(
                 Questao.objects.filter(
                     serie=aluno.serie
-                ).order_by('numero')
+                ).select_related('versao_atual').order_by('numero')
             )
 
             if not questoes:
@@ -310,6 +297,10 @@ class ListaQuestoesView(ListView):
             request.session[
                 'alternativas_ordem'
             ] = alternativas_ordem
+
+            request.session[
+                'questoes_versoes'
+            ] = mapa_versoes_atuais(questoes)
 
             # =============================================
             # INICIA QUESTIONÁRIO
@@ -395,6 +386,8 @@ class ListaQuestoesView(ListView):
         )
 
         questao = questoes[indice]
+        versoes = resolver_versoes_tentativa(questoes, request.session)
+        conteudo = versoes[questao.id]
 
         respostas = request.session.get(
             'respostas',
@@ -451,13 +444,13 @@ class ListaQuestoesView(ListView):
 
             request.session[
                 'resposta_correta'
-            ] = questao.resposta_correta
+            ] = conteudo.resposta_correta
 
             request.session[
                 'acertou'
             ] = (
                 resposta ==
-                questao.resposta_correta
+                conteudo.resposta_correta
             )
 
             return redirect(
@@ -518,130 +511,104 @@ class ListaQuestoesView(ListView):
             )
 
             if not aluno_id:
-                return redirect('home')
-
-            try:
-                aluno = Aluno.objects.get(
-                    id=aluno_id
-                )
-            except Aluno.DoesNotExist:
-                return redirect('home')
-
-            # Impede finalizar duas vezes
-            if request.session.get(
-                'questionario_finalizado',
-                False
-            ):
-                return redirect(
-                    'questoes:lista_questoes'
-                )
-
-            # =============================================
-            # CALCULA RESULTADO
-            # =============================================
-
-            acertos = sum(
-                respostas.get(str(q.id))
-                == q.resposta_correta
-                for q in questoes
-            )
-
-            total = len(questoes)
-
-            erros = total - acertos
-
-            nota = (
-                round(
-                    (acertos / total) * 10,
-                    2
-                )
-                if total
-                else 0
-            )
-
-            # =============================================
-            # CALCULA XP
-            # =============================================
-
-            xp_ganho = self.calcular_xp(
-                questoes,
-                respostas
-            )
-
-            # =============================================
-            # CALCULA TEMPO
-            # =============================================
+                return redirect('alunos:acesso_aluno')
 
             inicio = request.session.get(
                 'inicio_questionario'
             )
 
-            tempo_segundos = 0
-
-            if inicio:
-
-                inicio = timezone.datetime.fromisoformat(
-                    inicio
-                )
-
-                agora = timezone.now()
-
-                tempo_segundos = max(
-                    0,
-                    int(
-                        (
-                            agora - inicio
-                        ).total_seconds()
+            with transaction.atomic():
+                try:
+                    aluno = (
+                        Aluno.objects
+                        .select_for_update()
+                        .get(id=aluno_id)
                     )
+                except Aluno.DoesNotExist:
+                    return redirect('alunos:acesso_aluno')
+
+                ja_finalizado = request.session.get(
+                    'questionario_finalizado',
+                    False,
+                )
+                resultado_existente = self._resultado_desta_tentativa(
+                    aluno,
+                    inicio,
                 )
 
-            # =============================================
-            # ADICIONA XP AO ALUNO
-            # =============================================
+                if ja_finalizado or resultado_existente is not None:
+                    request.session['questionario_finalizado'] = True
+                    return redirect('questoes:lista_questoes')
 
-            aluno.xp += xp_ganho
+                try:
+                    versoes = resolver_versoes_tentativa(
+                        questoes,
+                        request.session,
+                        estrito=True,
+                    )
+                except VersaoTentativaInvalida:
+                    messages.error(
+                        request,
+                        'Não foi possível registrar esta tentativa porque '
+                        'os dados da prova estão inconsistentes. '
+                        'Inicie um novo simulado.',
+                    )
+                    return redirect('questoes:lista_questoes')
 
-            aluno.save(
-                update_fields=['xp']
-            )
+                acertos = sum(
+                    respostas.get(str(q.id))
+                    == versoes[q.id].resposta_correta
+                    for q in questoes
+                )
 
-            # =============================================
-            # SALVA RESULTADO
-            # =============================================
+                total = len(questoes)
+                erros = total - acertos
+                nota = (
+                    round((acertos / total) * 10, 2)
+                    if total
+                    else 0
+                )
 
-            Resultado.objects.create(
-                aluno=aluno,
-                acertos=acertos,
-                erros=erros,
-                total_questoes=total,
-                nota=nota,
-                xp_ganho=xp_ganho,
-                tempo_segundos=tempo_segundos
-            )
+                xp_ganho = self.calcular_xp(
+                    questoes,
+                    respostas,
+                    versoes,
+                )
 
-            # =============================================
-            # SALVA RESULTADO NA SESSÃO
-            # =============================================
+                inicio_dt = self._parse_inicio_questionario(inicio)
+                tempo_segundos = 0
+                if inicio_dt is not None:
+                    tempo_segundos = max(
+                        0,
+                        int((timezone.now() - inicio_dt).total_seconds()),
+                    )
 
-            request.session[
-                'acertos'
-            ] = acertos
+                aluno.xp += xp_ganho
+                aluno.save(update_fields=['xp'])
 
-            request.session[
-                'total_questoes'
-            ] = total
+                resultado = Resultado.objects.create(
+                    aluno=aluno,
+                    acertos=acertos,
+                    erros=erros,
+                    total_questoes=total,
+                    nota=nota,
+                    xp_ganho=xp_ganho,
+                    tempo_segundos=tempo_segundos,
+                    matricula=matricula_ativa_em(aluno),
+                )
+                persistir_respostas_resultado(
+                    resultado,
+                    questoes,
+                    respostas,
+                    versoes,
+                )
 
-            request.session[
-                'xp_ganho'
-            ] = xp_ganho
-
-            request.session[
-                'questionario_finalizado'
-            ] = True
-
-            request.session[
-                'resposta_mostrada'
-            ] = False
+            request.session['acertos'] = acertos
+            request.session['total_questoes'] = total
+            request.session['xp_ganho'] = xp_ganho
+            request.session['tempo_segundos'] = tempo_segundos
+            request.session['questionario_finalizado'] = True
+            request.session['resposta_mostrada'] = False
 
             return redirect(
                 'questoes:lista_questoes'
@@ -749,6 +716,7 @@ class ListaQuestoesView(ListView):
         # =================================================
 
         alternativas = []
+        questao_conteudo = None
 
         if questao_atual:
 
@@ -764,11 +732,18 @@ class ListaQuestoesView(ListView):
                 ['A', 'B', 'C', 'D']
             )
 
+            versoes = resolver_versoes_tentativa(
+                questoes,
+                self.request.session,
+            )
+            conteudo = versoes[questao_atual.id]
+            questao_conteudo = conteudo
+
             textos = {
-                'A': questao_atual.alternativa_a,
-                'B': questao_atual.alternativa_b,
-                'C': questao_atual.alternativa_c,
-                'D': questao_atual.alternativa_d,
+                'A': conteudo.alternativa_a,
+                'B': conteudo.alternativa_b,
+                'C': conteudo.alternativa_c,
+                'D': conteudo.alternativa_d,
             }
 
             letras_exibicao = [
@@ -828,6 +803,7 @@ class ListaQuestoesView(ListView):
             'aluno': aluno,
 
             'questao_atual': questao_atual,
+            'questao_conteudo': questao_conteudo,
 
             'indice_atual': indice,
 
@@ -901,6 +877,12 @@ class ListaQuestoesView(ListView):
 
             'xp_total':
                 aluno.xp if aluno else 0,
+            'tempo_segundos':
+                self.request.session.get('tempo_segundos', 0),
+            'tempo_formatado': formatar_tempo(
+                self.request.session.get('tempo_segundos', 0)
+            ),
+            'tempo_bloqueio_formatado': formatar_tempo(segundos_restantes),
         })
 
         # =================================================
@@ -935,31 +917,158 @@ class ListaQuestoesView(ListView):
 # CADASTRAR QUESTÃO
 # =========================================================
 
-class CadastrarQuestaoView(CreateView):
+class CadastrarQuestaoView(PermissionRequiredMixin, CreateView):
+
+    permission_required = "questoes.add_questao"
 
     model = Questao
     form_class = QuestaoForm
     template_name = 'questao_form.html'
 
-    success_url = reverse_lazy(
-        'area_professor'
-    )
+    def form_valid(self, form):
+        with transaction.atomic():
+            self.object = form.save()
+        messages.success(
+            self.request,
+            'Questão cadastrada com sucesso.',
+        )
+        return HttpResponseRedirect(self.get_success_url())
+
+    success_url = reverse_lazy('questoes:gestao')
+
+
+class GestaoQuestoesView(PermissionRequiredMixin, ListView):
+
+    permission_required = "questoes.view_questao"
+    model = Questao
+    template_name = "questao_gestao.html"
+    context_object_name = "questoes"
+    paginate_by = 20
+
+    def get_queryset(self):
+        queryset = Questao.objects.all().order_by("serie", "numero")
+        busca = self.request.GET.get("q", "").strip()
+        serie = self.request.GET.get("serie", "").strip()
+        dificuldade = self.request.GET.get("dificuldade", "").strip()
+        if busca:
+            filtro = Q(enunciado__icontains=busca)
+            if busca.isdigit():
+                filtro |= Q(numero=int(busca))
+            queryset = queryset.filter(filtro)
+        if serie:
+            queryset = queryset.filter(serie=serie)
+        if dificuldade:
+            queryset = queryset.filter(dificuldade=dificuldade)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["busca"] = self.request.GET.get("q", "").strip()
+        context["serie_filtro"] = self.request.GET.get("serie", "").strip()
+        context["dificuldade_filtro"] = self.request.GET.get("dificuldade", "").strip()
+        context["series"] = Questao.SERIE_CHOICES
+        context["dificuldades"] = Questao.DIFICULDADE_CHOICES
+        context["querystring"] = without_page(self.request)
+        return context
+
+
+class EditarQuestaoView(PermissionRequiredMixin, UpdateView):
+
+    permission_required = "questoes.change_questao"
+    model = Questao
+    form_class = QuestaoForm
+    template_name = "questao_form.html"
+    success_url = reverse_lazy("questoes:gestao")
 
     def form_valid(self, form):
+        self.object = aplicar_edicao_com_versao(form)
+        messages.success(
+            self.request,
+            "Questão atualizada com sucesso.",
+        )
+        return HttpResponseRedirect(self.get_success_url())
 
-        print(
-            "QUESTÃO SALVA:",
-            form.cleaned_data
+
+class ListaResultadosView(PermissionRequiredMixin, ListView):
+
+    permission_required = "questoes.view_resultado"
+    model = Resultado
+    template_name = "resultado_list.html"
+    context_object_name = "resultados"
+    paginate_by = 20
+
+    def get_queryset(self):
+        queryset = queryset_resultados_visiveis(
+            self.request.user,
+            Resultado.objects
+            .select_related("aluno", "matricula", "matricula__turma", "avaliacao")
+            .order_by("-data"),
+        )
+        busca = self.request.GET.get("q", "").strip()
+        serie = self.request.GET.get("serie", "").strip()
+        data = self.request.GET.get("data", "").strip()
+        nota = self.request.GET.get("nota", "").strip()
+        if busca:
+            queryset = queryset.filter(
+                Q(aluno__nome__icontains=busca) | Q(aluno__ra__icontains=busca)
+            )
+        if serie:
+            queryset = queryset.filter(aluno__serie=serie)
+        if data:
+            try:
+                datetime.strptime(data, "%Y-%m-%d")
+            except ValueError:
+                return queryset.none()
+            queryset = queryset.filter(data__date=data)
+        if nota:
+            try:
+                nota_valor = Decimal(nota.replace(",", "."))
+            except InvalidOperation:
+                return queryset.none()
+            queryset = queryset.filter(nota=nota_valor)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["busca"] = self.request.GET.get("q", "").strip()
+        context["serie_filtro"] = self.request.GET.get("serie", "").strip()
+        context["data_filtro"] = self.request.GET.get("data", "").strip()
+        context["nota_filtro"] = self.request.GET.get("nota", "").strip()
+        context["series"] = Aluno.SERIES
+        context["querystring"] = without_page(self.request)
+        return context
+
+
+class DetalheResultadoView(PermissionRequiredMixin, DetailView):
+
+    permission_required = "questoes.view_resultado"
+    model = Resultado
+    template_name = "resultado_detail.html"
+    context_object_name = "resultado"
+
+    def get_queryset(self):
+        return queryset_resultados_visiveis(
+            self.request.user,
+            Resultado.objects
+            .select_related("aluno", "matricula", "matricula__turma", "avaliacao")
+            .prefetch_related(
+                Prefetch(
+                    "respostas_questoes",
+                    queryset=(
+                        RespostaResultado.objects
+                        .select_related("questao", "questao_versao")
+                        .order_by("questao__serie", "questao__numero")
+                    ),
+                )
+            )
         )
 
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-
-        print(
-            "ERRO AO SALVAR QUESTÃO:"
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["tempo_formatado"] = formatar_tempo(
+            self.object.tempo_segundos
         )
-
-        print(form.errors)
-
-        return super().form_invalid(form)
+        respostas = list(self.object.respostas_questoes.all())
+        context["tem_respostas_questoes"] = bool(respostas)
+        context["desempenho_questoes"] = respostas
+        return context

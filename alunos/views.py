@@ -1,30 +1,85 @@
 from django.contrib import messages
+from django.db.models import Q
 from django.shortcuts import redirect
+from django.views import View
 from django.views.generic import (
     ListView,
     CreateView,
+    UpdateView,
     TemplateView
 )
 from django.urls import reverse_lazy
 from django.db.models import Avg, Count, Sum
 
-from .models import Aluno
+from accounts.mixins import PermissionRequiredMixin
+from accounts.querystring import without_page
+from questoes.cooldown import verificar_bloqueio
+from questoes.models import Avaliacao, Questao
+from questoes.avaliacoes import avaliacao_disponivel_para_aluno
+
+from .escopo import queryset_alunos_visiveis, queryset_resultados_visiveis
 from .forms import AlunoForm
+from .matriculas import matricula_ativa_em
+from .models import Aluno
+from .series import desempenho_serie, resumo_series, serie_ou_404
+from .security import (
+    limpar_falhas_ra,
+    mascarar_ra,
+    ra_acesso_limitado,
+    registrar_falha_ra,
+    formatar_tempo,
+)
+from .session import (
+    aluno_session_exists,
+    bind_linked_aluno_session,
+    clear_aluno_session,
+)
 
 
-class ListaAlunosView(ListView):
+class ListaAlunosView(PermissionRequiredMixin, ListView):
 
+    permission_required = "alunos.view_aluno"
     model = Aluno
     template_name = 'aluno_list.html'
     context_object_name = 'alunos'
     ordering = ['nome']
+    paginate_by = 20
+
+    def get_queryset(self):
+        queryset = queryset_alunos_visiveis(self.request.user).order_by('nome')
+        busca = self.request.GET.get('q', '').strip()
+        serie = self.request.GET.get('serie', '').strip()
+        if busca:
+            queryset = queryset.filter(
+                Q(nome__icontains=busca) | Q(ra__icontains=busca)
+            )
+        if serie:
+            queryset = queryset.filter(serie=serie)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['busca'] = self.request.GET.get('q', '').strip()
+        context['serie_filtro'] = self.request.GET.get('serie', '').strip()
+        context['series'] = Aluno.SERIES
+        context['querystring'] = without_page(self.request)
+        return context
 
 
-class CadastrarAlunoView(CreateView):
+class CadastrarAlunoView(PermissionRequiredMixin, CreateView):
+
+    permission_required = "alunos.add_aluno"
 
     model = Aluno
     form_class = AlunoForm
     template_name = 'aluno_form.html'
+
+    def form_valid(self, form):
+        messages.success(
+            self.request,
+            'Aluno cadastrado com sucesso.',
+        )
+        return super().form_valid(form)
 
     def get_success_url(self):
         return reverse_lazy(
@@ -35,11 +90,40 @@ class CadastrarAlunoView(CreateView):
         )
 
 
+class EditarAlunoView(PermissionRequiredMixin, UpdateView):
+
+    permission_required = "alunos.change_aluno"
+    model = Aluno
+    form_class = AlunoForm
+    template_name = 'aluno_form.html'
+    pk_url_kwarg = 'pk'
+
+    def get_queryset(self):
+        return queryset_alunos_visiveis(self.request.user)
+
+    def form_valid(self, form):
+        messages.success(
+            self.request,
+            'Aluno atualizado com sucesso.',
+        )
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('alunos:lista_alunos')
+
+
 class AcessoAlunoView(TemplateView):
 
     template_name = 'acesso_aluno.html'
 
     def post(self, request, *args, **kwargs):
+
+        if ra_acesso_limitado(request.session):
+            messages.error(
+                request,
+                'Muitas tentativas. Aguarde alguns minutos e tente novamente.',
+            )
+            return self.get(request, *args, **kwargs)
 
         ra = request.POST.get(
             'ra',
@@ -52,6 +136,7 @@ class AcessoAlunoView(TemplateView):
                 ra=ra
             )
 
+            limpar_falhas_ra(request.session)
             request.session['aluno_id'] = aluno.id
             request.session['questao_atual'] = 0
             request.session['respostas'] = {}
@@ -66,6 +151,11 @@ class AcessoAlunoView(TemplateView):
 
             request.session.pop(
                 'alternativas_ordem',
+                None
+            )
+
+            request.session.pop(
+                'questoes_versoes',
                 None
             )
 
@@ -100,9 +190,10 @@ class AcessoAlunoView(TemplateView):
 
         except Aluno.DoesNotExist:
 
+            registrar_falha_ra(request.session)
             messages.error(
                 request,
-                'RA não encontrado. Verifique o número informado.'
+                'Não foi possível acessar com os dados informados. Tente novamente.'
             )
 
             return self.get(
@@ -112,47 +203,103 @@ class AcessoAlunoView(TemplateView):
             )
 
 
+class SairAlunoView(View):
+    """Encerra só a sessão pedagógica (RA). Não faz logout Django."""
+
+    http_method_names = ['post']
+
+    def post(self, request, *args, **kwargs):
+        clear_aluno_session(request.session)
+        messages.info(
+            request,
+            'Acesso do aluno encerrado.',
+        )
+        return redirect('alunos:acesso_aluno')
+
+
 class AlunoLogadoView(TemplateView):
 
     template_name = 'aluno_logado.html'
 
     def get(self, request, *args, **kwargs):
 
+        bind_linked_aluno_session(request)
+
         aluno_id = request.session.get(
             'aluno_id'
         )
 
-        if not aluno_id:
+        if not aluno_id or not aluno_session_exists(aluno_id):
+
+            if aluno_id:
+                clear_aluno_session(
+                    request.session
+                )
+
+                messages.error(
+                    request,
+                    'Aluno não encontrado. Faça o acesso novamente.'
+                )
 
             return redirect(
                 'alunos:acesso_aluno'
             )
 
-        try:
+        aluno = Aluno.objects.get(
+            id=aluno_id
+        )
 
-            aluno = Aluno.objects.get(
-                id=aluno_id
-            )
+        bloqueado, _proxima, segundos_restantes = verificar_bloqueio(aluno)
+        total_questoes_serie = Questao.objects.filter(serie=aluno.serie).count()
 
-        except Aluno.DoesNotExist:
+        posicao = None
+        for indice, candidato in enumerate(queryset_ranking(aluno.serie), start=1):
+            if candidato.id == aluno.id:
+                posicao = indice
+                break
 
-            request.session.pop(
-                'aluno_id',
-                None
-            )
-
-            messages.error(
-                request,
-                'Aluno não encontrado. Faça o acesso novamente.'
-            )
-
-            return redirect(
-                'questoes:lista_questoes'
-            )
+        avaliacoes_abertas = []
+        matricula = matricula_ativa_em(aluno)
+        if matricula:
+            for item in (
+                Avaliacao.objects
+                .filter(turma=matricula.turma, status=Avaliacao.Status.PUBLICADA)
+                .order_by("data_fim", "titulo")
+            ):
+                ok, _motivo = avaliacao_disponivel_para_aluno(item, aluno)
+                if ok:
+                    avaliacoes_abertas.append(item)
 
         return self.render_to_response({
-            'aluno': aluno
+            'aluno': aluno,
+            'questionario_bloqueado': bloqueado,
+            'segundos_restantes': segundos_restantes,
+            'tempo_bloqueio_formatado': formatar_tempo(segundos_restantes),
+            'total_questoes_serie': total_questoes_serie,
+            'posicao': posicao,
+            'avaliacoes_abertas': avaliacoes_abertas,
         })
+
+
+def queryset_ranking(serie):
+    return (
+        Aluno.objects
+        .filter(serie=serie)
+        .annotate(
+            pontos=Avg('resultados__nota'),
+            tentativas=Count('resultados', distinct=True),
+            total_acertos=Sum('resultados__acertos'),
+            tempo_total=Sum('resultados__tempo_segundos'),
+        )
+        .order_by(
+            '-xp',
+            '-pontos',
+            '-total_acertos',
+            'tempo_total',
+            'nome',
+        )
+    )
+
 
 class RegrasView(TemplateView):
 
@@ -166,31 +313,7 @@ class RankingView(TemplateView):
     template_name = 'ranking.html'
 
     def formatar_tempo(self, segundos):
-
-        segundos = segundos or 0
-
-        horas = segundos // 3600
-
-        minutos = (
-            segundos % 3600
-        ) // 60
-
-        segundos_restantes = (
-            segundos % 60
-        )
-
-        if horas > 0:
-
-            return (
-                f'{horas}h '
-                f'{minutos:02d}min '
-                f'{segundos_restantes:02d}s'
-            )
-
-        return (
-            f'{minutos:02d}min '
-            f'{segundos_restantes:02d}s'
-        )
+        return formatar_tempo(segundos)
 
     def get_context_data(self, **kwargs):
 
@@ -206,56 +329,7 @@ class RankingView(TemplateView):
 
         for codigo, nome in Aluno.SERIES:
 
-            alunos = (
-                Aluno.objects
-                .filter(
-                    serie=codigo
-                )
-                .annotate(
-
-                    # Nota média
-                    pontos=Avg(
-                        'resultados__nota'
-                    ),
-
-                    # Número de tentativas
-                    tentativas=Count(
-                        'resultados',
-                        distinct=True
-                    ),
-
-                    # Total de acertos
-                    total_acertos=Sum(
-                        'resultados__acertos'
-                    ),
-
-                    # Tempo total
-                    tempo_total=Sum(
-                        'resultados__tempo_segundos'
-                    ),
-                )
-
-                # =================================================
-                # CRITÉRIOS DO RANKING
-                # =================================================
-                .order_by(
-
-                    # 1º - Maior XP
-                    '-xp',
-
-                    # 2º - Maior média
-                    '-pontos',
-
-                    # 3º - Maior número de acertos
-                    '-total_acertos',
-
-                    # 4º - MENOR TEMPO
-                    'tempo_total',
-
-                    # 5º - Nome
-                    'nome'
-                )[:20]
-            )
+            alunos = queryset_ranking(codigo)[:20]
 
             alunos_ranking = list(
                 alunos
@@ -304,6 +378,8 @@ class RankingView(TemplateView):
                     )
                 )
 
+                aluno.ra_mascarado = mascarar_ra(aluno.ra)
+
             rankings[codigo] = {
                 'nome': nome,
                 'alunos': alunos_ranking,
@@ -320,6 +396,14 @@ class RankingView(TemplateView):
         )
 
         usuario_logado = None
+
+        if aluno_id and not aluno_session_exists(aluno_id):
+
+            clear_aluno_session(
+                self.request.session
+            )
+
+            aluno_id = None
 
         if aluno_id:
 
@@ -388,6 +472,10 @@ class RankingView(TemplateView):
                     self.formatar_tempo(
                         resultado_aluno.tempo_total
                     )
+                )
+
+                resultado_aluno.ra_mascarado = mascarar_ra(
+                    resultado_aluno.ra
                 )
 
                 # =================================================
@@ -468,7 +556,9 @@ class RankingView(TemplateView):
 # LISTA DE SÉRIES
 # =========================================================
 
-class ListaSeriesView(TemplateView):
+class ListaSeriesView(PermissionRequiredMixin, TemplateView):
+
+    permission_required = "alunos.view_aluno"
 
     template_name = 'series.html'
 
@@ -481,10 +571,10 @@ class ListaSeriesView(TemplateView):
             **kwargs
         )
 
-        context['series'] = (
-            Aluno.SERIES
+        context['series'] = resumo_series(
+            alunos_qs=queryset_alunos_visiveis(self.request.user),
+            resultados_qs=queryset_resultados_visiveis(self.request.user),
         )
-
         return context
 
 
@@ -492,46 +582,46 @@ class ListaSeriesView(TemplateView):
 # ALUNOS POR SÉRIE
 # =========================================================
 
-class AlunosPorSerieView(ListView):
+class AlunosPorSerieView(PermissionRequiredMixin, ListView):
+
+    permission_required = "alunos.view_aluno"
 
     model = Aluno
 
-    template_name = ('alunos_por_serie.html')
-
+    template_name = 'alunos_por_serie.html'
     context_object_name = 'alunos'
+    paginate_by = 20
+
+    def dispatch(self, request, *args, **kwargs):
+        self.codigo_serie, self.nome_serie = serie_ou_404(
+            kwargs.get('serie')
+        )
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-
-        serie = self.kwargs['serie']
-
-        return (
-            Aluno.objects
-            .filter(
-                serie=serie
-            )
+        queryset = (
+            queryset_alunos_visiveis(self.request.user)
+            .filter(serie=self.codigo_serie)
             .order_by('nome')
         )
+        busca = self.request.GET.get('q', '').strip()
+        if busca:
+            queryset = queryset.filter(
+                Q(nome__icontains=busca) | Q(ra__icontains=busca)
+            )
+        return queryset
 
-    def get_context_data(
-        self,
-        **kwargs
-    ):
-
-        context = super().get_context_data(
-            **kwargs
-        )
-
-        serie = self.kwargs['serie']
-
-        series = dict(
-            Aluno.SERIES
-        )
-
-        context['nome_serie'] = (
-            series.get(
-                serie,
-                'Série não encontrada'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['codigo_serie'] = self.codigo_serie
+        context['nome_serie'] = self.nome_serie
+        context['busca'] = self.request.GET.get('q', '').strip()
+        context['querystring'] = without_page(self.request)
+        context.update(
+            desempenho_serie(
+                self.codigo_serie,
+                alunos_qs=queryset_alunos_visiveis(self.request.user),
+                resultados_qs=queryset_resultados_visiveis(self.request.user),
             )
         )
-
         return context

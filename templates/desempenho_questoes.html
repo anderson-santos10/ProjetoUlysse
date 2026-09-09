@@ -1,0 +1,199 @@
+{% extends "layouts/staff.html" %}
+
+{% block title %}Análise por questão | ULYSSES{% endblock %}
+{% block area_label %}Área do Professor{% endblock %}
+
+{% block page_header %}
+    {% include "components/page_header.html" with title="Análise pedagógica das questões" description="Indicadores calculados somente a partir de respostas individuais persistidas. Resultados antigos sem detalhamento não entram nesta análise. O indicador de revisão é estatístico: não afirma que o gabarito está errado." %}
+{% endblock %}
+
+{% block content %}
+    {% include "components/desempenho_nav.html" %}
+
+    <form method="get" class="filter-form" role="search">
+        <div class="field">
+            <label for="periodo">Período</label>
+            <select class="input" id="periodo" name="periodo">
+                {% for codigo, nome in periodos %}
+                    <option value="{{ codigo }}" {% if periodo == codigo %}selected{% endif %}>{{ nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="field">
+            <label for="de">De</label>
+            <input class="input" type="date" id="de" name="de" value="{{ data_de }}" {% if periodo != 'personalizado' %}aria-describedby="ajuda-periodo"{% endif %}>
+        </div>
+        <div class="field">
+            <label for="ate">Até</label>
+            <input class="input" type="date" id="ate" name="ate" value="{{ data_ate }}">
+        </div>
+        <div class="field">
+            <label for="serie">Série</label>
+            <select class="input" id="serie" name="serie">
+                <option value="">Todas as séries</option>
+                {% for codigo, nome in series %}
+                    <option value="{{ codigo }}" {% if serie_filtro == codigo %}selected{% endif %}>{{ nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="field">
+            <label for="turma">Turma</label>
+            <select class="input" id="turma" name="turma">
+                <option value="">Todas as turmas</option>
+                {% for item in turmas %}
+                    <option value="{{ item.pk }}" {% if turma_filtro and turma_filtro.pk == item.pk %}selected{% endif %}>{{ item }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="field">
+            <label for="dificuldade">Dificuldade cadastrada</label>
+            <select class="input" id="dificuldade" name="dificuldade">
+                <option value="">Todas</option>
+                {% for codigo, nome in dificuldades %}
+                    <option value="{{ codigo }}" {% if dificuldade_filtro == codigo %}selected{% endif %}>{{ nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="field">
+            <label for="taxa">Taxa de acerto</label>
+            <select class="input" id="taxa" name="taxa">
+                {% for codigo, nome in faixas_taxa %}
+                    <option value="{{ codigo }}" {% if faixa_taxa == codigo %}selected{% endif %}>{{ nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="field">
+            <label for="volume">Volume</label>
+            <select class="input" id="volume" name="volume">
+                {% for codigo, nome in volumes %}
+                    <option value="{{ codigo }}" {% if volume_filtro == codigo %}selected{% endif %}>{{ nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Aplicar filtros</button>
+        {% if request.GET %}
+            <a class="btn btn-ghost" href="{% url 'desempenho_questoes' %}">Limpar</a>
+        {% endif %}
+    </form>
+    <p class="help" id="ajuda-periodo">As datas De/Até só entram no recorte quando o período é personalizado.</p>
+
+    {% if not analise.tem_dados_persistidos %}
+        {% include "components/empty_state.html" with icon="file-text" title="Ainda não há dados suficientes para análise por questão." description="Novas provas passarão a alimentar esta análise. Tentativas anteriores à coleta detalhada continuam válidas na visão geral, mas não possuem respostas individuais." %}
+    {% else %}
+        <h2>Desempenho por dificuldade cadastrada na tentativa</h2>
+        <p class="muted">Usa a dificuldade da versão respondida. Se a resposta não tiver versão (legado), usa a dificuldade atual da questão.</p>
+        <div class="stat-grid">
+            {% for item in por_dificuldade %}
+                <div class="stat-tile">
+                    <span>{{ item.nome }}</span>
+                    <strong>{% if item.taxa is not None %}{{ item.taxa|floatformat:0 }}%{% else %}—{% endif %}</strong>
+                    <span class="muted">{{ item.tentativas }} tentativas</span>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% if analise.revisar %}
+            <div class="alert alert-warning" role="status">
+                <i data-lucide="alert-triangle" class="icon-sm" aria-hidden="true"></i>
+                <span>
+                    {{ analise.revisar|length }} questão{{ analise.revisar|length|pluralize }} com desempenho abaixo do esperado
+                    (taxa de acerto menor que 40% e pelo menos 5 tentativas). Isso não significa que o gabarito esteja errado.
+                </span>
+            </div>
+        {% endif %}
+
+        {% if analise.com_amostra %}
+            <h2>Questões com maior dificuldade observada</h2>
+            <p class="muted">Ordenação: menor taxa de acerto, com desempate pela maior quantidade de tentativas. Somente questões com pelo menos {{ analise.min_tentativas }} tentativas no período.</p>
+            <ol class="hard-list">
+                {% for item in analise.com_amostra|slice:":8" %}
+                    <li>
+                        <a href="{% url 'desempenho_questao' item.questao.pk %}{% if querystring %}?{{ querystring }}{% endif %}">Questão #{{ item.questao.numero }}</a>
+                        <span class="muted">{{ item.questao.get_serie_display }} · cadastrada: {{ item.questao.get_dificuldade_display }}</span>
+                        <strong>{{ item.taxa|floatformat:0 }}% de acerto ({{ item.tentativas }} tentativas)</strong>
+                    </li>
+                {% endfor %}
+            </ol>
+        {% endif %}
+
+        {% if analise.mais_faceis %}
+            <h2>Maior taxa de acerto</h2>
+            <ol class="hard-list">
+                {% for item in analise.mais_faceis %}
+                    <li>
+                        <a href="{% url 'desempenho_questao' item.questao.pk %}{% if querystring %}?{{ querystring }}{% endif %}">Questão #{{ item.questao.numero }}</a>
+                        <span class="muted">{{ item.questao.get_serie_display }}</span>
+                        <strong>{{ item.taxa|floatformat:0 }}% ({{ item.tentativas }} tentativas)</strong>
+                    </li>
+                {% endfor %}
+            </ol>
+        {% endif %}
+
+        <h2>Ranking de questões</h2>
+        <p class="muted">A taxa é acertos ÷ tentativas. Questões sem tentativas não aparecem como 0%. Em branco conta como erro na tentativa, mas o detalhe separa essa quantidade. Amostra insuficiente aparece marcada, sem ser tratada como a mais difícil da plataforma.</p>
+        {% if not analise.tem_resultados_filtrados %}
+            {% url 'desempenho_questoes' as analise_url %}
+            {% include "components/empty_state.html" with icon="search" title="Nenhuma questão corresponde aos filtros atuais." description="Ajuste série, dificuldade, taxa, volume ou período." action_url=analise_url action_label="Limpar filtros" %}
+        {% else %}
+            <div class="table-wrap">
+                <table class="table">
+                    <caption class="sr-only">Questões ordenadas da menor para a maior taxa de acerto</caption>
+                    <thead>
+                        <tr>
+                            <th>Questão</th>
+                            <th>Série</th>
+                            <th>Dificuldade</th>
+                            <th>Tentativas</th>
+                            <th>Acertos</th>
+                            <th>Erros</th>
+                            <th>Taxa</th>
+                            <th>Indicador</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in page_obj %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'desempenho_questao' item.questao.pk %}{% if querystring %}?{{ querystring }}{% endif %}">Questão #{{ item.questao.numero }}</a>
+                                </td>
+                                <td>{{ item.questao.get_serie_display }}</td>
+                                <td>{{ item.questao.get_dificuldade_display }}</td>
+                                <td>{{ item.tentativas }}</td>
+                                <td>{{ item.acertos }}</td>
+                                <td>{{ item.erros }}</td>
+                                <td>
+                                    {% if item.taxa is not None %}
+                                        <div class="taxa-cell">
+                                            <div class="evo-track" role="img" aria-label="Taxa de acerto {{ item.taxa|floatformat:1 }} por cento">
+                                                <div class="evo-fill" style="width: {{ item.taxa|floatformat:0 }}%;"></div>
+                                            </div>
+                                            <span>{{ item.taxa|floatformat:1 }}%{% if item.taxa_baixa %} (abaixo de 50%){% endif %}</span>
+                                        </div>
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if item.revisar %}
+                                        <span class="badge badge-warning">Baixo desempenho</span>
+                                        <span class="sr-only">Questão com desempenho abaixo do esperado</span>
+                                    {% elif not item.tem_dados %}
+                                        <span class="badge badge-neutral">Sem dados</span>
+                                    {% elif item.tem_amostra %}
+                                        <span class="badge badge-success">Amostra suficiente</span>
+                                    {% else %}
+                                        <span class="badge">Poucos dados</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% include "components/pagination.html" %}
+        {% endif %}
+        {% if analise.poucos_dados %}
+            <p class="muted mt-lg">Questões com menos de {{ analise.min_tentativas }} tentativas ficam em “Poucos dados” e não lideram a classificação de dificuldade observada.</p>
+        {% endif %}
+    {% endif %}
+{% endblock %}

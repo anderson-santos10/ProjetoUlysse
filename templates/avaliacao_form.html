@@ -1,0 +1,52 @@
+{% extends "layouts/staff.html" %}
+
+{% block title %}{% if object %}Editar avaliação{% else %}Nova avaliação{% endif %} | ULYSSES{% endblock %}
+{% block area_label %}Área do Professor{% endblock %}
+
+{% block page_header %}
+    {% if object %}
+        {% include "components/page_header.html" with title="Editar rascunho" description="A turma precisa estar no seu escopo. Questões da série da turma." %}
+    {% else %}
+        {% include "components/page_header.html" with title="Nova avaliação" description="Salve o rascunho com a turma para listar as questões da série. A publicação congela as versões." %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <form method="post" data-loading-form>
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="alert alert-error" role="alert">
+                    {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                </div>
+            {% endif %}
+            {% include "components/form_field.html" with field=form.titulo %}
+            {% include "components/form_field.html" with field=form.descricao %}
+            {% include "components/form_field.html" with field=form.turma %}
+            {% include "components/form_field.html" with field=form.data_inicio %}
+            {% include "components/form_field.html" with field=form.data_fim %}
+            {% include "components/form_field.html" with field=form.tempo_limite_minutos %}
+            {% include "components/form_field.html" with field=form.tentativas_maximas %}
+            <fieldset class="field">
+                <legend>{{ form.questoes.label }}</legend>
+                {% if form.questoes.help_text %}
+                    <p class="help">{{ form.questoes.help_text }}</p>
+                {% endif %}
+                {% if form.questoes.field.queryset.exists %}
+                    <div class="choice-list">
+                        {{ form.questoes }}
+                    </div>
+                {% else %}
+                    <p class="muted">Nenhuma questão listada. Selecione a turma e salve o rascunho, depois edite para marcar as questões.</p>
+                {% endif %}
+                {% if form.questoes.errors %}
+                    <div class="field-error">{{ form.questoes.errors }}</div>
+                {% endif %}
+            </fieldset>
+            <div class="nav-inline">
+                <a href="{% url 'questoes:lista_avaliacoes' %}" class="btn btn-outline">Cancelar</a>
+                <button type="submit" class="btn btn-primary">Salvar rascunho</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

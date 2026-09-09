@@ -1,0 +1,94 @@
+{% extends "layouts/staff.html" %}
+
+{% block title %}Questões | ULYSSES{% endblock %}
+{% block area_label %}Área do Professor{% endblock %}
+
+{% block page_header %}
+    {% url 'questoes:cadastrar' as cadastrar_questao_url %}
+    {% if perms.questoes.add_questao %}
+        {% include "components/page_header.html" with title="Questões" description="Banco de questões por série e dificuldade. O número é gerado automaticamente no cadastro." action_url=cadastrar_questao_url action_label="Cadastrar questão" %}
+    {% else %}
+        {% include "components/page_header.html" with title="Questões" description="Banco de questões por série e dificuldade. O número é gerado automaticamente no cadastro." %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class="toolbar">
+        <form method="get" class="filter-form" role="search">
+            <div class="field field--grow">
+                <label for="q">Buscar questão</label>
+                <input class="input" type="search" id="q" name="q" value="{{ busca }}" placeholder="Número ou trecho do enunciado" autocomplete="off">
+            </div>
+            <div class="field">
+                <label for="serie">Série</label>
+                <select class="input" id="serie" name="serie">
+                    <option value="">Todas</option>
+                    {% for codigo, nome in series %}
+                        <option value="{{ codigo }}" {% if serie_filtro == codigo %}selected{% endif %}>{{ nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="field">
+                <label for="dificuldade">Dificuldade</label>
+                <select class="input" id="dificuldade" name="dificuldade">
+                    <option value="">Todas</option>
+                    {% for codigo, nome in dificuldades %}
+                        <option value="{{ codigo }}" {% if dificuldade_filtro == codigo %}selected{% endif %}>{{ nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Pesquisar</button>
+            {% if busca or serie_filtro or dificuldade_filtro %}
+                <a class="btn btn-ghost" href="{% url 'questoes:gestao' %}">Limpar</a>
+            {% endif %}
+        </form>
+    </div>
+
+    {% if questoes %}
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Nº</th>
+                        <th>Série</th>
+                        <th>Dificuldade</th>
+                        <th>Enunciado</th>
+                        {% if perms.questoes.change_questao %}
+                            <th></th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for questao in questoes %}
+                        <tr>
+                            <td>{{ questao.numero }}</td>
+                            <td>{{ questao.get_serie_display }}</td>
+                            <td>{{ questao.get_dificuldade_display }}</td>
+                            <td>
+                                <span class="enunciado-resumo" title="{{ questao.enunciado }}">
+                                    {{ questao.enunciado|truncatechars:80 }}
+                                </span>
+                            </td>
+                            {% if perms.questoes.change_questao %}
+                                <td class="actions">
+                                    <a class="btn btn-outline" href="{% url 'questoes:editar_questao' questao.pk %}">Editar</a>
+                                </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% include "components/pagination.html" %}
+    {% elif busca or serie_filtro or dificuldade_filtro %}
+        {% url 'questoes:gestao' as gestao_url %}
+        {% include "components/empty_state.html" with icon="search" title="Nenhuma questão encontrada" description="Não existem questões correspondentes aos filtros atuais." action_url=gestao_url action_label="Limpar filtros" %}
+    {% else %}
+        {% url 'questoes:cadastrar' as cadastrar_questao_url %}
+        {% if perms.questoes.add_questao %}
+            {% include "components/empty_state.html" with icon="file-question" title="Nenhuma questão cadastrada." description="Cadastre uma questão para disponibilizar simulados." action_url=cadastrar_questao_url action_label="Cadastrar questão" %}
+        {% else %}
+            {% include "components/empty_state.html" with icon="file-question" title="Nenhuma questão cadastrada." description="Cadastre uma questão para disponibilizar simulados." %}
+        {% endif %}
+    {% endif %}
+{% endblock %}

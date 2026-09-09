@@ -1,0 +1,82 @@
+{% extends "layouts/staff.html" %}
+
+{% block title %}Relatório · {{ aluno.nome }} | ULYSSES{% endblock %}
+{% block area_label %}Relatório pedagógico{% endblock %}
+
+{% block page_header %}
+    {% include "components/page_header.html" with title=aluno.nome description="Relatório individual. Indicadores oficiais das tentativas persistidas." %}
+{% endblock %}
+
+{% block content %}
+    <p class="no-print muted">Use a impressão do navegador para gerar uma cópia em papel. PDF nativo fica pendente.</p>
+    <div class="stat-grid">
+        <div class="stat-tile"><span>Série</span><strong>{{ aluno.get_serie_display }}</strong></div>
+        <div class="stat-tile"><span>Turma atual</span><strong>{% if matricula_ativa %}{{ matricula_ativa.turma }}{% else %}—{% endif %}</strong></div>
+        <div class="stat-tile"><span>Período</span><strong>{{ periodo }}</strong></div>
+        <div class="stat-tile"><span>Avaliações</span><strong>{{ indicadores.provas }}</strong></div>
+    </div>
+    {% if indicadores.tem_dados %}
+        <div class="stat-grid">
+            <div class="stat-tile"><span>Média</span><strong>{{ indicadores.media|floatformat:1 }}</strong></div>
+            <div class="stat-tile"><span>Acurácia</span><strong>{% if indicadores.taxa is not None %}{{ indicadores.taxa|floatformat:1 }}%{% else %}—{% endif %}</strong></div>
+            <div class="stat-tile"><span>Acertos</span><strong>{{ indicadores.acertos }}</strong></div>
+            <div class="stat-tile"><span>Erros</span><strong>{{ indicadores.erros }}</strong></div>
+        </div>
+    {% else %}
+        <p>Não há tentativas no recorte visível. A média não é exibida como zero.</p>
+    {% endif %}
+
+    {% if evidencia_abaixo %}
+        <p>Há desempenho abaixo do esperado neste conjunto de questões (acurácia inferior a 40% com amostra mínima de {{ amostra_minima }} tentativas). Isto não é um diagnóstico clínico nem afirma que o gabarito está errado.</p>
+    {% endif %}
+
+    {% if evolucao %}
+        <h2>Evolução</h2>
+        <table class="table">
+            <thead><tr><th>Dia</th><th>Provas</th><th>Média</th></tr></thead>
+            <tbody>
+                {% for item in evolucao %}
+                    <tr>
+                        <td>{{ item.dia|date:"d/m/Y" }}</td>
+                        <td>{{ item.provas }}</td>
+                        <td>{% if item.media is not None %}{{ item.media|floatformat:1 }}{% else %}—{% endif %}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    <h2>Tentativas</h2>
+    <table class="table">
+        <thead><tr><th>Data</th><th>Tipo</th><th>Nota</th><th>Acertos</th><th>Erros</th></tr></thead>
+        <tbody>
+            {% for item in historico %}
+                <tr>
+                    <td>{{ item.data|date:"d/m/Y H:i" }}</td>
+                    <td>{% if item.avaliacao %}{{ item.avaliacao.titulo }}{% else %}Simulado livre{% endif %}</td>
+                    <td>{{ item.nota }}</td>
+                    <td>{{ item.acertos }}</td>
+                    <td>{{ item.erros }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if questoes_dificeis %}
+        <h2>Questões com menor acurácia neste aluno</h2>
+        <ul>
+            {% for item in questoes_dificeis %}
+                <li>Questão #{{ item.questao.numero }} · {{ item.taxa|floatformat:1 }}% em {{ item.tentativas }} tentativas</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if pontos_fortes %}
+        <h2>Pontos fortes (acurácia ≥ 80% com amostra)</h2>
+        <ul>
+            {% for item in pontos_fortes %}
+                <li>Questão #{{ item.questao.numero }} · {{ item.taxa|floatformat:1 }}%</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "layouts/app.html" %}
+
+{% block title %}Área do aluno | ULYSSES{% endblock %}
+
+{% block content %}
+    {% include "components/page_header.html" with title="Área do aluno" description="" %}
+    {% if aluno %}
+        <div class="card">
+            <p>Olá, {{ aluno.nome }}. RA: {{ aluno.ra }}.</p>
+            <p class="mt-lg"><a class="btn btn-primary" href="{% url 'alunos:aluno_logado' %}">Continuar para o simulado</a></p>
+        </div>
+    {% else %}
+        <div class="card">
+            <p>Sua conta está no grupo de alunos. O cadastro pedagógico (RA) ainda não está vinculado a este usuário.</p>
+        </div>
+    {% endif %}
+{% endblock %}

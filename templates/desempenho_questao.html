@@ -1,0 +1,170 @@
+{% extends "layouts/staff.html" %}
+
+{% block title %}Questão #{{ questao.numero }} | ULYSSES{% endblock %}
+{% block area_label %}Área do Professor{% endblock %}
+
+{% block page_header %}
+    {% include "components/page_header.html" with title=titulo_pagina description="Análise agregada desta questão. Não identifica alunos. O histórico usa a versão registrada na resposta, não o cadastro atual." %}
+{% endblock %}
+
+{% block content %}
+    <nav class="breadcrumb" aria-label="Trilha de navegação">
+        <a href="{% url 'desempenho' %}">Desempenho</a>
+        <span aria-hidden="true">/</span>
+        <a href="{% url 'desempenho_questoes' %}{% if querystring %}?{{ querystring }}{% endif %}">Por questão</a>
+        <span>Questão #{{ questao.numero }}</span>
+    </nav>
+
+    <form method="get" class="filter-form" role="search">
+        <div class="field">
+            <label for="periodo">Período</label>
+            <select class="input" id="periodo" name="periodo">
+                {% for codigo, nome in periodos %}
+                    <option value="{{ codigo }}" {% if periodo == codigo %}selected{% endif %}>{{ nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="field">
+            <label for="de">De</label>
+            <input class="input" type="date" id="de" name="de" value="{{ data_de }}">
+        </div>
+        <div class="field">
+            <label for="ate">Até</label>
+            <input class="input" type="date" id="ate" name="ate" value="{{ data_ate }}">
+        </div>
+        <button type="submit" class="btn btn-primary">Aplicar período</button>
+        {% if request.GET %}
+            <a class="btn btn-ghost" href="{% url 'desempenho_questao' questao.pk %}">Limpar</a>
+        {% endif %}
+    </form>
+
+    <div class="stat-grid stat-grid--4">
+        <div class="stat-tile">
+            <span>Série</span>
+            <strong>{{ questao.get_serie_display }}</strong>
+        </div>
+        <div class="stat-tile">
+            <span>Dificuldade cadastrada</span>
+            <strong>{{ questao.get_dificuldade_display }}</strong>
+        </div>
+        <div class="stat-tile">
+            <span>Versões</span>
+            <strong>{{ questao.total_versoes }}</strong>
+        </div>
+        <div class="stat-tile">
+            <span>Versão atual</span>
+            <strong>{% if questao.versao_atual %}V{{ questao.versao_atual.versao }}{% else %}—{% endif %}</strong>
+        </div>
+    </div>
+
+    <div class="stat-grid stat-grid--4">
+        <div class="stat-tile">
+            <span>Tentativas</span>
+            <strong>{{ metrica.tentativas }}</strong>
+        </div>
+        <div class="stat-tile">
+            <span>Acertos</span>
+            <strong>{{ metrica.acertos }}</strong>
+        </div>
+        <div class="stat-tile">
+            <span>Erros</span>
+            <strong>{{ metrica.erros }}</strong>
+        </div>
+        <div class="stat-tile">
+            <span>Taxa de acerto</span>
+            <strong>{% if metrica.taxa is not None %}{{ metrica.taxa|floatformat:1 }}%{% else %}—{% endif %}</strong>
+        </div>
+    </div>
+
+    {% if metrica.revisar %}
+        <div class="alert alert-warning" role="status">
+            <i data-lucide="alert-triangle" class="icon-sm" aria-hidden="true"></i>
+            <span>Baixo desempenho — merece revisão. Taxa abaixo de 40% com amostra suficiente. Isso não afirma que a questão está errada.</span>
+        </div>
+    {% endif %}
+
+    {% if not metrica.tem_dados %}
+        {% include "components/empty_state.html" with icon="file-text" title="Sem dados no período." description="Esta questão ainda não possui respostas persistidas no recorte selecionado. Isso não significa taxa de 0%." %}
+    {% else %}
+        <h2>Distribuição das respostas</h2>
+        <p class="muted">
+            Percentuais das alternativas A–D sobre respostas válidas (não em branco).
+            O gabarito destacado é o registrado nas tentativas
+            {% if metrica.gabarito_historico %}(letra {{ metrica.gabarito_historico }}){% endif %}.
+            {% if metrica.gabarito_misto %}As tentativas usam gabaritos diferentes entre versões; nenhuma letra é marcada como correta neste agregado.{% endif %}
+            Em branco: {{ metrica.em_branco }}.
+            {% if metrica.sem_versao %}{{ metrica.sem_versao }} resposta{{ metrica.sem_versao|pluralize }} sem versão (anterior ao versionamento).{% endif %}
+        </p>
+        <ul class="dist-list">
+            {% for item in metrica.distribuicao %}
+                <li>
+                    <span>
+                        {{ item.letra }}
+                        {% if item.gabarito %}<span class="badge badge-success">Correta</span>{% endif %}
+                        {% if item.distrator %}<span class="badge badge-warning">Mais escolhida entre as erradas</span>{% endif %}
+                    </span>
+                    <div class="evo-track" role="img" aria-label="{{ item.letra }}: {{ item.quantidade }} respostas, {{ item.pct|floatformat:0 }} por cento das válidas">
+                        <div class="evo-fill" style="width: {{ item.pct|floatformat:0 }}%;"></div>
+                    </div>
+                    <strong>{{ item.quantidade }} · {{ item.pct|floatformat:0 }}%</strong>
+                </li>
+            {% endfor %}
+            <li>
+                <span>Em branco</span>
+                <div class="evo-track" role="img" aria-label="Em branco: {{ metrica.em_branco }}">
+                    <div class="evo-fill" style="width: {{ metrica.em_branco_pct|floatformat:0 }}%;"></div>
+                </div>
+                <strong>{{ metrica.em_branco }}</strong>
+            </li>
+        </ul>
+        {% if metrica.distrator %}
+            <p class="muted">A alternativa {{ metrica.distrator.letra }} foi a errada mais escolhida ({{ metrica.distrator.quantidade }} respostas).</p>
+        {% endif %}
+
+        <h2>Versões</h2>
+        <p class="muted">Cada linha usa a versão registrada na resposta. A versão atual do cadastro não substitui o histórico.</p>
+        {% if versoes_metricas %}
+            <div class="table-wrap">
+                <table class="table">
+                    <caption class="sr-only">Desempenho por versão da questão</caption>
+                    <thead>
+                        <tr>
+                            <th>Versão</th>
+                            <th>Criada em</th>
+                            <th>Dificuldade</th>
+                            <th>Gabarito</th>
+                            <th>Imagem</th>
+                            <th>Tentativas</th>
+                            <th>Acertos</th>
+                            <th>Erros</th>
+                            <th>Taxa</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in versoes_metricas %}
+                            <tr>
+                                <td>
+                                    {% if item.anterior_ao_versionamento %}
+                                        Anterior ao versionamento
+                                    {% else %}
+                                        V{{ item.versao }}
+                                    {% endif %}
+                                </td>
+                                <td>{% if item.criado_em %}{{ item.criado_em|date:"d/m/Y H:i" }}{% else %}—{% endif %}</td>
+                                <td>{{ item.dificuldade_nome }}</td>
+                                <td>{% if item.gabarito %}{{ item.gabarito }}{% else %}—{% endif %}</td>
+                                <td>{% if item.anterior_ao_versionamento %}—{% elif item.tem_imagem %}Sim{% else %}Não{% endif %}</td>
+                                <td>{{ item.tentativas }}</td>
+                                <td>{{ item.acertos }}</td>
+                                <td>{{ item.erros }}</td>
+                                <td>{% if item.taxa is not None %}{{ item.taxa|floatformat:1 }}%{% else %}—{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="muted">Sem recorte por versão neste período.</p>
+        {% endif %}
+    {% endif %}
+{% endblock %}

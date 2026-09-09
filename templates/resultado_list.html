@@ -1,0 +1,81 @@
+{% extends "layouts/staff.html" %}
+
+{% block title %}Resultados | ULYSSES{% endblock %}
+{% block area_label %}Área do Professor{% endblock %}
+
+{% block page_header %}
+    {% include "components/page_header.html" with title="Resultados" description="Tentativas registradas pelos alunos. Os valores vêm do sistema e não são recalculados aqui." %}
+{% endblock %}
+
+{% block content %}
+    <form method="get" class="filter-form" role="search">
+        <div class="field field--grow">
+            <label for="q">Aluno</label>
+            <input class="input" type="search" id="q" name="q" value="{{ busca }}" placeholder="Nome ou RA" autocomplete="off">
+        </div>
+        <div class="field">
+            <label for="serie">Série</label>
+            <select class="input" id="serie" name="serie">
+                <option value="">Todas</option>
+                {% for codigo, nome in series %}
+                    <option value="{{ codigo }}" {% if serie_filtro == codigo %}selected{% endif %}>{{ nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="field">
+            <label for="data">Data</label>
+            <input class="input" type="date" id="data" name="data" value="{{ data_filtro }}">
+        </div>
+        <div class="field">
+            <label for="nota">Nota</label>
+            <input class="input" type="text" id="nota" name="nota" value="{{ nota_filtro }}" placeholder="Ex.: 8.00" inputmode="decimal">
+        </div>
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+        {% if busca or serie_filtro or data_filtro or nota_filtro %}
+            <a class="btn btn-ghost" href="{% url 'questoes:resultados' %}">Limpar</a>
+        {% endif %}
+    </form>
+
+    {% if resultados %}
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Aluno</th>
+                        <th>Série</th>
+                        <th>Data</th>
+                        <th>Acertos</th>
+                        <th>Erros</th>
+                        <th>Nota</th>
+                        <th>XP</th>
+                        <th>Tempo</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in resultados %}
+                        <tr>
+                            <td>{{ item.aluno.nome }}</td>
+                            <td>{{ item.aluno.get_serie_display }}</td>
+                            <td>{{ item.data|date:"d/m/Y H:i" }}</td>
+                            <td>{{ item.acertos }}</td>
+                            <td>{{ item.erros }}</td>
+                            <td>{{ item.nota }}</td>
+                            <td>{{ item.xp_ganho }}</td>
+                            <td>{{ item.tempo_segundos }}s</td>
+                            <td class="actions">
+                                <a class="btn btn-outline" href="{% url 'questoes:resultado_detalhe' item.pk %}">Ver</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% include "components/pagination.html" %}
+    {% elif busca or serie_filtro or data_filtro or nota_filtro %}
+        {% url 'questoes:resultados' as resultados_url %}
+        {% include "components/empty_state.html" with icon="search" title="Nenhum resultado encontrado" description="Não existem tentativas correspondentes aos filtros atuais." action_url=resultados_url action_label="Limpar filtros" %}
+    {% else %}
+        {% include "components/empty_state.html" with icon="bar-chart-3" title="Ainda não há resultados." description="Os resultados aparecerão aqui após os alunos realizarem simulados." %}
+    {% endif %}
+{% endblock %}

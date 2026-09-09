@@ -1,0 +1,88 @@
+{% extends "layouts/staff.html" %}
+
+{% block title %}Resultado | ULYSSES{% endblock %}
+{% block area_label %}Área do Professor{% endblock %}
+
+{% block page_header %}
+    {% include "components/page_header.html" with title="Resultado da tentativa" description="Quando houver versão histórica, o enunciado e as alternativas são os que o aluno viu nesta prova — não o cadastro atual da questão." %}
+{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <dl class="resultado-dl">
+            <dt>Aluno</dt>
+            <dd>{{ resultado.aluno.nome }}</dd>
+            <dt>Série</dt>
+            <dd>{{ resultado.aluno.get_serie_display }}</dd>
+            <dt>Turma na prova</dt>
+            <dd>
+                {% if resultado.matricula %}
+                    {{ resultado.matricula.turma }}
+                {% else %}
+                    Sem vínculo histórico (prova anterior às turmas)
+                {% endif %}
+            </dd>
+            <dt>Data</dt>
+            <dd>{{ resultado.data|date:"d/m/Y H:i" }}</dd>
+            <dt>Acertos</dt>
+            <dd>{{ resultado.acertos }}</dd>
+            <dt>Erros</dt>
+            <dd>{{ resultado.erros }}</dd>
+            <dt>Total de questões</dt>
+            <dd>{{ resultado.total_questoes }}</dd>
+            <dt>Nota</dt>
+            <dd>{{ resultado.nota }}</dd>
+            <dt>XP ganho</dt>
+            <dd>{{ resultado.xp_ganho }}</dd>
+            <dt>Tempo</dt>
+            <dd>{{ tempo_formatado }}</dd>
+        </dl>
+        <p class="mt-lg">
+            <a class="btn btn-outline" href="{% url 'questoes:resultados' %}">Voltar aos resultados</a>
+            <a class="btn btn-outline" href="{% url 'desempenho_aluno' resultado.aluno.pk %}">Desempenho do aluno</a>
+        </p>
+    </div>
+
+    <h2>Desempenho por questão</h2>
+    {% if tem_respostas_questoes %}
+        <p class="muted">Letras originais da questão. Em branco significa que a questão não foi respondida nesta tentativa.</p>
+        {% for item in desempenho_questoes %}
+            <article class="card mt-lg">
+                <h3>Questão #{% if item.questao_versao %}{{ item.questao_versao.numero }}{% else %}{{ item.questao.numero }}{% endif %}</h3>
+                {% if item.questao_versao %}
+                    <p class="muted">Versão {{ item.questao_versao.versao }} · {{ item.questao_versao.get_serie_display }} · Dificuldade cadastrada na prova: {{ item.questao_versao.get_dificuldade_display }}</p>
+                    {% if item.questao_versao.imagem %}
+                        <figure class="questao-figura">
+                            <img
+                                src="{{ item.questao_versao.imagem.url }}"
+                                alt="{% firstof item.questao_versao.imagem_alt 'Figura desta questão' %}"
+                            >
+                        </figure>
+                    {% endif %}
+                    <p>{{ item.questao_versao.enunciado }}</p>
+                    <ul class="answer-list">
+                        <li>A) {{ item.questao_versao.alternativa_a }}</li>
+                        <li>B) {{ item.questao_versao.alternativa_b }}</li>
+                        <li>C) {{ item.questao_versao.alternativa_c }}</li>
+                        <li>D) {{ item.questao_versao.alternativa_d }}</li>
+                    </ul>
+                {% else %}
+                    <p class="muted">Esta resposta foi registrada antes do versionamento de conteúdo. O enunciado apresentado na prova não foi congelado; não exibimos o cadastro atual como se fosse histórico.</p>
+                {% endif %}
+                <dl class="resultado-dl">
+                    <dt>Resposta do aluno</dt>
+                    <dd>{% if item.resposta %}{{ item.resposta }}{% else %}Em branco{% endif %}</dd>
+                    <dt>Gabarito daquela prova</dt>
+                    <dd>{{ item.resposta_correta }}</dd>
+                    <dt>Resultado</dt>
+                    <dd>{% if item.correta %}Acertou{% else %}Errou{% endif %}</dd>
+                </dl>
+                <p class="mt-lg">
+                    <a href="{% url 'desempenho_questao' item.questao.pk %}">Ver análise agregada da questão</a>
+                </p>
+            </article>
+        {% endfor %}
+    {% else %}
+        <p class="muted">Este resultado foi registrado antes da coleta detalhada por questão.</p>
+    {% endif %}
+{% endblock %}

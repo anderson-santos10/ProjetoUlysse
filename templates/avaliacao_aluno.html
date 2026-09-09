@@ -1,0 +1,56 @@
+{% extends "layouts/app.html" %}
+
+{% block title %}{{ avaliacao.titulo }} | ULYSSES{% endblock %}
+
+{% block content %}
+    <div class="aluno-panel">
+        <h1>{{ avaliacao.titulo }}</h1>
+        <p class="muted">{{ avaliacao.turma }} · tentativas usadas: {{ tentativas }} de {{ avaliacao.tentativas_maximas }}</p>
+
+        {% if em_andamento %}
+            <form method="post" data-loading-form>
+                {% csrf_token %}
+                <input type="hidden" name="acao" value="finalizar">
+                {% for item in itens %}
+                    {% with v=item.questao_versao %}
+                        <article class="card mt-lg">
+                            <h2>Questão {{ forloop.counter }}</h2>
+                            {% if v.imagem %}
+                                <img src="{{ v.imagem.url }}" alt="{{ v.imagem_alt|default:'Imagem da questão' }}">
+                            {% endif %}
+                            <p>{{ v.enunciado }}</p>
+                            <fieldset>
+                                <legend class="sr-only">Alternativas</legend>
+                                <div class="choice"><input type="radio" name="q_{{ item.questao_id }}" id="q{{ item.questao_id }}_a" value="A"> <label for="q{{ item.questao_id }}_a">A) {{ v.alternativa_a }}</label></div>
+                                <div class="choice"><input type="radio" name="q_{{ item.questao_id }}" id="q{{ item.questao_id }}_b" value="B"> <label for="q{{ item.questao_id }}_b">B) {{ v.alternativa_b }}</label></div>
+                                <div class="choice"><input type="radio" name="q_{{ item.questao_id }}" id="q{{ item.questao_id }}_c" value="C"> <label for="q{{ item.questao_id }}_c">C) {{ v.alternativa_c }}</label></div>
+                                <div class="choice"><input type="radio" name="q_{{ item.questao_id }}" id="q{{ item.questao_id }}_d" value="D"> <label for="q{{ item.questao_id }}_d">D) {{ v.alternativa_d }}</label></div>
+                            </fieldset>
+                        </article>
+                    {% endwith %}
+                {% endfor %}
+                <div class="nav-inline mt-lg">
+                    <button type="submit" class="btn btn-primary">Enviar avaliação</button>
+                    <a class="btn btn-outline" href="{% url 'alunos:aluno_logado' %}">Voltar</a>
+                </div>
+            </form>
+        {% elif disponivel %}
+            <div class="card">
+                {% if avaliacao.descricao %}<p>{{ avaliacao.descricao }}</p>{% endif %}
+                <p class="muted">
+                    {% if avaliacao.tempo_limite_minutos %}Tempo limite: {{ avaliacao.tempo_limite_minutos }} minutos (controlado pelo servidor).{% else %}Sem tempo limite.{% endif %}
+                </p>
+                <form method="post" data-loading-form>
+                    {% csrf_token %}
+                    <input type="hidden" name="acao" value="iniciar">
+                    <button type="submit" class="btn btn-primary">Iniciar</button>
+                </form>
+            </div>
+        {% else %}
+            <div class="card">
+                <p>{{ motivo }}</p>
+                <a class="btn btn-outline" href="{% url 'alunos:aluno_logado' %}">Voltar ao painel</a>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

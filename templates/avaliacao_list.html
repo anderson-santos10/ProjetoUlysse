@@ -1,0 +1,50 @@
+{% extends "layouts/staff.html" %}
+
+{% block title %}Avaliações | ULYSSES{% endblock %}
+{% block area_label %}Área do Professor{% endblock %}
+
+{% block page_header %}
+    {% include "components/page_header.html" with title="Avaliações e simulados" description="Atividades dirigidas à turma. As versões das questões são congeladas na publicação." %}
+{% endblock %}
+
+{% block content %}
+    <div class="nav-inline">
+        {% if perms.questoes.add_avaliacao %}
+            <a class="btn btn-primary" href="{% url 'questoes:cadastrar_avaliacao' %}">Nova avaliação</a>
+        {% endif %}
+    </div>
+
+    {% if avaliacoes %}
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Turma</th>
+                        <th>Status</th>
+                        <th>Início</th>
+                        <th>Fim</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in avaliacoes %}
+                        <tr>
+                            <td>{{ item.titulo }}</td>
+                            <td>{{ item.turma }}</td>
+                            <td><span class="badge">{{ item.get_status_display }}</span></td>
+                            <td>{% if item.data_inicio %}{{ item.data_inicio|date:"d/m/Y H:i" }}{% else %}—{% endif %}</td>
+                            <td>{% if item.data_fim %}{{ item.data_fim|date:"d/m/Y H:i" }}{% else %}—{% endif %}</td>
+                            <td class="actions">
+                                <a class="btn btn-outline" href="{% url 'questoes:detalhe_avaliacao' item.pk %}">Abrir</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% include "components/pagination.html" %}
+    {% else %}
+        {% include "components/empty_state.html" with icon="clipboard-check" title="Nenhuma avaliação no seu escopo." description="Crie um rascunho associado a uma turma que você gerencia." %}
+    {% endif %}
+{% endblock %}

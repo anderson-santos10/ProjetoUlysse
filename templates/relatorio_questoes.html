@@ -1,0 +1,72 @@
+{% extends "layouts/staff.html" %}
+
+{% block title %}Relatório de questões | ULYSSES{% endblock %}
+{% block area_label %}Relatório pedagógico{% endblock %}
+
+{% block page_header %}
+    {% include "components/page_header.html" with title="Relatório de questões" description="Mesma análise pedagógica da etapa 12. Filtros aplicados no servidor." %}
+{% endblock %}
+
+{% block content %}
+    <form method="get" class="filter-form no-print" role="search">
+        <div class="field">
+            <label for="periodo">Período</label>
+            <input class="input" id="periodo" name="periodo" value="{{ periodo }}">
+        </div>
+        <div class="field">
+            <label for="serie">Série</label>
+            <input class="input" id="serie" name="serie" value="{{ serie_filtro }}">
+        </div>
+        {% if turma_filtro %}
+            <input type="hidden" name="turma" value="{{ turma_filtro.pk }}">
+        {% endif %}
+        <button type="submit" class="btn btn-primary">Aplicar</button>
+    </form>
+
+    <p>{% if nome_serie %}Série: {{ nome_serie }}. {% endif %}{% if turma_filtro %}Turma: {{ turma_filtro }}. {% endif %}Período: {{ periodo }}.</p>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Questão</th>
+                <th>Série</th>
+                <th>Dificuldade</th>
+                <th>Versão atual</th>
+                <th>Imagem</th>
+                <th>Tentativas</th>
+                <th>Acertos</th>
+                <th>Erros</th>
+                <th>Em branco</th>
+                <th>Acurácia</th>
+                <th>Mais escolhidas</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in linhas %}
+                <tr>
+                    <td>#{{ item.questao.numero }}</td>
+                    <td>{{ item.questao.get_serie_display }}</td>
+                    <td>{{ item.questao.get_dificuldade_display }}</td>
+                    <td>{% if item.questao.versao_atual %}v{{ item.questao.versao_atual.versao }}{% else %}—{% endif %}</td>
+                    <td>{% if item.questao.imagem %}Sim{% else %}Não{% endif %}</td>
+                    <td>{{ item.tentativas }}</td>
+                    <td>{{ item.acertos }}</td>
+                    <td>{{ item.erros }}</td>
+                    <td>{% if item.detalhe %}{{ item.detalhe.em_branco }}{% else %}—{% endif %}</td>
+                    <td>{% if item.taxa is not None %}{{ item.taxa|floatformat:1 }}%{% else %}—{% endif %}</td>
+                    <td>
+                        {% if item.detalhe %}
+                            {% for alt in item.detalhe.distribuicao %}
+                                {{ alt.letra }}: {{ alt.quantidade }}{% if not forloop.last %} · {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="11">Nenhuma questão no recorte.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

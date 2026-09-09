@@ -1,0 +1,57 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ULYSSES{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@0.469.0"></script>
+    <link rel="stylesheet" href="{% static 'css/tokens.css' %}">
+    <link rel="stylesheet" href="{% static 'css/reset.css' %}">
+    <link rel="stylesheet" href="{% static 'css/layout.css' %}">
+    <link rel="stylesheet" href="{% static 'css/components.css' %}">
+    <link rel="stylesheet" href="{% static 'css/utilities.css' %}">
+    <link rel="stylesheet" href="{% static 'css/aluno-flow.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="layout-app {% block body_class %}{% endblock %}">
+    <a class="skip-link" href="#main-content">Pular para o conteúdo</a>
+    <header class="site-header">
+        <div class="site-header__left">
+            {% include "components/brand.html" %}
+            <span class="area-chip">Área do aluno</span>
+        </div>
+        <div class="site-header__right">
+            {% include "components/nav_aluno.html" %}
+            {% if aluno %}
+                <span class="muted">{{ aluno.nome }}</span>
+            {% elif user.is_authenticated %}
+                <span class="muted">{{ user.get_username }}</span>
+            {% endif %}
+            {% if request.session.aluno_id %}
+                <form method="post" action="{% url 'alunos:sair_aluno' %}" data-loading-form>
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline">Sair do aluno</button>
+                </form>
+            {% endif %}
+            {% if user.is_authenticated %}
+                <form method="post" action="{% url 'logout' %}" data-loading-form>
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-ghost">Sair da conta</button>
+                </form>
+            {% endif %}
+        </div>
+    </header>
+    <main id="main-content" class="{% block main_class %}site-main site-main--app{% endblock %}">
+        {% include "components/messages.html" %}
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="site-footer">ULYSSES • Sistema Educacional</footer>
+    <script src="{% static 'js/core/icons.js' %}"></script>
+    <script src="{% static 'js/components/form-submit.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,86 @@
+{% extends "layouts/staff.html" %}
+
+{% block title %}Alunos | ULYSSES{% endblock %}
+{% block area_label %}Área do Professor{% endblock %}
+
+{% block page_header %}
+    {% url 'alunos:cadastrar' as cadastrar_aluno_url %}
+    {% if perms.alunos.add_aluno %}
+        {% include "components/page_header.html" with title="Alunos" description="Gerencie os alunos cadastrados no sistema." action_url=cadastrar_aluno_url action_label="Cadastrar aluno" %}
+    {% else %}
+        {% include "components/page_header.html" with title="Alunos" description="Gerencie os alunos cadastrados no sistema." %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class="toolbar">
+        <form method="get" class="filter-form" role="search">
+            <div class="field field--grow">
+                <label for="q">Buscar aluno</label>
+                <input class="input" type="search" id="q" name="q" value="{{ busca }}" placeholder="Nome ou RA" autocomplete="off">
+            </div>
+            <div class="field">
+                <label for="serie">Série</label>
+                <select class="input" id="serie" name="serie">
+                    <option value="">Todas</option>
+                    {% for codigo, nome in series %}
+                        <option value="{{ codigo }}" {% if serie_filtro == codigo %}selected{% endif %}>{{ nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Pesquisar</button>
+            {% if busca or serie_filtro %}
+                <a class="btn btn-ghost" href="{% url 'alunos:lista_alunos' %}">Limpar</a>
+            {% endif %}
+        </form>
+    </div>
+
+    {% if alunos %}
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Aluno</th>
+                        <th>RA</th>
+                        <th>Série</th>
+                        <th>XP</th>
+                        {% if perms.alunos.change_aluno or perms.questoes.view_resultado %}
+                            <th></th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for aluno in alunos %}
+                        <tr>
+                            <td>{{ aluno.nome }}</td>
+                            <td>{{ aluno.ra }}</td>
+                            <td>{{ aluno.get_serie_display }}</td>
+                            <td>{{ aluno.xp|default:0 }}</td>
+                            {% if perms.alunos.change_aluno or perms.questoes.view_resultado %}
+                                <td class="actions">
+                                    {% if perms.questoes.view_resultado %}
+                                        <a class="btn btn-outline" href="{% url 'desempenho_aluno' aluno.pk %}">Ver desempenho</a>
+                                    {% endif %}
+                                    {% if perms.alunos.change_aluno %}
+                                        <a class="btn btn-outline" href="{% url 'alunos:editar_aluno' aluno.pk %}">Editar</a>
+                                    {% endif %}
+                                </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% include "components/pagination.html" %}
+    {% elif busca or serie_filtro %}
+        {% url 'alunos:lista_alunos' as lista_alunos_url %}
+        {% include "components/empty_state.html" with icon="search" title="Nenhum aluno encontrado" description="Não existem alunos correspondentes aos filtros atuais." action_url=lista_alunos_url action_label="Limpar filtros" %}
+    {% else %}
+        {% url 'alunos:cadastrar' as cadastrar_aluno_url %}
+        {% if perms.alunos.add_aluno %}
+            {% include "components/empty_state.html" with icon="users" title="Nenhum aluno cadastrado." description="Cadastre o primeiro aluno para começar." action_url=cadastrar_aluno_url action_label="Cadastrar aluno" %}
+        {% else %}
+            {% include "components/empty_state.html" with icon="users" title="Nenhum aluno cadastrado." description="Cadastre o primeiro aluno para começar." %}
+        {% endif %}
+    {% endif %}
+{% endblock %}

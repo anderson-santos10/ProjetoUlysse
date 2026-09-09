@@ -1,0 +1,58 @@
+<nav class="sidebar__nav" aria-label="Menu da equipe">
+    {% if perms.accounts.access_area_professor %}
+        <a class="sidebar__link {% if request.resolver_match.url_name == 'area_professor' %}is-active{% endif %}" href="{% url 'area_professor' %}">
+            <i data-lucide="home" class="icon-sm"></i>
+            Início
+        </a>
+    {% endif %}
+    {% if perms.alunos.view_aluno %}
+        <a class="sidebar__link {% if request.resolver_match.url_name == 'lista_alunos' or request.resolver_match.url_name == 'cadastrar' and request.resolver_match.app_name == 'alunos' or request.resolver_match.url_name == 'editar_aluno' %}is-active{% endif %}" href="{% url 'alunos:lista_alunos' %}">
+            <i data-lucide="users" class="icon-sm"></i>
+            Alunos
+        </a>
+        <a class="sidebar__link {% if request.resolver_match.url_name == 'series' or request.resolver_match.url_name == 'alunos_por_serie' %}is-active{% endif %}" href="{% url 'alunos:series' %}">
+            <i data-lucide="school" class="icon-sm"></i>
+            Séries
+        </a>
+    {% endif %}
+    {% if perms.alunos.view_turma %}
+        <a class="sidebar__link {% if 'turma' in request.resolver_match.url_name or request.resolver_match.url_name == 'encerrar_matricula' %}is-active{% endif %}" href="{% url 'alunos:lista_turmas' %}">
+            <i data-lucide="group" class="icon-sm"></i>
+            Turmas
+        </a>
+    {% endif %}
+    {% if perms.questoes.view_questao %}
+        <a class="sidebar__link {% if request.resolver_match.url_name == 'gestao' or request.resolver_match.url_name == 'cadastrar' and request.resolver_match.app_name == 'questoes' or request.resolver_match.url_name == 'editar_questao' %}is-active{% endif %}" href="{% url 'questoes:gestao' %}">
+            <i data-lucide="file-text" class="icon-sm"></i>
+            Questões
+        </a>
+    {% endif %}
+    {% if perms.questoes.view_resultado %}
+        <a class="sidebar__link {% if request.resolver_match.url_name == 'resultados' or request.resolver_match.url_name == 'resultado_detalhe' %}is-active{% endif %}" href="{% url 'questoes:resultados' %}">
+            <i data-lucide="clipboard-list" class="icon-sm"></i>
+            Resultados
+        </a>
+        <a class="sidebar__link {% if request.resolver_match.url_name == 'desempenho' or request.resolver_match.url_name == 'desempenho_aluno' or request.resolver_match.url_name == 'desempenho_questoes' or request.resolver_match.url_name == 'desempenho_questao' or request.resolver_match.url_name == 'relatorio_aluno' or request.resolver_match.url_name == 'relatorio_turma' or request.resolver_match.url_name == 'relatorio_questoes' %}is-active{% endif %}" href="{% url 'desempenho' %}">
+            <i data-lucide="bar-chart-3" class="icon-sm"></i>
+            Desempenho
+        </a>
+    {% endif %}
+    {% if perms.questoes.view_avaliacao %}
+        <a class="sidebar__link {% if 'avaliacao' in request.resolver_match.url_name %}is-active{% endif %}" href="{% url 'questoes:lista_avaliacoes' %}">
+            <i data-lucide="clipboard-check" class="icon-sm"></i>
+            Avaliações
+        </a>
+    {% endif %}
+    {% if perms.accounts.access_area_coordenacao %}
+        <a class="sidebar__link {% if request.resolver_match.url_name == 'area_coordenacao' %}is-active{% endif %}" href="{% url 'area_coordenacao' %}">
+            <i data-lucide="clipboard-list" class="icon-sm"></i>
+            Coordenação
+        </a>
+    {% endif %}
+    {% if perms.accounts.access_area_direcao %}
+        <a class="sidebar__link {% if request.resolver_match.url_name == 'area_direcao' %}is-active{% endif %}" href="{% url 'area_direcao' %}">
+            <i data-lucide="building-2" class="icon-sm"></i>
+            Direção
+        </a>
+    {% endif %}
+</nav>

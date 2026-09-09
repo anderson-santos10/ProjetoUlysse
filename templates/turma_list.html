@@ -1,0 +1,67 @@
+{% extends "layouts/staff.html" %}
+
+{% block title %}Turmas | ULYSSES{% endblock %}
+{% block area_label %}Área do Professor{% endblock %}
+
+{% block page_header %}
+    {% url 'alunos:cadastrar_turma' as cadastrar_turma_url %}
+    {% if perms.alunos.add_turma %}
+        {% include "components/page_header.html" with title="Turmas" description="Gestão pedagógica por turma e ano letivo. O ranking público e o quiz continuam usando a série do aluno. A turma atual é o vínculo ativo, não um campo direto no cadastro." action_url=cadastrar_turma_url action_label="Cadastrar turma" %}
+    {% else %}
+        {% include "components/page_header.html" with title="Turmas" description="Turmas sob sua responsabilidade. O ranking público e o quiz continuam usando a série do aluno." %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if turmas %}
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Turma</th>
+                        <th>Série</th>
+                        <th>Ano</th>
+                        <th>Professor</th>
+                        <th>Alunos</th>
+                        <th>Situação</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for turma in turmas %}
+                        <tr>
+                            <td>{{ turma.nome }}</td>
+                            <td>{{ turma.get_serie_display }}</td>
+                            <td>{{ turma.ano_letivo }}</td>
+                            <td>{{ turma.professor_responsavel.get_username }}</td>
+                            <td>{{ turma.total_alunos }}</td>
+                            <td>
+                                {% if turma.ativa %}
+                                    <span class="badge">Ativa</span>
+                                {% else %}
+                                    <span class="badge">Inativa</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'alunos:detalhe_turma' turma.pk %}">Abrir</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if page_obj.paginator.num_pages > 1 %}
+            <nav class="pagination" aria-label="Paginação">
+                {% if page_obj.has_previous %}
+                    <a class="btn btn-outline" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                {% endif %}
+                <span class="is-current">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                {% if page_obj.has_next %}
+                    <a class="btn btn-outline" href="?page={{ page_obj.next_page_number }}">Próxima</a>
+                {% endif %}
+            </nav>
+        {% endif %}
+    {% else %}
+        {% include "components/empty_state.html" with icon="school" title="Nenhuma turma visível." description="Coordenação e direção cadastram turmas. Professores vêem apenas as turmas em que são responsáveis." %}
+    {% endif %}
+{% endblock %}

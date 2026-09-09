@@ -1,0 +1,39 @@
+<div class="card auth-card">
+    <div class="auth-header">
+        <div class="auth-icon">
+            <i data-lucide="shield-check"></i>
+        </div>
+        <h1>Acesso do aluno</h1>
+        <p class="muted">
+            Digite seu RA para acessar seu ambiente e iniciar o simulado.
+        </p>
+    </div>
+
+    <form method="post" action="{% url 'alunos:acesso_aluno' %}" class="ra-form" data-loading-form>
+        {% csrf_token %}
+        <div class="field">
+            <label for="ra">Registro acadêmico (RA)</label>
+            <input
+                class="input"
+                type="text"
+                id="ra"
+                name="ra"
+                placeholder="Informe o RA"
+                required
+                autofocus
+                autocomplete="username"
+                inputmode="numeric"
+                autocapitalize="off"
+                spellcheck="false"
+                aria-describedby="ra-help"
+            >
+            <p class="help" id="ra-help">Use o número informado pela escola. Não compartilhe com outras pessoas.</p>
+        </div>
+        <button type="submit" class="btn btn-primary btn--lg">
+            Entrar com RA
+        </button>
+    </form>
+    <p class="muted mt-md">
+        Não sabe o seu RA? Solicite o número à escola.
+    </p>
+</div>

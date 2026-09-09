@@ -1,0 +1,16 @@
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags|default:'info' }}" role="status">
+            {% if 'error' in message.tags or 'danger' in message.tags %}
+                <i data-lucide="alert-circle" class="icon-sm" aria-hidden="true"></i>
+            {% elif 'success' in message.tags %}
+                <i data-lucide="check-circle" class="icon-sm" aria-hidden="true"></i>
+            {% elif 'warning' in message.tags %}
+                <i data-lucide="alert-triangle" class="icon-sm" aria-hidden="true"></i>
+            {% else %}
+                <i data-lucide="info" class="icon-sm" aria-hidden="true"></i>
+            {% endif %}
+            <span>{{ message }}</span>
+        </div>
+    {% endfor %}
+{% endif %}

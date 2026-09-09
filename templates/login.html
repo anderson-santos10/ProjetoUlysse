@@ -1,0 +1,52 @@
+{% extends "layouts/guest.html" %}
+{% load static %}
+
+{% block title %}Entrar | ULYSSES{% endblock %}
+
+{% block content %}
+    <div class="card auth-card">
+        <div class="auth-header">
+            <div class="auth-icon">
+                <i data-lucide="shield-lock"></i>
+            </div>
+            <h1>Entrar</h1>
+            <p class="muted">Informe usuário e senha para acessar a área correspondente ao seu perfil.</p>
+        </div>
+
+        {% if erro %}
+            <div class="alert alert-error" role="alert">
+                <i data-lucide="alert-circle"></i>
+                <span>{{ erro }}</span>
+            </div>
+        {% endif %}
+
+        <form method="post" data-loading-form>
+            {% csrf_token %}
+            <div class="field">
+                <label for="username">Usuário</label>
+                <div class="input-wrap">
+                    <i data-lucide="user" class="input-icon"></i>
+                    <input class="input" type="text" id="username" name="username" placeholder="Digite seu usuário" required autofocus autocomplete="username">
+                </div>
+            </div>
+            <div class="field">
+                <label for="senha">Senha</label>
+                <div class="input-wrap">
+                    <i data-lucide="lock" class="input-icon"></i>
+                    <input class="input has-toggle" type="password" id="senha" name="senha" placeholder="Digite sua senha" required autocomplete="current-password">
+                    <button type="button" class="toggle-password" data-password-toggle="senha" aria-label="Alternar visibilidade da senha">
+                        <i data-lucide="eye"></i>
+                    </button>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn--lg">
+                <i data-lucide="log-in"></i>
+                Entrar
+            </button>
+        </form>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'js/components/password-toggle.js' %}"></script>
+{% endblock %}

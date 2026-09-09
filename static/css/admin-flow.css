@@ -1,0 +1,233 @@
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+}
+
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: var(--space-lg);
+}
+
+.filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    align-items: flex-end;
+    width: 100%;
+    margin-bottom: var(--space-lg);
+}
+
+.filter-form .field {
+    margin: 0;
+    min-width: 160px;
+    flex: 1;
+}
+
+.filter-form .field--grow {
+    flex: 2;
+    min-width: 200px;
+}
+
+.filter-form .input,
+.filter-form select.input {
+    min-height: 40px;
+}
+
+.stat-grid--4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.evo-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-lg);
+    display: grid;
+    gap: var(--space-sm);
+}
+
+.evo-list li {
+    display: grid;
+    grid-template-columns: 4.5rem 1fr 3rem;
+    gap: var(--space-sm);
+    align-items: center;
+}
+
+.evo-track {
+    height: 10px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    overflow: hidden;
+}
+
+.evo-fill {
+    height: 100%;
+    background: var(--color-primary);
+    border-radius: var(--radius-pill);
+}
+
+.toolbar-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+}
+
+.enunciado-resumo {
+    max-width: 36ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.radio-row,
+ul.radio-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+ul.radio-row li {
+    margin: 0;
+}
+
+.radio-row label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+}
+
+.alternativa-admin {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    align-items: center;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    margin-bottom: var(--space-sm);
+}
+
+.alternativa-admin .letra {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg);
+    font-weight: var(--weight-extrabold);
+    color: var(--color-primary);
+    min-height: 40px;
+}
+
+.alternativa-admin .input {
+    border: 0;
+    border-radius: 0;
+}
+
+.questao-meta {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-md);
+}
+
+.pagination {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    align-items: center;
+    justify-content: center;
+    margin-top: var(--space-lg);
+}
+
+.resultado-dl {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: var(--space-sm) var(--space-md);
+}
+
+.resultado-dl dt {
+    color: var(--color-text-muted);
+    font-size: var(--text-caption);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.subnav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+}
+
+.subnav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 var(--space-md);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+}
+
+.subnav a[aria-current="page"] {
+    border-color: var(--color-primary);
+    font-weight: var(--weight-extrabold);
+}
+
+.taxa-cell {
+    display: grid;
+    gap: 4px;
+    min-width: 8rem;
+}
+
+.dist-list,
+.hard-list,
+.answer-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-lg);
+    display: grid;
+    gap: var(--space-sm);
+}
+
+.dist-list li,
+.hard-list li {
+    display: grid;
+    grid-template-columns: minmax(8rem, 14rem) 1fr auto;
+    gap: var(--space-sm);
+    align-items: center;
+}
+
+.answer-list {
+    grid-template-columns: 1fr;
+    grid-auto-flow: row;
+}
+
+.answer-list li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+}
+
+@media (max-width: 768px) {
+    .stat-grid,
+    .stat-grid--4,
+    .questao-meta,
+    .resultado-dl,
+    .dist-list li,
+    .hard-list li {
+        grid-template-columns: 1fr;
+    }
+
+    .enunciado-resumo {
+        max-width: 20ch;
+    }
+}

@@ -1,0 +1,12 @@
+{% extends "layouts/guest.html" %}
+
+{% block title %}Acesso não autorizado | ULYSSES{% endblock %}
+
+{% block content %}
+    <div class="card auth-card text-center">
+        <h1>Acesso não autorizado</h1>
+        <p>Você está autenticado, mas não possui permissão para acessar esta área.</p>
+        <p class="muted">Se acredita que isso é um erro, procure um administrador da escola.</p>
+        <p><a class="btn btn-primary" href="{% url 'home' %}">Voltar ao início</a></p>
+    </div>
+{% endblock %}

@@ -1,0 +1,5 @@
+{% if aluno.exibe_foto_no_ranking %}
+    <img src="{{ aluno.foto.url }}" alt="" class="avatar-img">
+{% else %}
+    <span>{{ aluno.inicial_nome }}</span>
+{% endif %}

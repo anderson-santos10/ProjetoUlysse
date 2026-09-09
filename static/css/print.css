@@ -1,0 +1,53 @@
+@media print {
+    .skip-link,
+    .site-header,
+    .sidebar,
+    .sidebar__overlay,
+    .menu-toggle,
+    .filter-form,
+    .nav-inline a.btn-outline,
+    .subnav,
+    form,
+    .no-print {
+        display: none !important;
+    }
+
+    .staff-body {
+        display: block;
+    }
+
+    .staff-content,
+    main {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+    }
+
+    body {
+        background: #fff;
+        color: #111;
+        font-size: 12pt;
+    }
+
+    h1, h2, h3 {
+        break-after: avoid;
+    }
+
+    table {
+        break-inside: auto;
+        width: 100%;
+    }
+
+    tr, .stat-tile, .card {
+        break-inside: avoid;
+    }
+
+    a {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    @page {
+        margin: 18mm 16mm;
+    }
+}

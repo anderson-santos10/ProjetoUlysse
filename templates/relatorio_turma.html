@@ -1,0 +1,57 @@
+{% extends "layouts/staff.html" %}
+
+{% block title %}Relatório · {{ turma }} | ULYSSES{% endblock %}
+{% block area_label %}Relatório pedagógico{% endblock %}
+
+{% block page_header %}
+    {% include "components/page_header.html" with title=turma description="Relatório da turma com a mesma camada de métricas do dashboard." %}
+{% endblock %}
+
+{% block content %}
+    <p class="no-print muted">Imprima pelo navegador. PDF nativo não faz parte desta etapa.</p>
+    <div class="stat-grid">
+        <div class="stat-tile"><span>Professor</span><strong>{{ turma.professor_responsavel.get_username }}</strong></div>
+        <div class="stat-tile"><span>Período</span><strong>{{ periodo }}</strong></div>
+        <div class="stat-tile"><span>Alunos ativos</span><strong>{{ alunos_ativos }}</strong></div>
+        <div class="stat-tile"><span>Participantes</span><strong>{{ indicadores.participantes }}</strong></div>
+        <div class="stat-tile"><span>Avaliações (provas)</span><strong>{{ indicadores.provas }}</strong></div>
+        <div class="stat-tile"><span>Média</span><strong>{% if indicadores.media is not None %}{{ indicadores.media|floatformat:1 }}{% else %}—{% endif %}</strong></div>
+        <div class="stat-tile"><span>Acurácia</span><strong>{% if indicadores.taxa is not None %}{{ indicadores.taxa|floatformat:1 }}%{% else %}—{% endif %}</strong></div>
+        <div class="stat-tile"><span>Participação</span><strong>{% if alunos_ativos %}{{ indicadores.participantes }}/{{ alunos_ativos }}{% else %}—{% endif %}</strong></div>
+    </div>
+
+    {% if evolucao %}
+        <h2>Evolução</h2>
+        <table class="table">
+            <thead><tr><th>Dia</th><th>Provas</th><th>Média</th></tr></thead>
+            <tbody>
+                {% for item in evolucao %}
+                    <tr>
+                        <td>{{ item.dia|date:"d/m/Y" }}</td>
+                        <td>{{ item.provas }}</td>
+                        <td>{% if item.media is not None %}{{ item.media|floatformat:1 }}{% else %}—{% endif %}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    {% if revisar %}
+        <h2>Questões que merecem revisão pedagógica</h2>
+        <p class="muted">Acurácia abaixo de 40% com amostra mínima. Linguagem estatística, não afirma erro de gabarito.</p>
+        <ul>
+            {% for item in revisar %}
+                <li>Questão #{{ item.questao.numero }} · {{ item.taxa|floatformat:1 }}% ({{ item.tentativas }} tentativas)</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if questoes_dificeis %}
+        <h2>Questões com menor acurácia</h2>
+        <ul>
+            {% for item in questoes_dificeis %}
+                <li>Questão #{{ item.questao.numero }} · {{ item.taxa|floatformat:1 }}%</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}

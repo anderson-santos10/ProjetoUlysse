@@ -1,0 +1,202 @@
+{% extends "layouts/staff.html" %}
+
+{% block title %}Desempenho | ULYSSES{% endblock %}
+{% block area_label %}Área do Professor{% endblock %}
+
+{% block page_header %}
+    {% include "components/page_header.html" with title="Desempenho pedagógico" description="Indicadores calculados a partir dos resultados oficiais das tentativas. Não altera notas, XP ou o ranking público." %}
+{% endblock %}
+
+{% block content %}
+    {% include "components/desempenho_nav.html" %}
+    <form method="get" class="filter-form" role="search">
+        <div class="field">
+            <label for="periodo">Período</label>
+            <select class="input" id="periodo" name="periodo">
+                {% for codigo, nome in periodos %}
+                    <option value="{{ codigo }}" {% if periodo == codigo %}selected{% endif %}>{{ nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="field">
+            <label for="serie">Série</label>
+            <select class="input" id="serie" name="serie">
+                <option value="">Todas as séries</option>
+                {% for codigo, nome in series %}
+                    <option value="{{ codigo }}" {% if serie_filtro == codigo %}selected{% endif %}>{{ nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="field">
+            <label for="turma">Turma</label>
+            <select class="input" id="turma" name="turma">
+                <option value="">Todas as turmas</option>
+                {% for item in turmas %}
+                    <option value="{{ item.pk }}" {% if turma_filtro and turma_filtro.pk == item.pk %}selected{% endif %}>{{ item }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="field">
+            <label for="ordem">Ordenar séries</label>
+            <select class="input" id="ordem" name="ordem">
+                <option value="-media" {% if ordem == "-media" %}selected{% endif %}>Melhor média</option>
+                <option value="media" {% if ordem == "media" %}selected{% endif %}>Maior dificuldade (menor média)</option>
+                <option value="-taxa" {% if ordem == "-taxa" %}selected{% endif %}>Maior taxa de acertos</option>
+                <option value="taxa" {% if ordem == "taxa" %}selected{% endif %}>Menor taxa de acertos</option>
+                <option value="-provas" {% if ordem == "-provas" %}selected{% endif %}>Mais provas</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Aplicar filtros</button>
+        {% if request.GET %}
+            <a class="btn btn-ghost" href="{% url 'desempenho' %}">Limpar</a>
+        {% endif %}
+    </form>
+
+    {% if indicadores.tem_dados %}
+        <div class="stat-grid stat-grid--4">
+            <div class="stat-tile">
+                <span>Provas realizadas</span>
+                <strong>{{ indicadores.provas }}</strong>
+            </div>
+            <div class="stat-tile">
+                <span>Alunos participantes</span>
+                <strong>{{ indicadores.participantes }}</strong>
+            </div>
+            <div class="stat-tile">
+                <span>Média geral</span>
+                <strong>{{ indicadores.media|floatformat:1 }}</strong>
+            </div>
+            <div class="stat-tile">
+                <span>Taxa de acertos</span>
+                <strong>{% if indicadores.taxa is not None %}{{ indicadores.taxa|floatformat:1 }}%{% else %}—{% endif %}</strong>
+            </div>
+        </div>
+        <div class="stat-grid">
+            <div class="stat-tile">
+                <span>Acertos</span>
+                <strong>{{ indicadores.acertos }}</strong>
+            </div>
+            <div class="stat-tile">
+                <span>Erros</span>
+                <strong>{{ indicadores.erros }}</strong>
+            </div>
+            <div class="stat-tile">
+                <span>Questões respondidas</span>
+                <strong>{{ indicadores.questoes }}</strong>
+            </div>
+            <div class="stat-tile">
+                <span>XP no período</span>
+                <strong>{{ indicadores.xp }} XP</strong>
+            </div>
+        </div>
+    {% else %}
+        {% include "components/empty_state.html" with icon="bar-chart-3" title="Nenhum resultado encontrado para os filtros selecionados." description="Ajuste o período ou a série. Os filtros permanecem disponíveis acima." %}
+    {% endif %}
+
+    <h2>Desempenho por série</h2>
+    <div class="table-wrap">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Série</th>
+                    <th>Alunos</th>
+                    <th>Provas</th>
+                    <th>Média</th>
+                    <th>Acertos</th>
+                    <th>Taxa</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in series_desempenho %}
+                    <tr>
+                        <td>{{ item.nome }}</td>
+                        <td>{{ item.alunos }}</td>
+                        <td>{{ item.provas }}</td>
+                        <td>{% if item.media is not None %}{{ item.media|floatformat:1 }}{% else %}—{% endif %}</td>
+                        <td>{{ item.acertos }}</td>
+                        <td>{% if item.taxa is not None %}{{ item.taxa|floatformat:1 }}%{% else %}—{% endif %}</td>
+                        <td class="actions">
+                            <a class="btn btn-outline" href="{% url 'alunos:alunos_por_serie' item.codigo %}">Ver série</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <p class="muted mt-lg">Séries sem provas no período aparecem com traço, não com média zero.</p>
+
+    {% if turmas_desempenho %}
+        <h2>Desempenho por turma</h2>
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Turma</th>
+                        <th>Provas</th>
+                        <th>Participantes</th>
+                        <th>Média</th>
+                        <th>Acurácia</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in turmas_desempenho %}
+                        <tr>
+                            <td>{{ item.turma }}</td>
+                            <td>{{ item.provas }}</td>
+                            <td>{{ item.participantes }}</td>
+                            <td>{% if item.media is not None %}{{ item.media|floatformat:1 }}{% else %}—{% endif %}</td>
+                            <td>{% if item.taxa is not None %}{{ item.taxa|floatformat:1 }}%{% else %}—{% endif %}</td>
+                            <td class="actions">
+                                <a class="btn btn-outline" href="{% url 'relatorio_turma' item.turma.pk %}">Relatório</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+    {% if evolucao %}
+        <h2>Evolução da média (por dia)</h2>
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Dia</th>
+                        <th>Provas</th>
+                        <th>Média</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in evolucao %}
+                        <tr>
+                            <td>{{ item.dia|date:"d/m/Y" }}</td>
+                            <td>{{ item.provas }}</td>
+                            <td>{% if item.media is not None %}{{ item.media|floatformat:1 }}{% else %}—{% endif %}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+    {% if revisar %}
+        <h2>Questões que merecem revisão pedagógica</h2>
+        <p class="muted">Acurácia abaixo de 40% com amostra mínima. Isto não afirma que o gabarito está errado.</p>
+        <ul>
+            {% for item in revisar %}
+                <li>Questão #{{ item.questao.numero }} · {{ item.taxa|floatformat:1 }}% em {{ item.tentativas }} tentativas</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <p class="mt-lg no-print">
+        <a class="btn btn-outline" href="{% url 'questoes:resultados' %}{% if serie_filtro %}?serie={{ serie_filtro }}{% endif %}">Ver registros individuais</a>
+        {% if perms.questoes.view_relatorio_pedagogico %}
+            <a class="btn btn-outline" href="{% url 'relatorio_questoes' %}{% if turma_filtro %}?turma={{ turma_filtro.pk }}{% endif %}">Relatório de questões</a>
+        {% endif %}
+        <a class="btn btn-primary" href="{% url 'desempenho_questoes' %}{% if periodo %}?periodo={{ periodo }}{% endif %}{% if serie_filtro %}{% if periodo %}&{% else %}?{% endif %}serie={{ serie_filtro }}{% endif %}">Análise por questão</a>
+    </p>
+{% endblock %}

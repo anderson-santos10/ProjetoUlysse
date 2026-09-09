@@ -1,0 +1,131 @@
+{% extends "layouts/staff.html" %}
+
+{% block title %}Desempenho de {{ aluno.nome }} | ULYSSES{% endblock %}
+{% block area_label %}Área do Professor{% endblock %}
+
+{% block page_header %}
+    {% include "components/page_header.html" with title=aluno.nome description="Histórico oficial de tentativas deste aluno." %}
+{% endblock %}
+
+{% block content %}
+    <nav class="breadcrumb" aria-label="Trilha de navegação">
+        <a href="{% url 'desempenho' %}">Desempenho</a>
+        <span aria-hidden="true">/</span>
+        <a href="{% url 'alunos:lista_alunos' %}">Alunos</a>
+        <span>{{ aluno.nome }}</span>
+    </nav>
+    {% if perms.questoes.view_relatorio_pedagogico %}
+        <p class="no-print"><a class="btn btn-outline" href="{% url 'relatorio_aluno' aluno.pk %}">Relatório para impressão</a></p>
+    {% endif %}
+
+    <div class="stat-grid">
+        <div class="stat-tile">
+            <span>Série</span>
+            <strong>{{ aluno.get_serie_display }}</strong>
+        </div>
+        <div class="stat-tile">
+            <span>XP atual</span>
+            <strong>{{ aluno.xp|default:0 }}</strong>
+        </div>
+        <div class="stat-tile">
+            <span>RA</span>
+            <strong>{{ aluno.ra }}</strong>
+        </div>
+    </div>
+
+    {% if indicadores.tem_dados %}
+        <div class="stat-grid stat-grid--4">
+            <div class="stat-tile">
+                <span>Provas realizadas</span>
+                <strong>{{ indicadores.provas }}</strong>
+            </div>
+            <div class="stat-tile">
+                <span>Média</span>
+                <strong>{{ indicadores.media|floatformat:1 }}</strong>
+            </div>
+            <div class="stat-tile">
+                <span>Taxa de acertos</span>
+                <strong>{% if indicadores.taxa is not None %}{{ indicadores.taxa|floatformat:1 }}%{% else %}—{% endif %}</strong>
+            </div>
+            <div class="stat-tile">
+                <span>Acertos / erros</span>
+                <strong>{{ indicadores.acertos }} / {{ indicadores.erros }}</strong>
+            </div>
+        </div>
+
+        {% if evolucao %}
+            <h2>Evolução das notas</h2>
+            <p class="muted">Últimas tentativas, da mais antiga para a mais recente. A tabela abaixo tem os valores oficiais.</p>
+            <ol class="evo-list">
+                {% for item in evolucao %}
+                    <li>
+                        <span class="muted">{{ item.data|date:"d/m" }}</span>
+                        <div class="evo-track" role="img" aria-label="Nota {{ item.nota }}">
+                            <div class="evo-fill" style="width: {{ item.barra_pct }}%;"></div>
+                        </div>
+                        <strong>{{ item.nota|floatformat:1 }}</strong>
+                    </li>
+                {% endfor %}
+            </ol>
+        {% endif %}
+
+        <h2>Histórico</h2>
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Nota</th>
+                        <th>Acertos</th>
+                        <th>Erros</th>
+                        <th>XP</th>
+                        <th>Tempo</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in historico %}
+                        <tr>
+                            <td>{{ item.data|date:"d/m/Y H:i" }}</td>
+                            <td>{{ item.nota }}</td>
+                            <td>{{ item.acertos }}</td>
+                            <td>{{ item.erros }}</td>
+                            <td>{{ item.xp_ganho }}</td>
+                            <td>{{ item.tempo_formatado }}</td>
+                            <td class="actions">
+                                <a class="btn btn-outline" href="{% url 'questoes:resultado_detalhe' item.pk %}">Ver</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="7">
+                                {% with respostas=item.respostas_questoes.all %}
+                                    {% if respostas %}
+                                        <p class="muted">Desempenho por questão nesta prova</p>
+                                        <ul class="answer-list">
+                                            {% for resp in respostas %}
+                                                <li>
+                                                    Questão {% if resp.questao_versao %}{{ resp.questao_versao.numero }}{% else %}{{ resp.questao.numero }}{% endif %}
+                                                    {% if resp.questao_versao %}(versão {{ resp.questao_versao.versao }}, {{ resp.questao_versao.get_dificuldade_display }}){% endif %}
+                                                    {% if resp.correta %}
+                                                        Acertou
+                                                    {% else %}
+                                                        Errou{% if not resp.resposta %} (em branco){% endif %}
+                                                    {% endif %}
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <p class="muted">Este resultado foi registrado antes da coleta detalhada por questão.</p>
+                                    {% endif %}
+                                {% endwith %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% include "components/pagination.html" %}
+    {% else %}
+        {% include "components/empty_state.html" with icon="bar-chart-3" title="Ainda não há resultados para este aluno." description="A média não é exibida como zero. Os indicadores aparecerão após a primeira tentativa." %}
+    {% endif %}
+{% endblock %}
