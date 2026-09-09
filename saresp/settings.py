@@ -35,7 +35,8 @@ def _load_local_env_file(path):
         return
     if not path.is_file():
         return
-    for raw_line in path.read_text(encoding="utf-8").splitlines():
+    # utf-8-sig descarta BOM do Bloco de Notas; não substitui variáveis já definidas.
+    for raw_line in path.read_text(encoding="utf-8-sig").splitlines():
         line = raw_line.strip()
         if not line or line.startswith("#") or "=" not in line:
             continue
