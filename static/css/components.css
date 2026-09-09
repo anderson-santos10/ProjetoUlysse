@@ -163,7 +163,7 @@ textarea.input:focus-visible,
 .auth-card .card-login-header,
 .auth-header {
     text-align: center;
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-md);
 }
 
 .auth-icon {
@@ -258,7 +258,8 @@ textarea.form-control {
 .card--action {
     display: flex;
     align-items: center;
-    gap: var(--space-md);
+    gap: var(--space-12);
+    padding: var(--space-md);
     text-decoration: none;
     color: inherit;
 }
@@ -289,7 +290,7 @@ textarea.form-control {
 .card-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-md);
+    gap: var(--space-12);
 }
 
 .table-wrap {
@@ -307,7 +308,7 @@ textarea.form-control {
 .table th,
 .table td {
     text-align: left;
-    padding: var(--space-12) var(--space-md);
+    padding: var(--space-sm) var(--space-12);
     border-bottom: 1px solid var(--color-border);
     font-size: var(--text-small);
 }
@@ -416,7 +417,7 @@ textarea.form-control {
 
 .empty-state {
     text-align: center;
-    padding: var(--space-2xl) var(--space-lg);
+    padding: var(--space-lg) var(--space-md);
     color: var(--color-text-muted);
 }
 
@@ -482,13 +483,14 @@ input[type="radio"] {
     background: var(--color-bg);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
-    padding: var(--space-md);
+    padding: var(--space-sm) var(--space-12);
     text-align: center;
 }
 
 .stat-tile strong {
     display: block;
-    font-size: var(--text-h2);
+    font-size: var(--text-h3);
+    line-height: var(--leading-tight);
 }
 
 .stat-tile span {

@@ -1,8 +1,8 @@
 .stat-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-md);
-    margin-bottom: var(--space-lg);
+    gap: var(--space-12);
+    margin-bottom: var(--space-md);
 }
 
 .toolbar {
@@ -11,7 +11,7 @@
     gap: var(--space-sm);
     justify-content: space-between;
     align-items: flex-end;
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-md);
 }
 
 .filter-form {
@@ -20,7 +20,7 @@
     gap: var(--space-sm);
     align-items: flex-end;
     width: 100%;
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-md);
 }
 
 .filter-form .field {
@@ -76,7 +76,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-sm);
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-md);
 }
 
 .enunciado-resumo {
